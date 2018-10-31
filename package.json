@@ -1,0 +1,55 @@
+{
+  "name": "decompanyio-front-end",
+  "version": "1.0.0",
+  "description": "## Truffle > npm install -g truffle",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "async": "^2.6.1",
+    "bip39": "^2.5.0",
+    "bitcoin-core": "^2.0.0",
+    "bs58check": "^2.1.2",
+    "cipher-ethereum": "0.0.3",
+    "create-hash": "^1.2.0",
+    "ecdsa": "^0.7.0",
+    "elliptic": "^6.4.1",
+    "eth-block-tracker": "^4.1.0",
+    "eth-sig-util": "^2.1.0",
+    "eth-utils": "0.1.0-alpha.9",
+    "ethereumjs-util": "^6.0.0",
+    "inherits": "^2.0.3",
+    "json-rpc-random-id": "^1.0.1",
+    "keccak": "^1.4.0",
+    "keccakjs": "^0.2.1",
+    "lodash": "^4.17.11",
+    "openzeppelin-solidity": "1.12.0",
+    "randombytes": "^2.0.6",
+    "rng": "^0.2.2",
+    "rng.js": "^1.0.2",
+    "secp256k1": "^1.1.4",
+    "sha3": "^1.2.2",
+    "strip-hex-prefix": "^1.0.0",
+    "truffle": "^4.1.14",
+    "truffle-hdwallet-provider": "0.0.6",
+    "uuid": "^3.3.2",
+    "web3": "^1.0.0-beta.36",
+    "web3-provider-engine": "^14.1.0",
+    "xtend": "^4.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decompanyio/decompanyio-front-end.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/decompanyio/decompanyio-front-end/issues"
+  },
+  "homepage": "https://github.com/decompanyio/decompanyio-front-end#readme"
+}
