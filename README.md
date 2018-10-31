@@ -1,35 +1,33 @@
-# blue-bottle
+# decompany.io
+- The decentralized and incentivized knowledge trading system
 
-## Truffle
-> npm install -g truffle
+# Smart Contracts
+- Deck.sol: EIP20 Token. mintable
+- DocumentReg.sol: the document registry. reward pool. stores daily page view for each document
+- AuthorPool.sol: the reward engine for authors. stores user to document mappings
+- CuratorPool.sol: the reward engine for curators. stores voting data
+- Utility.sol: a library contract with useful functions
 
-## Ganache-CLI
-> npm install -g ganache-cli
+# Developer Guide
+## Install Truffle
+- npm install -g truffle
 
-## Create-React-App
-> npm install -g create-react-app
+## Install Ganache-CLI
+- npm install -g ganache-cli
 
 ## Running Ganache
-> ganache-cli -b 3
+- ganache-cli -b 3
 
-## SmartContract Compile
-> npm init
-> npm install
-> npm install truffle
-> npm install truffle-hdwallet-provider
-> npm install -E openzeppelin-solidity@1.12.0
-> truffle compile
+## Build Environment Set up
+- npm init
+- npm install
+- npm install truffle
+- npm install truffle-hdwallet-provider
+- npm install -E openzeppelin-solidity@1.12.0
+- truffle compile
 
-## SmartContract Migrate
-> truffle migrate
+## Migrate contracts to local dev network
+- truffle migrate
 
-## Choose Network
-> truffle migrate --network rinkeby
-
-## install openzeppelin
-> cd client
-> npm install -E openzeppelin-solidity@1.12.0
-
-## nodejs start
->> cd client
-npm start
+## Migrate contracts to Rinkeby Network
+- truffle migrate --network rinkeby
