@@ -2,3 +2,6 @@
 * text=auto
 *.sol linguist-language=Solidity
 *.or-any-other-extension-you-like linguist-language=Solidity
+migrations/* linguist-vendored
+build/* linguist-vendored
+test/* linguist-vendored
