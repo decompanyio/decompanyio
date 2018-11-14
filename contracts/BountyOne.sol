@@ -15,7 +15,7 @@ contract BountyOne is Ownable {
   address[] public claimed;
 
   function init(address _token, uint256 _provision) public
-    //onlyOwner()
+    onlyOwner()
   {
     require(_token != 0 && address(token) == 0);
     require(_provision != 0 && provision == 0);
