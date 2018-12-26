@@ -1,11 +1,3 @@
-/*
-   Diesel Price Peg
-
-   This contract keeps in storage a reference
-   to the Diesel Price in USD
-*/
-
-
 pragma solidity ^0.4.0;
 import "./OraclizeAPI.sol";
 
