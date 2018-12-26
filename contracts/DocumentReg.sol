@@ -45,10 +45,12 @@ contract DocumentReg is Ownable {
   uint public createTime;
   address private foundation;
 
+  constructor() payable public {
+  }
+
   // --------------------------------------------
   // Initialize the Document Registry Contract
   // --------------------------------------------
-
   function init(address _token, address _author, address _curator, address _utility) public
     onlyOwner()
   {

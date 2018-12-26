@@ -70,8 +70,8 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     const totalSupply = new web3.BigNumber('10000000000000000000000000000');
     const rewardPool = new web3.BigNumber('200000000000000000000000000');
 
-    await _deck.issue(accounts[0], totalSupply, { from: accounts[0] });
-    await _deck.release({ from: accounts[0] });
+    await _deck.mint(accounts[0], totalSupply, { from: accounts[0] });
+    //await _deck.release({ from: accounts[0] });
 
     await _deck.transfer(accounts[1], '300000000000000000000000', { from: accounts[0] });
     await _deck.transfer(accounts[2], '200000000000000000000000', { from: accounts[0] });
@@ -158,11 +158,6 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     //console.log('deposit_A3_D1 : ' + deposit_A3_D1);
     assert.equal(VOTE_A3_D1, deposit_A3_D1);
 
-/*
-    const deposit_A3_D1 = (await _documentReg.getCuratorDepositOnUserDocument(accounts[3], DOC1, DAYS_5)) * 1;
-    //console.log('deposit_A3_D1 : ' + deposit_A3_D1);
-    assert.equal(VOTE_A3_D1, deposit_A3_D1);
-*/
     const deposit_A3_D2 = (await _documentReg.getCuratorDepositOnUserDocument(accounts[3], DOC2, DAYS_1)) * 1;
     //console.log('deposit_A3_D2 : ' + deposit_A3_D2);
     assert.equal(VOTE_A3_D2, deposit_A3_D2);
@@ -174,11 +169,7 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     const deposit_A4_D4 = (await _documentReg.getCuratorDepositOnUserDocument(accounts[4], DOC4, DAYS_2)) * 1;
     //console.log('deposit_A4_D4 : ' + deposit_A4_D4);
     assert.equal(VOTE_A4_D4, deposit_A4_D4);
-/*
-    const deposit_A4_D4 = (await _documentReg.getCuratorDepositOnUserDocument(accounts[4], DOC4, DAYS_4)) * 1;
-    //console.log('deposit_A4_D4 : ' + deposit_A4_D4);
-    assert.equal(VOTE_A4_D4, deposit_A4_D4);
-*/
+
     const deposit_A4_D3 = (await _documentReg.getCuratorDepositOnUserDocument(accounts[4], DOC3, DAYS_0)) * 1;
     //console.log('deposit_A4_D3 : ' + deposit_A4_D3);
     assert.equal(VOTE_A4_D3, deposit_A4_D3);

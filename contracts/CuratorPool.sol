@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import "./Deck.sol";
 import "./Utility.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract CuratorPool is Ownable {
 

@@ -68,8 +68,8 @@ contract("DocumentReg - determine & claim author reward", accounts => {
     const totalSupply = new web3.BigNumber('10000000000000000000000000000');
     const rewardPool = new web3.BigNumber('200000000000000000000000000');
 
-    await _deck.issue(accounts[0], totalSupply, { from: accounts[0] });
-    await _deck.release({ from: accounts[0] });
+    await _deck.mint(accounts[0], totalSupply, { from: accounts[0] });
+    //await _deck.release({ from: accounts[0] });
 
     await _deck.transfer(accounts[1], '300000000000000000000000', { from: accounts[0] });
     await _deck.transfer(accounts[2], '200000000000000000000000', { from: accounts[0] });

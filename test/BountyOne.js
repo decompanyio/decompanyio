@@ -17,8 +17,8 @@ contract("BountyOne", accounts => {
     // - TOTAL SUPPLY (ACCOUNT[0]) : 100,000,000 DECK
     // - BOUNTY POOL (ACCOUNT[0]) : 50,000,000 DECK
 
-    await _deck.issue(accounts[0], new web3.BigNumber('100000000000000000000000000'), { from: accounts[0] });
-    await _deck.release({ from: accounts[0] });
+    await _deck.mint(accounts[0], new web3.BigNumber('100000000000000000000000000'), { from: accounts[0] });
+    //await _deck.finishMinting({ from: accounts[0] });
     await _deck.transfer(_bountyOne.address, new web3.BigNumber('50000000000000000000000000'), { from: accounts[0] });
     const balance_bounty_S1 = web3.fromWei(await _deck.balanceOf(_bountyOne.address), "ether");
     assert.equal(50000000, balance_bounty_S1 * 1);
@@ -37,21 +37,27 @@ contract("BountyOne", accounts => {
   });
 
   it("claim bounty", async () => {
-    const balance_A2_S1 = web3.fromWei(await _deck.balanceOf(accounts[2]), "ether") * 1;
+    const available_A2_S1 = web3.fromWei(await _bountyOne.available({ from: accounts[2] }), "ether");
+    assert.equal(5000, available_A2_S1 * 1, "wrong amount of available token");
+    const balance_A2_S2 = web3.fromWei(await _deck.balanceOf(accounts[2]), "ether") * 1;
+    // TEST
     await _bountyOne.claim({ from: accounts[2] });
-
-    const balance_A2_S2 = web3.fromWei(await _deck.balanceOf(accounts[2], { from: accounts[0] }), "ether") * 1;
-    assert.equal(5000, balance_A2_S2 - balance_A2_S1, "wrong amount of bounty claimed");
+    const balance_A2_S3 = web3.fromWei(await _deck.balanceOf(accounts[2]), "ether") * 1;
+    assert.equal(5000, balance_A2_S3 - balance_A2_S2, "wrong amount of bounty claimed");
   });
 
   it("count claimed users", async () => {
+    const available_A3_S1 = web3.fromWei(await _bountyOne.available({ from: accounts[3] }), "ether");
+    assert.equal(5000, available_A3_S1 * 1, "wrong amount of available token");
     const count_S1 = await _bountyOne.count({ from: accounts[0] });
     assert.equal(1, count_S1, "wrong initial number of claimed users");
-
+    const balance_A3_S2 = web3.fromWei(await _deck.balanceOf(accounts[3]), "ether") * 1;
+    // TEST
     await _bountyOne.claim({ from: accounts[3] });
-
+    const balance_A3_S3 = web3.fromWei(await _deck.balanceOf(accounts[3]), "ether") * 1;
+    assert.equal(5000, balance_A3_S3 - balance_A3_S2, "wrong amount of bounty claimed");
     const count_S2 = await _bountyOne.count({ from: accounts[0] });
-    assert.equal(2, count_S2, "wrong number of claimed users");
+    assert.equal(count_S1*1 + 1, count_S2*1, "wrong number of claimed users");
   });
 
   it("get claimed users", async () => {

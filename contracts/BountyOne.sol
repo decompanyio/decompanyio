@@ -44,10 +44,9 @@ contract BountyOne is Ownable {
     require(address(msg.sender) != 0);
     require(map[msg.sender] == 0);
 
-    if (token.transfer(msg.sender, provision)) {
-      map[msg.sender] = provision;
-      claimed.push(msg.sender);
-      emit _ClaimBountyOne(msg.sender, provision);
-    }
+    token.transfer(msg.sender, provision);
+    map[msg.sender] = provision;
+    claimed.push(msg.sender);
+    emit _ClaimBountyOne(msg.sender, provision);
   }
 }

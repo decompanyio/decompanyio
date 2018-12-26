@@ -24,7 +24,7 @@
     "keccak": "^1.4.0",
     "keccakjs": "^0.2.1",
     "lodash": "^4.17.11",
-    "openzeppelin-solidity": "1.12.0",
+    "openzeppelin-solidity": "^2.0.0",
     "randombytes": "^2.0.6",
     "rng": "^0.2.2",
     "rng.js": "^1.0.2",

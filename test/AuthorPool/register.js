@@ -7,15 +7,18 @@ contract("AuthorPool", accounts => {
   it("should be initialized", async () => {
 
     // prepare
-    const deck = await Deck.deployed();
-    const utility = await Utility.deployed();
-    const authorPool = await AuthorPool.deployed();
+    objects = await Promise.all([
+      Deck.deployed(),
+      Utility.deployed(),
+      AuthorPool.deployed(),
+    ]);
 
-    var _token = deck.address;
-    var _utility = utility.address;
+    const deck = objects[0];
+    const utility = objects[1];
+    const authorPool = objects[2];
 
     // logic
-    await authorPool.init(_token, _utility, { from: accounts[0] });
+    await authorPool.init(deck.address, utility.address, { from: accounts[0] });
 
     // assert
     const b = await authorPool.createTime.call();
