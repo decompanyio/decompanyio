@@ -3,6 +3,7 @@ const Utility = artifacts.require("./Utility.sol");
 const DocumentReg = artifacts.require("./DocumentReg.sol");
 const AuthorPool = artifacts.require("./AuthorPool.sol");
 const CuratorPool = artifacts.require("./CuratorPool.sol");
+const VoteMap = artifacts.require("./VoteMap.sol");
 
 contract("DocumentReg - estimate, determine & claim curator rewards", accounts => {
 
@@ -33,15 +34,18 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     _authorPool = await AuthorPool.deployed();
     _curatorPool = await CuratorPool.deployed();
     _documentReg = await DocumentReg.deployed();
+    _voteMap = await VoteMap.deployed();
 
     await _authorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
     await _curatorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
+    await _voteMap.transferOwnership(_documentReg.address, { from: accounts[0] });
 
     await _documentReg.init (
       _deck.address,
       _authorPool.address,
       _curatorPool.address,
       _utility.address,
+      _voteMap.address,
       { from: accounts[0] }
     );
 
@@ -153,6 +157,8 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     await _documentReg.updateVoteOnDocument(accounts[4], DOC1, VOTE_A4_D1, DAYS_3, { from: accounts[0] });
     await _documentReg.updateVoteOnDocument(accounts[4], DOC4, VOTE_A4_D4, DAYS_2, { from: accounts[0] });
     await _documentReg.updateVoteOnDocument(accounts[4], DOC3, VOTE_A4_D3, DAYS_0, { from: accounts[0] });
+
+    //console.log('done vote updating');
 
     const deposit_A3_D1 = (await _documentReg.getCuratorDepositOnUserDocument(accounts[3], DOC1, DAYS_2)) * 1;
     //console.log('deposit_A3_D1 : ' + deposit_A3_D1);

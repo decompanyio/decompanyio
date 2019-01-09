@@ -4,6 +4,7 @@ import "./Deck.sol";
 import "./Utility.sol";
 import "./AuthorPool.sol";
 import "./CuratorPool.sol";
+import "./VoteMap.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract DocumentReg is Ownable {
@@ -40,6 +41,7 @@ contract DocumentReg is Ownable {
   Utility private util;
   AuthorPool private authorPool;
   CuratorPool private curatorPool;
+  VoteMap private voteMap;
 
   // public variables
   uint public createTime;
@@ -51,7 +53,7 @@ contract DocumentReg is Ownable {
   // --------------------------------------------
   // Initialize the Document Registry Contract
   // --------------------------------------------
-  function init(address _token, address _author, address _curator, address _utility) public
+  function init(address _token, address _author, address _curator, address _utility, address _voteMap) public
     onlyOwner()
   {
 
@@ -59,6 +61,7 @@ contract DocumentReg is Ownable {
     require(_author != 0 && address(authorPool) == 0);
     require(_curator != 0 && address(curatorPool) == 0);
     require(_utility != 0 && address(util) == 0);
+    //require(_voteMap != 0 && address(voteMap) == 0);
 
     token = Deck(_token);
     util = Utility(_utility);
@@ -66,13 +69,17 @@ contract DocumentReg is Ownable {
     // first set foundation as contract owner
     foundation = msg.sender;
 
+    voteMap = VoteMap(_voteMap);
+    voteMap.init(util);
+    voteMap.transferOwnership(_curator);
+
     // init author pool
     authorPool = AuthorPool(_author);
     authorPool.init(token, util);
 
     // init curator pool
     curatorPool = CuratorPool(_curator);
-    curatorPool.init(token, util);
+    curatorPool.init(token, util, voteMap);
 
     createTime = util.getTimeMillis();
     emit _InitializeDocumentReg(createTime, _token);

@@ -3,6 +3,7 @@ const Utility = artifacts.require("./Utility.sol");
 const DocumentReg = artifacts.require("./DocumentReg.sol");
 const AuthorPool = artifacts.require("./AuthorPool.sol");
 const CuratorPool = artifacts.require("./CuratorPool.sol");
+const VoteMap = artifacts.require("./VoteMap.sol");
 
 contract("DocumentReg - confirm page view & total page view", accounts => {
 
@@ -33,15 +34,18 @@ contract("DocumentReg - confirm page view & total page view", accounts => {
     _authorPool = await AuthorPool.deployed();
     _curatorPool = await CuratorPool.deployed();
     _documentReg = await DocumentReg.deployed();
+    _voteMap = await VoteMap.deployed();
 
     await _authorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
     await _curatorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
+    await _voteMap.transferOwnership(_documentReg.address, { from: accounts[0] });
 
     await _documentReg.init (
       _deck.address,
       _authorPool.address,
       _curatorPool.address,
       _utility.address,
+      _voteMap.address,
       { from: accounts[0] }
     );
 
