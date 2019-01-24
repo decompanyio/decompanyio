@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./Utility.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract VoteMap is Ownable {
+contract Ballot is Ownable {
 
   event Initialize(uint256 createTime, address util);
   event CreateVote(uint256 voteId, address addr, bytes32 docId, uint256 dateMillis, uint256 deposit);
@@ -46,55 +46,39 @@ contract VoteMap is Ownable {
   }
 
   // adding a new vote
-  function create(uint256 voteId, address addr, bytes32 docId, uint256 deposit) public
+  function create(uint256 i, address addr, bytes32 docId, uint256 deposit) public
     onlyOwner()
   {
-    insert(voteId, addr, docId, deposit, _util.getDateMillis());
+    insert(i, addr, docId, deposit, _util.getDateMillis());
   }
 
   // adding a new vote
-  function insert(uint256 voteId, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) public
+  function insert(uint256 i, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) public
     onlyOwner()
   {
-    require(voteId == _length + 1);
+    require(i == _length + 1);
 
     Vote memory vote = Vote(addr, docId, dateMillis, deposit, 0);
-    _mapById[voteId] = vote;
+    _mapById[i] = vote;
     _length++;
 
-    emit CreateVote(voteId, addr, docId, dateMillis, deposit);
+    emit CreateVote(i, addr, docId, dateMillis, deposit);
   }
 
-  function claim(uint256 voteId, uint256 amount) public
+  function claim(uint256 i, uint256 amount) public
     onlyOwner()
   {
     require(amount != 0);
-    require(address(_mapById[voteId].addr) != 0);
-    require(uint256(_mapById[voteId].deposit) != 0);
-    require(uint256(_mapById[voteId].claimed) == 0);
+    require(address(_mapById[i].addr) != 0);
+    require(uint256(_mapById[i].deposit) != 0);
+    require(uint256(_mapById[i].claimed) == 0);
 
-    _mapById[voteId].claimed = amount;
+    _mapById[i].claimed = amount;
 
-    emit ClaimVote(voteId, amount);
+    emit ClaimVote(i, amount);
   }
 
-  function getVoteAddress(uint256 voteId) public view returns (address) {
-    return _mapById[voteId].addr;
-  }
-
-  function getVoteDocId(uint256 voteId) public view returns (bytes32) {
-    return _mapById[voteId].docId;
-  }
-
-  function getVoteStartDate(uint256 voteId) public view returns (uint256) {
-    return _mapById[voteId].startDate;
-  }
-
-  function getVoteDeposit(uint256 voteId) public view returns (uint256) {
-    return _mapById[voteId].deposit;
-  }
-
-  function getVoteClaimed(uint256 voteId) public view returns (uint256) {
-    return _mapById[voteId].claimed;
+  function getVote(uint256 i) public view returns (address, bytes32, uint256, uint256, uint256) {
+    return (_mapById[i].addr, _mapById[i].docId, _mapById[i].startDate, _mapById[i].deposit, _mapById[i].claimed);
   }
 }

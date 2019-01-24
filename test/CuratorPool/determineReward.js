@@ -1,7 +1,6 @@
-const Deck = artifacts.require("./Deck.sol");
 const Utility = artifacts.require("./Utility.sol");
 const CuratorPool = artifacts.require("./CuratorPool.sol");
-const VoteMap = artifacts.require("./VoteMap.sol");
+const Ballot = artifacts.require("./Ballot.sol");
 
 contract("CuratorPool", accounts => {
 
@@ -11,18 +10,16 @@ contract("CuratorPool", accounts => {
     const pv = 123;
     const pvts = 123 ** 2;
 
-    const deck = await Deck.deployed();
     const utility = await Utility.deployed();
     const curatorPool = await CuratorPool.deployed();
-    const voteMap = await VoteMap.deployed();
+    const ballot = await Ballot.deployed();
 
-    var _token = deck.address;
     var _utility = utility.address;
-    var _voteMap = voteMap.address;
+    var _ballot = ballot.address;
 
-    await voteMap.init(_utility, { from: accounts[0] });
-    await curatorPool.init(_token, _utility, _voteMap, { from: accounts[0] });
-    await voteMap.transferOwnership(curatorPool.address, { from: accounts[0] });
+    await ballot.init(_utility, { from: accounts[0] });
+    await curatorPool.init(_utility, _ballot, { from: accounts[0] });
+    await ballot.transferOwnership(curatorPool.address, { from: accounts[0] });
 
     // logic
     const c1 = await curatorPool.getVoteCountByAddr(accounts[1]);
@@ -51,7 +48,6 @@ contract("CuratorPool", accounts => {
     const pv2 = 234;
     const pvts = 234 ** 2 + 123 ** 2;;
 
-    const deck = await Deck.deployed();
     const utility = await Utility.deployed();
     const curatorPool = await CuratorPool.deployed();
 

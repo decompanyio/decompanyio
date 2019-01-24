@@ -4,7 +4,8 @@ const AuthorPool = artifacts.require("AuthorPool");
 const CuratorPool = artifacts.require("CuratorPool");
 const DocumentReg = artifacts.require("DocumentReg");
 //const ViewCount = artifacts.require("ViewCount");
-const VoteMap = artifacts.require("VoteMap");
+const DocumentRegistry = artifacts.require("DocumentRegistry");
+const Ballot = artifacts.require("Ballot");
 
 module.exports = async function(deployer, network, accounts) {
 
@@ -12,7 +13,8 @@ module.exports = async function(deployer, network, accounts) {
 
   await Promise.all([
     // Contracts
-    deployer.deploy(VoteMap),
+    deployer.deploy(Ballot),
+    deployer.deploy(DocumentRegistry),
     deployer.deploy(AuthorPool),
     deployer.deploy(CuratorPool),
     //deployer.deploy(ViewCount, { from: accounts[9], gas:6721975, value: 500000000000000000 }),

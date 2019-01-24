@@ -1,4 +1,3 @@
-const Deck = artifacts.require("./Deck.sol");
 const Utility = artifacts.require("./Utility.sol");
 const AuthorPool = artifacts.require("./AuthorPool.sol");
 
@@ -8,17 +7,15 @@ contract("AuthorPool", accounts => {
 
     // prepare
     objects = await Promise.all([
-      Deck.deployed(),
       Utility.deployed(),
-      AuthorPool.deployed(),
+      AuthorPool.deployed()
     ]);
 
-    const deck = objects[0];
-    const utility = objects[1];
-    const authorPool = objects[2];
+    const utility = objects[0];
+    const authorPool = objects[1];
 
     // logic
-    await authorPool.init(deck.address, utility.address, { from: accounts[0] });
+    await authorPool.init(utility.address, { from: accounts[0] });
 
     // assert
     const b = await authorPool.createTime.call();
