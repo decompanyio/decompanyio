@@ -5,6 +5,7 @@ import "./Utility.sol";
 import "./AuthorPool.sol";
 import "./CuratorPool.sol";
 import "./Ballot.sol";
+import "./DocumentRegistry.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract DocumentReg is Ownable {
@@ -42,6 +43,7 @@ contract DocumentReg is Ownable {
   AuthorPool private authorPool;
   CuratorPool private curatorPool;
   Ballot private ballot;
+  DocumentRegistry private documentRegistry;
 
   // public variables
   uint public createTime;
@@ -53,7 +55,7 @@ contract DocumentReg is Ownable {
   // --------------------------------------------
   // Initialize the Document Registry Contract
   // --------------------------------------------
-  function init(address _token, address _author, address _curator, address _utility, address _ballot) public
+  function init(address _token, address _author, address _curator, address _utility, address _ballot, address _documentRegistry) public
     onlyOwner()
   {
 
@@ -73,9 +75,13 @@ contract DocumentReg is Ownable {
     ballot.init(util);
     ballot.transferOwnership(_curator);
 
+    documentRegistry = DocumentRegistry(_documentRegistry);
+    documentRegistry.init(util);
+    documentRegistry.transferOwnership(_author);
+
     // init author pool
     authorPool = AuthorPool(_author);
-    authorPool.init(util);
+    authorPool.init(documentRegistry, util);
 
     // init curator pool
     curatorPool = CuratorPool(_curator);
@@ -199,16 +205,15 @@ contract DocumentReg is Ownable {
 
     require(_addr != 0);
     require(authorPool.createTime() != 0);
-    int idx = authorPool.getUserDocumentIndex(_addr, _docId);
-    if (idx < 0) {
+    if (authorPool.containsUserDocument(_addr, _docId) == false) {
       return uint(0);
     }
 
     uint sumReward = 0;
-    uint claimDate = authorPool.getUserDocumentLastClaimedDate(_addr, uint(idx));
+    uint claimDate = authorPool.getUserDocumentLastClaimedDate(_docId);
     while (claimDate < util.getDateMillis()) {
       if (claimDate == 0) {
-        claimDate = authorPool.getUserDocumentListedDate(_addr, uint(idx));
+        claimDate = authorPool.getUserDocumentListedDate(_docId);
       }
       //assert(claimDate <= util.getDateMillis());
       uint tpv = getTotalPageView(claimDate);
@@ -233,20 +238,19 @@ contract DocumentReg is Ownable {
   function claimAuthorReward(bytes32 _docId) public {
     require(msg.sender != 0);
     require(authorPool.createTime() != 0);
-    int idx = authorPool.getUserDocumentIndex(msg.sender, _docId);
-    if (idx < 0) {
+
+    if (authorPool.containsUserDocument(msg.sender, _docId) == false) {
       return;
     }
 
-    emit _ClaimAuthorReward(_docId, uint(idx), msg.sender);
-    uint claimDate = authorPool.getUserDocumentLastClaimedDate(msg.sender, uint(idx));
-    emit _ClaimAuthorReward(_docId, claimDate, msg.sender);
+    uint claimDate = authorPool.getUserDocumentLastClaimedDate(_docId);
+    //emit _ClaimAuthorReward(_docId, claimDate, msg.sender);
     uint dateMillis = util.getDateMillis();
 
     uint sumReward = 0;
     while (claimDate < dateMillis) {
       if (claimDate == 0) {
-        claimDate = authorPool.getUserDocumentListedDate(msg.sender, uint(idx));
+        claimDate = authorPool.getUserDocumentListedDate(_docId);
       }
       assert(claimDate <= dateMillis);
 
@@ -260,7 +264,7 @@ contract DocumentReg is Ownable {
     }
 
     token.transfer(msg.sender, sumReward);
-    authorPool.withdraw(msg.sender, uint(idx), sumReward, claimDate);
+    authorPool.withdraw(msg.sender, _docId, sumReward, claimDate);
 
     emit _ClaimAuthorReward(_docId, sumReward, msg.sender);
   }
@@ -517,7 +521,7 @@ contract DocumentReg is Ownable {
   // _addr : the EOA of the curator
   // _docId : target document id
   function getAuthorWithdrawOnUserDocument(address _addr, bytes32 _docId) public view returns (uint) {
-    return authorPool.getUserDocumentWithdraw(_addr, _docId);
+    return authorPool.getUserDocumentWithdraw(_docId);
   }
 
   // Get a author's amount of estimated reward on the document
@@ -540,13 +544,12 @@ contract DocumentReg is Ownable {
   // _dateMillis : find the amount of estimated reward based on this date in milliseconds (eg. YYYY-MM-dd 00:00:00.000)
   function getAuthor3DayRewardOnDocument(address _addr, bytes32 _docId, uint _dateMillis) public view returns (uint) {
 
-    int idx = authorPool.getUserDocumentIndex(_addr, _docId);
-    if (idx < 0) {
+    if (authorPool.containsUserDocument(_addr, _docId) == false) {
       return uint(0);
     }
 
     uint sumReward = 0;
-    uint nextDate = authorPool.getUserDocumentListedDate(_addr, uint(idx));
+    uint nextDate = authorPool.getUserDocumentListedDate(_docId);
     uint endDate = util.getDateMillis();
 
     // when _dateMillis == 0, from listed date to today

@@ -66,11 +66,26 @@ contract("DocumentRegistry", accounts => {
     assert.equal(1, DOC_COUNT_S1*1, "the doc map is still empty");
 
     const doc1 = await _documentRegistry.getDocument(DOC1, 0);
-    console.log("doc1 : " + doc1);
+    //console.log("doc1 : " + doc1);
     assert.equal(accounts[0], doc1[0], "wrong address");
-    assert.isBelow(0, doc1[1]*1, "wrong doc id");
-    assert.equal(0, doc1[2]*1, "wrong page view");
+    assert.isBelow(0, doc1[1]*1, "wrong createTime");
+    assert.equal(0, doc1[2]*1, "wrong unlistedDate");
+    assert.equal(0, doc1[3]*1, "wrong lastClaimedDate");
+    assert.equal(0, doc1[4]*1, "wrong withdraw");
+    assert.equal(0, doc1[5]*1, "wrong page view");
   });
+
+  // 쓰기
+  // 1. 신규 문서를 등록하기 (본인만 가능)
+  // 2. 특정 문서를 등록헤제하기 (본인만 가능)
+  // 3. 일자 별 정산된 보상액 기록하기 (본인만 가능)
+  // 4. 등록된 문서의 Effective Page View를 입데이트하기 (Foundation만 가능)
+
+  // 열람하기
+  // 1. 지정된 기간에 대해서 대상 문서의 Effective Page View 수를 열람하기
+  // 2. 대상 문서의 미정산 날짜 목록과 해당일의 Effective Page View 수를 열람하기
+  // 3. 유저 별 등록한 문서 목록 열람하기
+  // 4. 유저 별 등록한 문서 중 지정된 기간 동안 Effective Page View가 양수인 목록 열람하기
 
   it("confirm page view for 0 day", async () => {
 

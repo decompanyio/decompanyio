@@ -1,14 +1,15 @@
 pragma solidity ^0.4.24;
 
 import "./Utility.sol";
+import "./DocumentRegistry.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract AuthorPool is Ownable {
 
   event _InitializeAuthorPool(uint timestamp);
-  event _RegisterNewUserDocument(bytes32 indexed docId, uint timestamp, address indexed applicant, uint count);
-  event _Withdraw(address indexed applicant, uint idx, uint withdraw, uint timestamp);
-
+  event _RegisterNewUserDocument(bytes32 indexed docId, uint timestamp, address indexed applicant);
+  event _Withdraw(address indexed applicant, bytes32 indexed docId, uint withdraw, uint timestamp);
+/*
   struct Asset {
     bytes32 docId;
     uint listedDate;
@@ -21,21 +22,24 @@ contract AuthorPool is Ownable {
 
   // key list for iteration
   address[] private keys;
-
+*/
   // private variables
-  Utility private util;
+  Utility private _util;
+  DocumentRegistry private _docReg;
 
   // public variables
   uint public createTime;
 
-  function init(address _utility) public
+  function init(address docReg, address util) public
     onlyOwner()
   {
-    require(_utility != 0 && address(util) == 0);
+    require(util != 0 && address(_util) == 0);
+    require(docReg != 0 && address(_docReg) == 0);
 
-    util = Utility(_utility);
+    _util = Utility(util);
+    _docReg = DocumentRegistry(docReg);
 
-    createTime = util.getTimeMillis();
+    createTime = _util.getTimeMillis();
     emit _InitializeAuthorPool(createTime);
   }
 
@@ -45,7 +49,7 @@ contract AuthorPool is Ownable {
 
   // author list for iteration
   function getAuthors() public view returns (address[]) {
-    return keys;
+    return _docReg.getCreators();
   }
 
   // -------------------------------
@@ -53,68 +57,44 @@ contract AuthorPool is Ownable {
   // -------------------------------
 
   // register a new document
-  function registerUserDocument(bytes32 _docId, address _author) public
+  function registerUserDocument(bytes32 docId, address author) public
     onlyOwner()
   {
-    require(getIndex(_docId, _author) < 0);
-
-    // adding to document registry
-    uint tMillis = util.getDateMillis();
-    if (map[_author].length == 0){
-      keys.push(_author);
-    }
-    uint index = map[_author].push(Asset(_docId, tMillis, 0, 0));
-
-    emit _RegisterNewUserDocument(_docId, tMillis, _author, index);
+    _docReg.registerUserDocument(author, docId);
   }
 
-  function updateUserDocument(bytes32 _docId, address _author, uint _timestamp) public
+  function updateUserDocument(bytes32 docId, address author, uint timeMillis) public
     onlyOwner()
   {
-    if (map[_author].length == 0){
-      keys.push(_author);
-    }
-    for (uint i=0; i<map[_author].length; i++) {
-      if (map[_author][i].docId == _docId) {
-        map[_author][i].listedDate = _timestamp;
-        return;
-      }
-    }
-    uint index = map[_author].push(Asset(_docId, _timestamp, 0, 0));
-
-    emit _RegisterNewUserDocument(_docId, _timestamp, _author, index);
+    _docReg.update(author, docId, timeMillis, 0, 0, 0);
   }
 
   function containsUserDocument(address _addr, bytes32 _docId) public view returns (bool) {
-    return getIndex(_docId, _addr) >= 0;
+    return _docReg.isOwner(_addr, _docId);
   }
 
-  function getUserDocumentIndex(address _addr, bytes32 _docId) public view returns (int) {
-    return getIndex(_docId, _addr);
+  function getUserDocumentListedDate(bytes32 _docId) public view returns (uint) {
+    // address, uint256, uint256, uint256, uint256, uint256
+    (, uint256 t,,,,) = _docReg.getDocument(_docId, 0);
+    return t;
   }
 
-  function getUserDocumentListedDate(address _addr, uint _idx) public view returns (uint) {
-    return map[_addr][_idx].listedDate;
+  function getUserDocumentLastClaimedDate(bytes32 _docId) public view returns (uint) {
+    (,,, uint256 t,,) = _docReg.getDocument(_docId, 0);
+    return t;
   }
 
-  function getUserDocumentLastClaimedDate(address _addr, uint _idx) public view returns (uint) {
-    return map[_addr][_idx].lastClaimedDate;
+  function getUserDocumentWithdraw(bytes32 _docId) public view returns (uint) {
+    (,,,, uint256 w,) = _docReg.getDocument(_docId, 0);
+    return w;
   }
 
-  function getUserDocumentWithdraw(address _addr, bytes32 _docId) public view returns (uint) {
-    int idx = getIndex(_docId, _addr);
-    if (idx < 0) {
-      return 0;
-    }
-    return map[_addr][uint(idx)].withdraw;
-  }
-
-  function withdraw(address _author, uint _idx, uint _withdraw, uint _dateMillis) public
+  function withdraw(address _author, bytes32 _docId, uint _withdraw, uint _dateMillis) public
     onlyOwner()
   {
-    map[_author][_idx].withdraw += _withdraw;
-    map[_author][_idx].lastClaimedDate = _dateMillis;
-    emit _Withdraw(_author, _idx, _withdraw, _dateMillis);
+    (address o, uint256 t,,, uint256 w,) = _docReg.getDocument(_docId, 0);
+    _docReg.update(o, _docId, t, 0, _dateMillis, w + _withdraw);
+    emit _Withdraw(_author, _docId, _withdraw, _dateMillis);
   }
 
   function determineReward(uint _pv, uint _tpv, uint _dateMillis) public view returns (uint) {
@@ -122,20 +102,8 @@ contract AuthorPool is Ownable {
       return uint(0);
     }
 
-    uint drp = util.getDailyRewardPool(uint(70), _dateMillis);
+    uint drp = _util.getDailyRewardPool(uint(70), _dateMillis);
     return uint(_pv * uint(drp / _tpv));
-  }
-
-  function getIndex(bytes32 _docId, address _author) private view returns (int) {
-    Asset[] storage assetList = map[_author];
-    if (assetList.length > 0) {
-      for (uint i=0; i<assetList.length; i++) {
-        if (assetList[i].docId == _docId) {
-          return int(i);
-        }
-      }
-    }
-    return -1;
   }
 
 }

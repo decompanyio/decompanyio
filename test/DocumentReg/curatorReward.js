@@ -4,6 +4,7 @@ const DocumentReg = artifacts.require("./DocumentReg.sol");
 const AuthorPool = artifacts.require("./AuthorPool.sol");
 const CuratorPool = artifacts.require("./CuratorPool.sol");
 const Ballot = artifacts.require("./Ballot.sol");
+const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
 
 contract("DocumentReg - estimate, determine & claim curator rewards", accounts => {
 
@@ -35,10 +36,12 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     _curatorPool = await CuratorPool.deployed();
     _documentReg = await DocumentReg.deployed();
     _ballot = await Ballot.deployed();
+    _documentRegistry = await DocumentRegistry.deployed();
 
     await _authorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
     await _curatorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
     await _ballot.transferOwnership(_documentReg.address, { from: accounts[0] });
+    await _documentRegistry.transferOwnership(_documentReg.address, { from: accounts[0] });
 
     await _documentReg.init (
       _deck.address,
@@ -46,6 +49,7 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
       _curatorPool.address,
       _utility.address,
       _ballot.address,
+      _documentRegistry.address,
       { from: accounts[0] }
     );
 
@@ -102,6 +106,12 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     // ACOUNT[1] : DOC #3, +0 DAYS
     // ACOUNT[2] : DOC #4, +8 DAYS
     // ACOUNT[2] : DOC #5, +1 DAYS
+
+    await _documentReg.register(DOC1, { from: accounts[1] });
+    await _documentReg.register(DOC2, { from: accounts[1] });
+    await _documentReg.register(DOC3, { from: accounts[1] });
+    await _documentReg.register(DOC4, { from: accounts[2] });
+    await _documentReg.register(DOC5, { from: accounts[2] });
 
     await _documentReg.update(accounts[1], DOC1, DAYS_5, { from: accounts[0] });
     await _documentReg.update(accounts[1], DOC2, DAYS_1, { from: accounts[0] });
