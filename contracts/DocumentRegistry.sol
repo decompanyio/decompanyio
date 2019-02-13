@@ -7,6 +7,7 @@ contract DocumentRegistry is Ownable {
 
   event RegisterDocument(bytes32 docId, uint256 dateMillis, address creator);
   event UpdateDocument(bytes32 docId, uint256 createTime, uint256 lastClaimedDate, uint256 withdraw);
+  event UpdateWithdraw(bytes32 docId, uint256 claimedDate, uint256 withdraw);
   event DeletePageView(bytes32 docId, uint256 dateMillis);
   event AddPageView(bytes32 docId, uint256 dateMillis, uint256 pv);
 
@@ -53,14 +54,7 @@ contract DocumentRegistry is Ownable {
   }
 
   // adding a new vote
-  function registerUserDocument(address owner, bytes32 docId) public
-    onlyOwner()
-  {
-    registerDocument(owner, docId);
-  }
-
-  // adding a new vote
-  function registerDocument(address owner, bytes32 docId) private
+  function registerDocument(address owner, bytes32 docId) public
   {
     require(_docByDocId[docId].createTime == 0); // register once
 
@@ -99,6 +93,15 @@ contract DocumentRegistry is Ownable {
     _docByDocId[docId].withdraw = withdraw;
 
     emit UpdateDocument(docId, createTime, lastClaimedDate, withdraw);
+  }
+
+  function updateWithdraw(bytes32 docId, uint256 claimedDate, uint256 withdraw) public
+    onlyOwner()
+  {
+    require(_docByDocId[docId].createTime != 0);
+    _docByDocId[docId].lastClaimedDate = claimedDate;
+    _docByDocId[docId].withdraw += withdraw;
+    emit UpdateWithdraw(docId, claimedDate, withdraw);
   }
 
   function getDocument(bytes32 docId) public view returns (address, uint256, uint256, uint256) {
@@ -148,6 +151,7 @@ contract DocumentRegistry is Ownable {
   }
 
   function setPageView(bytes32 docId, uint dateMillis, uint pv) public
+    onlyOwner()
   {
     require(pv > 0);
     require(_docByDocId[docId].createTime != 0);
@@ -163,12 +167,14 @@ contract DocumentRegistry is Ownable {
   }
 
   function updatePageView(bytes32 docId, uint dateMillis, uint pv) public
+    onlyOwner()
   {
     deletePageView(docId, dateMillis);
     setPageView(docId, dateMillis, pv);
   }
 
   function deletePageView(bytes32 docId, uint dateMillis) public
+    onlyOwner()
   {
     require(_docByDocId[docId].createTime != 0);
     // delete only when pv > 0
@@ -182,8 +188,24 @@ contract DocumentRegistry is Ownable {
       _docByDocId[docId].pvIdx[toDelete] = lastIndex;
       (_docByDocId[docId].pvMap)[lastIndex].idx = toDelete;
       _docByDocId[docId].pvIdx.length--;
+      // set page view as 0
+      (_docByDocId[docId].pvMap)[dateMillis].idx = 0;
+      (_docByDocId[docId].pvMap)[dateMillis].pv = 0;
       // emit a delete event
       emit DeletePageView(docId, dateMillis);
+    }
+  }
+
+  function updatePageViews(uint dateMillis, bytes32[] docIds, uint[] pvs) public
+    onlyOwner()
+  {
+    require(dateMillis > 0);
+    require(docIds.length > 0);
+    require(docIds.length == pvs.length);
+
+    for(uint i=0; i<docIds.length; i++) {
+      deletePageView(docIds[i], dateMillis);
+      setPageView(docIds[i], dateMillis, pvs[i]);
     }
   }
 

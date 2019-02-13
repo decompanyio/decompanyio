@@ -49,15 +49,8 @@ contract("DocumentRegistry - register", accounts => {
     assert.equal(1, 1, "failed to set up");
   });
 
+  // DOC #1 : ACCOUNTS[0]
   it("register a document with foundation account", async () => {
-
-    // ------------------
-    // ACCOUNT[1]
-    // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
-    // DOC #2 : ACOUNT[1], PV(0, 200)
-    // DOC #3 : ACOUNT[1], PV(0, )
-    // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
-    // DOC #5 : ACOUNT[2], PV(0, 300)
 
     const DOC_COUNT_S0 = await _documentRegistry.count();
     assert.equal(0, DOC_COUNT_S0, "the doc map is not empty");
@@ -73,28 +66,54 @@ contract("DocumentRegistry - register", accounts => {
     assert.equal(0, doc1[3]*1, "wrong withdraw");
   });
 
+  // DOC #1 : ACCOUNTS[0]
+  // DOC #2 : ACCOUNTS[1]
   it("register a document with a user account", async () => {
-
-    // ------------------
-    // ACCOUNT[1]
-    // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
-    // DOC #2 : ACOUNT[1], PV(0, 200)
-    // DOC #3 : ACOUNT[1], PV(0, )
-    // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
-    // DOC #5 : ACOUNT[2], PV(0, 300)
 
     const DOC_COUNT_S0 = await _documentRegistry.count();
     assert.equal(1, DOC_COUNT_S0, "wrong count");
-    await _documentRegistry.register(DOC2, { from: accounts[5] });
+    await _documentRegistry.register(DOC2, { from: accounts[1] });
     const DOC_COUNT_S1 = await _documentRegistry.count();
     assert.equal(2, DOC_COUNT_S1*1, "count wasn't increased");
 
     const doc1 = await _documentRegistry.getDocument(DOC2);
     //console.log("doc1 : " + doc1);
-    assert.equal(accounts[5], doc1[0], "wrong address");
+    assert.equal(accounts[1], doc1[0], "wrong address");
     assert.isBelow(0, doc1[1]*1, "wrong createTime");
     assert.equal(0, doc1[2]*1, "wrong lastClaimedDate");
     assert.equal(0, doc1[3]*1, "wrong withdraw");
+  });
+
+  // DOC #1 : ACCOUNTS[0]
+  // DOC #2 : ACCOUNTS[1]
+  // DOC #3 : ACCOUNTS[2]
+  // DOC #4 : ACCOUNTS[2]
+  // DOC #5 : ACCOUNTS[2]
+  it("register multi document with a user account", async () => {
+
+    await _documentRegistry.register(DOC3, { from: accounts[2] });
+    await _documentRegistry.register(DOC4, { from: accounts[2] });
+    await _documentRegistry.register(DOC5, { from: accounts[2] });
+
+    const doc3 = await _documentRegistry.getDocument(DOC3);
+    const doc4 = await _documentRegistry.getDocument(DOC4);
+    const doc5 = await _documentRegistry.getDocument(DOC5);
+
+    assert.equal(accounts[2], doc3[0], "wrong address doc3");
+    assert.equal(accounts[2], doc4[0], "wrong address doc4");
+    assert.equal(accounts[2], doc5[0], "wrong address doc5");
+
+    assert.isBelow(0, doc3[1]*1, "wrong createTime doc3");
+    assert.isBelow(0, doc4[1]*1, "wrong createTime doc4");
+    assert.isBelow(0, doc5[1]*1, "wrong createTime doc5");
+
+    assert.equal(0, doc3[2]*1, "wrong lastClaimedDate doc3");
+    assert.equal(0, doc4[2]*1, "wrong lastClaimedDate doc4");
+    assert.equal(0, doc5[2]*1, "wrong lastClaimedDate doc5");
+
+    assert.equal(0, doc3[3]*1, "wrong withdraw doc3");
+    assert.equal(0, doc4[3]*1, "wrong withdraw doc4");
+    assert.equal(0, doc5[3]*1, "wrong withdraw doc5");
   });
 
   // 쓰기
@@ -102,11 +121,6 @@ contract("DocumentRegistry - register", accounts => {
   // 2. 특정 문서를 등록헤제하기 (본인만 가능)
   // 3. 일자 별 정산된 보상액 기록하기 (본인만 가능)
   // 4. 등록된 문서의 Effective Page View를 입데이트하기 (Foundation만 가능)
-
-  // 열람하기
-  // 1. 지정된 기간에 대해서 대상 문서의 Effective Page View 수를 열람하기
-  // 2. 대상 문서의 미정산 날짜 목록과 해당일의 Effective Page View 수를 열람하기
-  // 3. 유저 별 등록한 문서 목록 열람하기
-  // 4. 유저 별 등록한 문서 중 지정된 기간 동안 Effective Page View가 양수인 목록 열람하기
+  // 5. 한 사람이 여러 개의 문서를 등록하기
 
 });

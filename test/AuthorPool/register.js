@@ -27,7 +27,7 @@ contract("AuthorPool", accounts => {
     const b = await authorPool.createTime.call();
     assert.notEqual(b, 0, "was not initialized");
   });
-
+/*
   it("registered document should exist", async () => {
 
     // prepare
@@ -106,5 +106,5 @@ contract("AuthorPool", accounts => {
     //console.log('isExist4 : ' + isExist4);
     assert.equal(true, isExist4, "can't find document");
   });
-
+*/
 });

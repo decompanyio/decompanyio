@@ -75,7 +75,7 @@ contract DocumentReg is Ownable {
     ballot.transferOwnership(_curator);
 
     documentRegistry = DocumentRegistry(_documentRegistry);
-    documentRegistry.transferOwnership(_author);
+    //documentRegistry.transferOwnership(_author);
 
     // init author pool
     authorPool = AuthorPool(_author);
@@ -113,7 +113,8 @@ contract DocumentReg is Ownable {
     //uint index = docList.push(_docId);
 
     // creating user document mapping
-    authorPool.registerUserDocument(_docId, msg.sender);
+    documentRegistry.registerDocument(msg.sender, _docId);
+    //authorPool.registerUserDocument(_docId, msg.sender);
     assert(authorPool.containsUserDocument(msg.sender, _docId));
 
     emit _RegisterNewDocument(_docId, tMillis, msg.sender);
@@ -129,7 +130,8 @@ contract DocumentReg is Ownable {
     //map[_docId] = Document(_addr, _timestamp);
 
     // creating user document mapping
-    authorPool.updateUserDocument(_docId, _addr, _timestamp);
+    documentRegistry.update(_addr, _docId, _timestamp, 0, 0);
+    //authorPool.updateUserDocument(_docId, _addr, _timestamp);
 
     //emit _UpdateDocument(_docId, _timestamp, _addr);
   }
@@ -263,7 +265,8 @@ contract DocumentReg is Ownable {
     }
 
     token.transfer(msg.sender, sumReward);
-    authorPool.withdraw(msg.sender, _docId, sumReward, claimDate);
+    //authorPool.withdraw(msg.sender, _docId, sumReward, claimDate);
+    documentRegistry.updateWithdraw(_docId, claimDate, sumReward);
 
     emit _ClaimAuthorReward(_docId, sumReward, msg.sender);
   }

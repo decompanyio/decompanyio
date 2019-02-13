@@ -56,19 +56,6 @@ contract AuthorPool is Ownable {
   // User Document Functions
   // -------------------------------
 
-  // register a new document
-  function registerUserDocument(bytes32 docId, address author) public
-    onlyOwner()
-  {
-    _docReg.registerUserDocument(author, docId);
-  }
-
-  function updateUserDocument(bytes32 docId, address author, uint timeMillis) public
-    onlyOwner()
-  {
-    _docReg.update(author, docId, timeMillis, 0, 0);
-  }
-
   function containsDocument(bytes32 _docId) public view returns (bool) {
     return _docReg.contains(_docId);
   }
@@ -97,7 +84,7 @@ contract AuthorPool is Ownable {
     (,,, uint256 w) = _docReg.getDocument(_docId);
     return w;
   }
-
+/*
   function withdraw(address _author, bytes32 _docId, uint _withdraw, uint _dateMillis) public
     onlyOwner()
   {
@@ -105,7 +92,7 @@ contract AuthorPool is Ownable {
     _docReg.update(o, _docId, t, _dateMillis, w + _withdraw);
     emit _Withdraw(_author, _docId, _withdraw, _dateMillis);
   }
-
+*/
   function determineReward(uint _pv, uint _tpv, uint _dateMillis) public view returns (uint) {
     if (_tpv == 0 || _pv == 0) {
       return uint(0);
