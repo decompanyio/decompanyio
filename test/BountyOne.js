@@ -47,15 +47,27 @@ contract("BountyOne", accounts => {
   });
 
   it("count claimed users", async () => {
-    const available_A3_S1 = web3.fromWei(await _bountyOne.available({ from: accounts[3] }), "ether");
-    assert.equal(5000, available_A3_S1 * 1, "wrong amount of available token");
+    //console.log("1");
     const count_S1 = await _bountyOne.count({ from: accounts[0] });
     assert.equal(1, count_S1, "wrong initial number of claimed users");
-    const balance_A3_S2 = web3.fromWei(await _deck.balanceOf(accounts[3]), "ether") * 1;
+
+    //console.log("2");
+    const available_A2_S1 = web3.fromWei(await _bountyOne.available({ from: accounts[2] }), "ether");
+    assert.equal(0, available_A2_S1 * 1, "wrong amount of available token a2");
+
+    //console.log("3");
+    const available_A3_S1 = web3.fromWei(await _bountyOne.available({ from: accounts[7] }), "ether");
+    assert.equal(5000, available_A3_S1 * 1, "wrong amount of available token a3");
+
+    const balance_A3_S2 = web3.fromWei(await _deck.balanceOf(accounts[7]), "ether") * 1;
     // TEST
-    await _bountyOne.claim({ from: accounts[3] });
-    const balance_A3_S3 = web3.fromWei(await _deck.balanceOf(accounts[3]), "ether") * 1;
-    assert.equal(5000, balance_A3_S3 - balance_A3_S2, "wrong amount of bounty claimed");
+    //console.log("calling claim");
+    await _bountyOne.claim({ from: accounts[7] });
+    //console.log("called claim");
+    const balance_A3_S3 = web3.fromWei(await _deck.balanceOf(accounts[7]), "ether") * 1;
+    assert.equal(5000, balance_A3_S3 - balance_A3_S2, "failed (should be 0) : " + balance_A3_S3 + "-" + balance_A3_S2);
+
+    //console.log("6");
     const count_S2 = await _bountyOne.count({ from: accounts[0] });
     assert.equal(count_S1*1 + 1, count_S2*1, "wrong number of claimed users");
   });
@@ -64,7 +76,7 @@ contract("BountyOne", accounts => {
     const array_S1 = await _bountyOne.getClaimedUsers({ from: accounts[0] });
     assert.equal(2, array_S1.length, "wrong number of claimed users");
     assert.equal(accounts[2], array_S1[0], "wrong account of user #1");
-    assert.equal(accounts[3], array_S1[1], "wrong account of user #2");
+    assert.equal(accounts[7], array_S1[1], "wrong account of user #2");
   });
 
   it("claim bounty twice", async () => {

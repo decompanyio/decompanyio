@@ -37,7 +37,7 @@ contract("Ballot", accounts => {
 
     // prepare
     _ballot = await Ballot.deployed();
-    await _ballot.init(_util.address);
+    //await _ballot.init(_util.address);
 
     // assert
     assert.equal(1, 1, "failed to set up");

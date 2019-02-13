@@ -361,7 +361,7 @@ contract("DocumentReg - determine & claim author reward", accounts => {
     //  : DOC #3, +0 DAYS, PV(0, )
 
     // #1. check withdrawn amount
-    const withdrawDoc1 = await _documentReg.getAuthorWithdrawOnUserDocument(accounts[1], DOC1);
+    const withdrawDoc1 = await _documentReg.getAuthorWithdrawOnUserDocument(DOC1);
     //console.log('withdrawDoc1 : ' + withdrawDoc1.toString());
     assert.isBelow(821917, Math.floor(withdrawDoc1 * 1), "withdrawn author reward is 0");
   });

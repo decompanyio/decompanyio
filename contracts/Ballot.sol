@@ -1,15 +1,12 @@
 pragma solidity ^0.4.24;
 
-import "./Utility.sol";
+import "./IBallot.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Ballot is Ownable {
+contract Ballot is IBallot, Ownable {
 
-  event Initialize(uint256 createTime, address util);
   event CreateVote(uint256 voteId, address addr, bytes32 docId, uint256 dateMillis, uint256 deposit);
   event ClaimVote(uint256 voteId, uint256 amount);
-
-  Utility private _util;
 
   struct Vote {
     address addr;
@@ -25,18 +22,6 @@ contract Ballot is Ownable {
   // number of total votes
   uint256 _length;
 
-  // public variables
-  uint256 public _createTime;
-
-  function init(address util) public
-    onlyOwner()
-  {
-    require(util != 0 && address(_util) == 0);
-    _util = Utility(util);
-    _createTime = _util.getTimeMillis();
-    emit Initialize(_createTime, _util);
-  }
-
   function count() public view returns (uint256) {
     return uint256(_length);
   }
@@ -49,7 +34,7 @@ contract Ballot is Ownable {
   function create(uint256 i, address addr, bytes32 docId, uint256 deposit) public
     onlyOwner()
   {
-    insert(i, addr, docId, deposit, _util.getDateMillis());
+    insert(i, addr, docId, deposit, uint(block.timestamp/86400) * 86400000);
   }
 
   // adding a new vote

@@ -1,5 +1,5 @@
-const Deck = artifacts.require("Deck");
-const Utility = artifacts.require("Utility");
+//const Deck = artifacts.require("Deck");
+//const Utility = artifacts.require("Utility");
 const AuthorPool = artifacts.require("AuthorPool");
 const CuratorPool = artifacts.require("CuratorPool");
 const DocumentReg = artifacts.require("DocumentReg");
@@ -9,7 +9,7 @@ const Ballot = artifacts.require("Ballot");
 
 module.exports = async function(deployer, network, accounts) {
 
-  let deckObj, utilityObj, authorPoolObj, curatorPoolObj, documentRegObj;
+  //let deckObj, utilityObj, authorPoolObj, curatorPoolObj, documentRegObj;
 
   await Promise.all([
     // Contracts

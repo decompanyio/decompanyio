@@ -66,7 +66,11 @@ contract AuthorPool is Ownable {
   function updateUserDocument(bytes32 docId, address author, uint timeMillis) public
     onlyOwner()
   {
-    _docReg.update(author, docId, timeMillis, 0, 0, 0);
+    _docReg.update(author, docId, timeMillis, 0, 0);
+  }
+
+  function containsDocument(bytes32 _docId) public view returns (bool) {
+    return _docReg.contains(_docId);
   }
 
   function containsUserDocument(address _addr, bytes32 _docId) public view returns (bool) {
@@ -75,25 +79,30 @@ contract AuthorPool is Ownable {
 
   function getUserDocumentListedDate(bytes32 _docId) public view returns (uint) {
     // address, uint256, uint256, uint256, uint256, uint256
-    (, uint256 t,,,,) = _docReg.getDocument(_docId, 0);
+    (, uint256 t,,) = _docReg.getDocument(_docId);
     return t;
   }
 
+  function getUserDocumentOwner(bytes32 _docId) public view returns (address) {
+    (address a,,,) = _docReg.getDocument(_docId);
+    return a;
+  }
+
   function getUserDocumentLastClaimedDate(bytes32 _docId) public view returns (uint) {
-    (,,, uint256 t,,) = _docReg.getDocument(_docId, 0);
+    (,, uint256 t,) = _docReg.getDocument(_docId);
     return t;
   }
 
   function getUserDocumentWithdraw(bytes32 _docId) public view returns (uint) {
-    (,,,, uint256 w,) = _docReg.getDocument(_docId, 0);
+    (,,, uint256 w) = _docReg.getDocument(_docId);
     return w;
   }
 
   function withdraw(address _author, bytes32 _docId, uint _withdraw, uint _dateMillis) public
     onlyOwner()
   {
-    (address o, uint256 t,,, uint256 w,) = _docReg.getDocument(_docId, 0);
-    _docReg.update(o, _docId, t, 0, _dateMillis, w + _withdraw);
+    (address o, uint256 t,, uint256 w) = _docReg.getDocument(_docId);
+    _docReg.update(o, _docId, t, _dateMillis, w + _withdraw);
     emit _Withdraw(_author, _docId, _withdraw, _dateMillis);
   }
 

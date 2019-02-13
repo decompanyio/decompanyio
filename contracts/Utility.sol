@@ -1,6 +1,8 @@
 pragma solidity ^0.4.24;
 
-contract Utility {
+import "./IUtility.sol";
+
+contract Utility is IUtility {
 
   uint private ONE_DAY_MILLIS = 86400000;
   uint private DEPOSIT_DAYS = 3;

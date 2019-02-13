@@ -18,7 +18,7 @@ contract("AuthorPool", accounts => {
     const documentRegistry = objects[2];
 
     // logic
-    await documentRegistry.init(utility.address, { from: accounts[0] });
+    //await documentRegistry.init(utility.address, { from: accounts[0] });
     await documentRegistry.transferOwnership(authorPool.address, { from: accounts[0] });
 
     await authorPool.init(documentRegistry.address, utility.address, { from: accounts[0] });

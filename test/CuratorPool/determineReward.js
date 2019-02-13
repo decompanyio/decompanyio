@@ -17,7 +17,7 @@ contract("CuratorPool", accounts => {
     var _utility = utility.address;
     var _ballot = ballot.address;
 
-    await ballot.init(_utility, { from: accounts[0] });
+    //await ballot.init(_utility, { from: accounts[0] });
     await curatorPool.init(_utility, _ballot, { from: accounts[0] });
     await ballot.transferOwnership(curatorPool.address, { from: accounts[0] });
 

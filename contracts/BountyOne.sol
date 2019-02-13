@@ -27,7 +27,6 @@ contract BountyOne is Ownable {
   }
 
   function available() public view returns (uint) {
-    require(address(msg.sender) != 0);
     return (map[msg.sender] != 0 || token.balanceOf(address(this)) < provision) ? 0 : provision;
   }
 
@@ -40,13 +39,17 @@ contract BountyOne is Ownable {
   }
 
   function claim() public {
-    require(address(token) != 0);
-    require(address(msg.sender) != 0);
-    require(map[msg.sender] == 0);
+    //require(address(token) != 0);
+    //require(address(msg.sender) != 0);
+    //require(map[msg.sender] == 0);
 
-    token.transfer(msg.sender, provision);
-    map[msg.sender] = provision;
-    claimed.push(msg.sender);
-    emit _ClaimBountyOne(msg.sender, provision);
+    if (map[msg.sender] == 0) {
+      token.transfer(msg.sender, provision);
+      map[msg.sender] = provision;
+      claimed.push(msg.sender);
+      emit _ClaimBountyOne(msg.sender, provision);
+      return;
+    }
+    emit _ClaimBountyOne(msg.sender, 0);
   }
 }

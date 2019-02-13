@@ -2,7 +2,7 @@ const Utility = artifacts.require("./Utility.sol");
 const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
 //var moment = require('moment');
 
-contract("DocumentRegistry - register", accounts => {
+contract("DocumentRegistry - upadte", accounts => {
 
   const DOC1 = "10000000000000000000000000000001";  // accounts[1]
   const DOC2 = "10000000000000000000000000000002";  // accounts[1]
@@ -45,12 +45,6 @@ contract("DocumentRegistry - register", accounts => {
     DAYS_8 = ((await _util.getDateMillis()) * 1) - 8 * (await _util.getOneDayMillis());
     DAYS_9 = ((await _util.getDateMillis()) * 1) - 9 * (await _util.getOneDayMillis());
 
-    // assert
-    assert.equal(1, 1, "failed to set up");
-  });
-
-  it("register a document with foundation account", async () => {
-
     // ------------------
     // ACCOUNT[1]
     // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
@@ -73,7 +67,12 @@ contract("DocumentRegistry - register", accounts => {
     assert.equal(0, doc1[3]*1, "wrong withdraw");
   });
 
-  it("register a document with a user account", async () => {
+  // 업데이트하기
+  // 1. 특정 문서를 업데이트하기 (foundation만 가능)
+  // 2. 특정 문서를 등록헤제하기 (Foundation만 가능)
+  // 3. 일자 별 정산된 보상액 기록하기 (Foundation만 가능)
+
+  it("update a document", async () => {
 
     // ------------------
     // ACCOUNT[1]
@@ -84,29 +83,33 @@ contract("DocumentRegistry - register", accounts => {
     // DOC #5 : ACOUNT[2], PV(0, 300)
 
     const DOC_COUNT_S0 = await _documentRegistry.count();
-    assert.equal(1, DOC_COUNT_S0, "wrong count");
-    await _documentRegistry.register(DOC2, { from: accounts[5] });
+    await _documentRegistry.update(accounts[1], DOC1, 1, 3, 4);
     const DOC_COUNT_S1 = await _documentRegistry.count();
-    assert.equal(2, DOC_COUNT_S1*1, "count wasn't increased");
+    assert.equal(1, DOC_COUNT_S1*1, "the doc map is still empty");
 
-    const doc1 = await _documentRegistry.getDocument(DOC2);
+    const doc1 = await _documentRegistry.getDocument(DOC1);
     //console.log("doc1 : " + doc1);
-    assert.equal(accounts[5], doc1[0], "wrong address");
-    assert.isBelow(0, doc1[1]*1, "wrong createTime");
-    assert.equal(0, doc1[2]*1, "wrong lastClaimedDate");
-    assert.equal(0, doc1[3]*1, "wrong withdraw");
+    assert.equal(accounts[1], doc1[0], "wrong address");
+    assert.equal(1, doc1[1]*1, "wrong createTime");
+    assert.equal(3, doc1[2]*1, "wrong lastClaimedDate");
+    assert.equal(4, doc1[3]*1, "wrong withdraw");
   });
 
-  // 쓰기
-  // 1. 신규 문서를 등록하기 (본인만 가능)
-  // 2. 특정 문서를 등록헤제하기 (본인만 가능)
-  // 3. 일자 별 정산된 보상액 기록하기 (본인만 가능)
-  // 4. 등록된 문서의 Effective Page View를 입데이트하기 (Foundation만 가능)
+  it("try to update a document with a user account", async () => {
+    try {
+      // calling from account #1 should throw exception
+      await _documentRegistry.update(accounts[1], DOC1, 11, 13, 14, { from: accounts[1] });
+    } catch (error) {
+      const revertFound = error.message.search('revert') >= 0;
+      assert.strictEqual(revertFound, true);
+    }
 
-  // 열람하기
-  // 1. 지정된 기간에 대해서 대상 문서의 Effective Page View 수를 열람하기
-  // 2. 대상 문서의 미정산 날짜 목록과 해당일의 Effective Page View 수를 열람하기
-  // 3. 유저 별 등록한 문서 목록 열람하기
-  // 4. 유저 별 등록한 문서 중 지정된 기간 동안 Effective Page View가 양수인 목록 열람하기
+    const doc1 = await _documentRegistry.getDocument(DOC1);
+    //console.log("doc1 : " + doc1);
+    assert.equal(accounts[1], doc1[0], "wrong address");
+    assert.equal(1, doc1[1]*1, "wrong createTime");
+    assert.equal(3, doc1[2]*1, "wrong lastClaimedDate");
+    assert.equal(4, doc1[3]*1, "wrong withdraw");
+  });
 
 });

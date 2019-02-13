@@ -11,7 +11,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract DocumentReg is Ownable {
 
   event _InitializeDocumentReg(uint timestamp, address token);
-  event _RegisterNewDocument(bytes32 indexed docId, uint timestamp, address indexed applicant, uint count);
+  event _RegisterNewDocument(bytes32 indexed docId, uint timestamp, address indexed applicant);
   event _UpdateDocument(bytes32 indexed docId, uint timestamp, address indexed applicant);
   event _ConfirmPageView(bytes32 indexed docId, uint timestamp, uint pageView);
   event _ConfirmTotalPageView(uint timestamp, uint pageView, uint pageViewSquare);
@@ -19,7 +19,7 @@ contract DocumentReg is Ownable {
   event _UpdateVoteOnDocument(bytes32 indexed docId, uint deposit, address indexed applicant, uint timestamp);
   event _ClaimAuthorReward(bytes32 indexed docId, uint reward, address indexed applicant);
   event _ClaimCuratorReward(bytes32 indexed docId, uint reward, address indexed applicant);
-
+/*
   struct Document {
     address author;
     uint createTime;
@@ -36,7 +36,7 @@ contract DocumentReg is Ownable {
   //  : timestamp(yyyy-mm-dd) => daily total page view square
   mapping (uint => uint) private totalPageView;
   mapping (uint => uint) private totalPageViewSquare;
-
+*/
   // private variables
   Deck private token;
   Utility private util;
@@ -72,11 +72,9 @@ contract DocumentReg is Ownable {
     foundation = msg.sender;
 
     ballot = Ballot(_ballot);
-    ballot.init(util);
     ballot.transferOwnership(_curator);
 
     documentRegistry = DocumentRegistry(_documentRegistry);
-    documentRegistry.init(util);
     documentRegistry.transferOwnership(_author);
 
     // init author pool
@@ -105,67 +103,66 @@ contract DocumentReg is Ownable {
   // register a new document
   function register(bytes32 _docId) public {
 
-    require(map[_docId].createTime == 0); // register once
+    //require(map[_docId].createTime == 0); // register once
+    require(!documentRegistry.contains(_docId));
 
     uint tMillis = util.getDateMillis();
 
     // adding to document registry
-    map[_docId] = Document(msg.sender, tMillis);
-    uint index = docList.push(_docId);
+    //map[_docId] = Document(msg.sender, tMillis);
+    //uint index = docList.push(_docId);
 
     // creating user document mapping
     authorPool.registerUserDocument(_docId, msg.sender);
     assert(authorPool.containsUserDocument(msg.sender, _docId));
 
-    emit _RegisterNewDocument(_docId, tMillis, msg.sender, index);
+    emit _RegisterNewDocument(_docId, tMillis, msg.sender);
   }
 
   function update(address _addr, bytes32 _docId, uint _timestamp) public
     onlyOwner()
   {
     // updating to document registry
-    if (map[_docId].createTime == 0) {
-      docList.push(_docId);
-    }
-    map[_docId] = Document(_addr, _timestamp);
+    //if (map[_docId].createTime == 0) {
+    //  docList.push(_docId);
+    //}
+    //map[_docId] = Document(_addr, _timestamp);
 
     // creating user document mapping
     authorPool.updateUserDocument(_docId, _addr, _timestamp);
 
-    emit _UpdateDocument(_docId, _timestamp, _addr);
+    //emit _UpdateDocument(_docId, _timestamp, _addr);
   }
 
   function contains(bytes32 _docId) public view returns (bool) {
-    return map[_docId].createTime != 0;
+    return documentRegistry.contains(_docId);
   }
 
   function getAuthorByKey(bytes32 _docId) public view returns (address) {
-    require(map[_docId].createTime != 0);
-    return map[_docId].author;
+    return authorPool.getUserDocumentOwner(_docId);
   }
 
   function getCreateTimeByKey(bytes32 _docId) public view returns (uint) {
-    require(map[_docId].createTime != 0);
-    return map[_docId].createTime;
+    return authorPool.getUserDocumentListedDate(_docId);
   }
 
   function count() public view returns (uint) {
-    return uint(docList.length);
+    return documentRegistry.count();
   }
 
   // document list for iteration
-  function getDocuments() public view returns (bytes32[]) {
-    return docList;
-  }
+  //function getDocuments() public view returns (bytes32[]) {
+  //  return docList;
+  //}
 
   function getTotalPageView(uint _date) public view returns (uint) {
     require(_date != 0);
-    return totalPageView[_date];
+    return documentRegistry.getTotalPageView(_date);
   }
 
   function getTotalPageViewSquare(uint _date) public view returns (uint) {
     require(_date != 0);
-    return totalPageViewSquare[_date];
+    return documentRegistry.getTotalPageViewSquare(_date);
   }
 
   // -------------------------------
@@ -174,7 +171,8 @@ contract DocumentReg is Ownable {
   function confirmPageView(bytes32 _docId, uint _date, uint _pageView) public
   {
     require(msg.sender == foundation);
-    require(map[_docId].createTime != 0);
+    /*
+    //require(map[_docId].createTime != 0);
 
     Document storage doc = map[_docId];
 
@@ -191,11 +189,12 @@ contract DocumentReg is Ownable {
 
     emit _ConfirmPageView(_docId, _date, _pageView);
     emit _ConfirmTotalPageView(_date, totalPageView[_date], totalPageViewSquare[_date]);
+    */
+    documentRegistry.updatePageView(_docId, _date, _pageView);
   }
 
-  function getPageView(bytes32 _docId, uint _date) public view returns (uint) {
-    require(map[_docId].createTime != 0);
-    return map[_docId].pageViews[_date];
+  function getPageView(bytes32 _docId, uint _dateMillis) public view returns (uint) {
+    return documentRegistry.getPageView(_docId, _dateMillis);
   }
 
   // -------------------------------
@@ -520,7 +519,7 @@ contract DocumentReg is Ownable {
   // Get a author's total amount of reward withdrawn from the document
   // _addr : the EOA of the curator
   // _docId : target document id
-  function getAuthorWithdrawOnUserDocument(address _addr, bytes32 _docId) public view returns (uint) {
+  function getAuthorWithdrawOnUserDocument(bytes32 _docId) public view returns (uint) {
     return authorPool.getUserDocumentWithdraw(_docId);
   }
 
