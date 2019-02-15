@@ -37,6 +37,7 @@ contract("Ballot", accounts => {
 
     // prepare
     _ballot = await Ballot.deployed();
+    await _ballot.setCurator(accounts[0]);
     //await _ballot.init(_util.address);
 
     // assert

@@ -97,7 +97,7 @@ contract CuratorPool is Ownable {
   function withdraw(address _curator, uint _idx, uint _withdraw) public
     onlyOwner()
   {
-    _ballot.claim(mapByAddr[_curator][_idx], _withdraw);
+    _ballot.updateClaimed(mapByAddr[_curator][_idx], _withdraw);
     emit _Withdraw(_curator, _idx, _withdraw);
   }
 

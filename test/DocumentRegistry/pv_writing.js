@@ -32,6 +32,9 @@ contract("DocumentRegistry - writing page views", accounts => {
 
     // prepare
     _documentRegistry = await DocumentRegistry.deployed();
+    await _documentRegistry.setRewardPool(accounts[0]);
+    await _documentRegistry.setCreator(accounts[0]);
+    await _documentRegistry.setFoundation(accounts[0]);
     //await _documentRegistry.init(_util.address);
 
     DAYS_0 = ((await _util.getDateMillis()) * 1) - 0 * (await _util.getOneDayMillis());

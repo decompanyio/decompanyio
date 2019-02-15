@@ -1,9 +1,8 @@
 pragma solidity ^0.4.24;
 
-import "./IBallot.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Ballot is IBallot, Ownable {
+contract Ballot is Ownable {
 
   event CreateVote(uint256 voteId, address addr, bytes32 docId, uint256 dateMillis, uint256 deposit);
   event ClaimVote(uint256 voteId, uint256 amount);
@@ -22,6 +21,25 @@ contract Ballot is IBallot, Ownable {
   // number of total votes
   uint256 _length;
 
+  address private _rewardPool;
+  address private _curator;
+
+  function setRewardPool(address addr) external
+    onlyOwner()
+  {
+    if (addr != _rewardPool) {
+      _rewardPool = addr;
+    }
+  }
+
+  function setCurator(address addr) external
+    onlyOwner()
+  {
+    if (addr != _curator) {
+      _curator = addr;
+    }
+  }
+
   function count() public view returns (uint256) {
     return uint256(_length);
   }
@@ -31,16 +49,18 @@ contract Ballot is IBallot, Ownable {
   }
 
   // adding a new vote
-  function create(uint256 i, address addr, bytes32 docId, uint256 deposit) public
-    onlyOwner()
-  {
-    insert(i, addr, docId, deposit, uint(block.timestamp/86400) * 86400000);
+  function create(uint256 i, address addr, bytes32 docId, uint256 deposit) public {
+    require(msg.sender == _curator);
+    add(i, addr, docId, deposit, uint(block.timestamp/86400) * 86400000);
+  }
+
+  function insert(uint256 i, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) public {
+    require(msg.sender == _curator);
+    add(i, addr, docId, deposit, dateMillis);
   }
 
   // adding a new vote
-  function insert(uint256 i, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) public
-    onlyOwner()
-  {
+  function add(uint256 i, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) private {
     require(i == _length + 1);
 
     Vote memory vote = Vote(addr, docId, dateMillis, deposit, 0);
@@ -50,10 +70,9 @@ contract Ballot is IBallot, Ownable {
     emit CreateVote(i, addr, docId, dateMillis, deposit);
   }
 
-  function claim(uint256 i, uint256 amount) public
-    onlyOwner()
-  {
+  function updateClaimed(uint256 i, uint256 amount) public {
     require(amount != 0);
+    require(msg.sender == _rewardPool);
     require(address(_mapById[i].addr) != 0);
     require(uint256(_mapById[i].deposit) != 0);
     require(uint256(_mapById[i].claimed) == 0);

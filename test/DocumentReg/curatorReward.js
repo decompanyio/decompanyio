@@ -38,6 +38,9 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     _ballot = await Ballot.deployed();
     _documentRegistry = await DocumentRegistry.deployed();
 
+    await _ballot.setRewardPool(_curatorPool.address);
+    await _ballot.setCurator(_curatorPool.address);
+
     await _authorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
     await _curatorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
     await _ballot.transferOwnership(_documentReg.address, { from: accounts[0] });

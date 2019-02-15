@@ -18,9 +18,9 @@ contract("CuratorPool", accounts => {
     var _ballot = ballot.address;
 
     //await ballot.init(_utility, { from: accounts[0] });
+    await ballot.setCurator(curatorPool.address);
     await curatorPool.init(_utility, _ballot, { from: accounts[0] });
-    await ballot.transferOwnership(curatorPool.address, { from: accounts[0] });
-
+    
     // logic
     const c1 = await curatorPool.getVoteCountByAddr(accounts[1]);
     assert.equal(0, c1 * 1, "not empty");

@@ -4,8 +4,12 @@ import "./IReward.sol";
 
 contract Curator is IReward {
 
-  function determine(address addr, bytes32 docId) public view returns (uint256) {
-      return 0;
+  function determine(bytes32 docId) external view returns (uint256) {
+      return docId == 0 ? 0 : 1;
+  }
+
+  function determineAt(bytes32 docId, uint256 dateMillis) external view returns (uint256) {
+      return docId == 0 ? 0 : dateMillis;
   }
 
 }

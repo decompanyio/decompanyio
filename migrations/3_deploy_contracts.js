@@ -6,6 +6,9 @@ const DocumentReg = artifacts.require("DocumentReg");
 //const ViewCount = artifacts.require("ViewCount");
 const DocumentRegistry = artifacts.require("DocumentRegistry");
 const Ballot = artifacts.require("Ballot");
+const Creator = artifacts.require("Creator");
+const Curator = artifacts.require("Curator");
+const RewardPool = artifacts.require("RewardPool");
 
 module.exports = async function(deployer, network, accounts) {
 
@@ -15,6 +18,9 @@ module.exports = async function(deployer, network, accounts) {
     // Contracts
     deployer.deploy(Ballot),
     deployer.deploy(DocumentRegistry),
+    deployer.deploy(Creator),
+    deployer.deploy(Curator),
+    deployer.deploy(RewardPool),
     deployer.deploy(AuthorPool),
     deployer.deploy(CuratorPool),
     //deployer.deploy(ViewCount, { from: accounts[9], gas:6721975, value: 500000000000000000 }),

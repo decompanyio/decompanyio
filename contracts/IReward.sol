@@ -1,7 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "./IRegistry.sol";
-
 interface IReward {
-  function determine(IRegistry registry, address addr, bytes32 docId) external view returns (uint256);
+  function determineAt(bytes32 docId, uint256 dateMillis) external view returns (uint256);
 }

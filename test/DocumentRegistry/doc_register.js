@@ -32,7 +32,9 @@ contract("DocumentRegistry - register", accounts => {
 
     // prepare
     _documentRegistry = await DocumentRegistry.deployed();
-    //await _documentRegistry.init(_util.address);
+    await _documentRegistry.setRewardPool(accounts[0]);
+    await _documentRegistry.setCreator(accounts[0]);
+    await _documentRegistry.setFoundation(accounts[0]);
 
     DAYS_0 = ((await _util.getDateMillis()) * 1) - 0 * (await _util.getOneDayMillis());
     DAYS_1 = ((await _util.getDateMillis()) * 1) - 1 * (await _util.getOneDayMillis());
@@ -50,11 +52,11 @@ contract("DocumentRegistry - register", accounts => {
   });
 
   // DOC #1 : ACCOUNTS[0]
-  it("register a document with foundation account", async () => {
+  it("register a document with creator account", async () => {
 
     const DOC_COUNT_S0 = await _documentRegistry.count();
     assert.equal(0, DOC_COUNT_S0, "the doc map is not empty");
-    await _documentRegistry.register(DOC1);
+    await _documentRegistry.registerByCreator(accounts[0], DOC1, { from: accounts[0] } );
     const DOC_COUNT_S1 = await _documentRegistry.count();
     assert.equal(1, DOC_COUNT_S1*1, "the doc map is still empty");
 

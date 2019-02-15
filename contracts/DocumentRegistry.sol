@@ -1,6 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "./Utility.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract DocumentRegistry is Ownable {
@@ -43,19 +42,25 @@ contract DocumentRegistry is Ownable {
   mapping (uint256 => uint256) private _tpvByDate;
   mapping (uint256 => uint256) private _tpvsByDate;
 
+  // accessibility
+  address private _foundation;
+  address private _rewardPool;
+  address private _creator;
+
   function count() public view returns (uint256) {
     return _docIds.length;
   }
 
-  // adding a new vote
-  function register(bytes32 docId) public
-  {
+  function register(bytes32 docId) external {
     registerDocument(msg.sender, docId);
   }
 
-  // adding a new vote
-  function registerDocument(address owner, bytes32 docId) public
-  {
+  function registerByCreator(address owner, bytes32 docId) external {
+    require(msg.sender == _creator);
+    registerDocument(owner, docId);
+  }
+
+  function registerDocument(address owner, bytes32 docId) private {
     require(_docByDocId[docId].createTime == 0); // register once
 
     // adding to document registry
@@ -80,11 +85,10 @@ contract DocumentRegistry is Ownable {
     emit RegisterDocument(docId, _docByDocId[docId].createTime, _docByDocId[docId].owner);
   }
 
-  function update(address owner, bytes32 docId, uint256 createTime, uint256 lastClaimedDate, uint256 withdraw) public
-    onlyOwner()
-  {
-    require(_docByDocId[docId].createTime != 0);
+  function update(address owner, bytes32 docId, uint256 createTime, uint256 lastClaimedDate, uint256 withdraw) public {
+    require(msg.sender == _creator);
     require(createTime != 0);
+    require(_docByDocId[docId].createTime != 0);
 
     // adding to document registry
     _docByDocId[docId].owner = owner;
@@ -95,13 +99,16 @@ contract DocumentRegistry is Ownable {
     emit UpdateDocument(docId, createTime, lastClaimedDate, withdraw);
   }
 
-  function updateWithdraw(bytes32 docId, uint256 claimedDate, uint256 withdraw) public
-    onlyOwner()
-  {
+  function updateWithdraw(bytes32 docId, uint256 claimedDate, uint256 withdraw) external {
+    require(msg.sender == _rewardPool);
     require(_docByDocId[docId].createTime != 0);
     _docByDocId[docId].lastClaimedDate = claimedDate;
     _docByDocId[docId].withdraw += withdraw;
     emit UpdateWithdraw(docId, claimedDate, withdraw);
+  }
+
+  function getDocuments(address owner) external view returns (bytes32[]) {
+    return _docIdsByAddr[owner];
   }
 
   function getDocument(bytes32 docId) public view returns (address, uint256, uint256, uint256) {
@@ -118,16 +125,8 @@ contract DocumentRegistry is Ownable {
     return _docByDocId[docId].createTime > 0;
   }
 
-  function isOwner(address owner, bytes32 docId) public view returns (bool) {
-    if (_docIdsByAddr[owner].length == 0) {
-      return false;
-    }
-    for (uint i=0; i<_docIdsByAddr[owner].length; i++) {
-      if (_docIdsByAddr[owner][i] == docId) {
-        return true;
-      }
-    }
-    return false;
+  function isOwner(address owner, bytes32 docId) external view returns (bool) {
+    return address(_docByDocId[docId].owner) == owner ? true : false;
   }
 
   // creator list for iteration
@@ -150,9 +149,8 @@ contract DocumentRegistry is Ownable {
     return (_docByDocId[docId].pvMap)[dateMillis].pv;
   }
 
-  function setPageView(bytes32 docId, uint dateMillis, uint pv) public
-    onlyOwner()
-  {
+  function setPageView(bytes32 docId, uint dateMillis, uint pv) public {
+    require(msg.sender == _foundation);
     require(pv > 0);
     require(_docByDocId[docId].createTime != 0);
     require((_docByDocId[docId].pvMap)[dateMillis].pv == 0);
@@ -166,16 +164,14 @@ contract DocumentRegistry is Ownable {
     emit AddPageView(docId, dateMillis, pv);
   }
 
-  function updatePageView(bytes32 docId, uint dateMillis, uint pv) public
-    onlyOwner()
-  {
+  function updatePageView(bytes32 docId, uint dateMillis, uint pv) public {
+    require(msg.sender == _foundation);
     deletePageView(docId, dateMillis);
     setPageView(docId, dateMillis, pv);
   }
 
-  function deletePageView(bytes32 docId, uint dateMillis) public
-    onlyOwner()
-  {
+  function deletePageView(bytes32 docId, uint dateMillis) public {
+    require(msg.sender == _foundation);
     require(_docByDocId[docId].createTime != 0);
     // delete only when pv > 0
     if ((_docByDocId[docId].pvMap)[dateMillis].pv > 0) {
@@ -196,9 +192,8 @@ contract DocumentRegistry is Ownable {
     }
   }
 
-  function updatePageViews(uint dateMillis, bytes32[] docIds, uint[] pvs) public
-    onlyOwner()
-  {
+  function updatePageViews(uint dateMillis, bytes32[] docIds, uint[] pvs) public {
+    require(msg.sender == _foundation);
     require(dateMillis > 0);
     require(docIds.length > 0);
     require(docIds.length == pvs.length);
@@ -209,4 +204,21 @@ contract DocumentRegistry is Ownable {
     }
   }
 
+  function setRewardPool(address addr) external onlyOwner() {
+    if (addr != _rewardPool) {
+      _rewardPool = addr;
+    }
+  }
+
+  function setCreator(address addr) external onlyOwner() {
+    if (addr != _creator) {
+      _creator = addr;
+    }
+  }
+
+  function setFoundation(address addr) external onlyOwner() {
+    if (addr != _foundation) {
+      _foundation = addr;
+    }
+  }
 }

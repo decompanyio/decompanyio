@@ -1,52 +1,77 @@
 pragma solidity ^0.4.24;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./RewardPool.sol";
+import "./DocumentRegistry.sol";
 import "./IReward.sol";
-import "./IRegistry.sol";
 
-contract Creator is IReward {
+contract Creator is IReward, Ownable {
 
-  function determine(IRegistry registry, address addr, bytes32 docId) public view returns (uint256) {
+  RewardPool public _rewardPool;
 
-    require(addr != address(0));
-    require(docId != 0);
-    require(registry.contains(docId));
-
-    uint sumReward = 0;
-    (,,, uint256 lastClaimed,,) = registry.getDocument(docId, 0);
-    while (lastClaimed < uint(block.timestamp/86400) * 86400000) {
-      if (lastClaimed == 0) {
-        (, lastClaimed,,,,) = registry.getDocument(docId, 0);
-      }
-      (,,,,,uint256 pv) = registry.getDocument(docId, lastClaimed);
-      sumReward += determineReward(pv, registry.getTotalPageView(lastClaimed), lastClaimed);
-      uint nextDate = lastClaimed + 86400000;
-      assert(lastClaimed < nextDate);
-      lastClaimed = nextDate;
-    }
-    return sumReward;
+  function init(address rewardPool) external
+    onlyOwner()
+  {
+    require(address(rewardPool) != address(0));
+    require(address(_rewardPool) == address(0));
+    _rewardPool = RewardPool(rewardPool);
   }
 
-  function determineReward(uint _pv, uint _tpv, uint _dateMillis) private view returns (uint) {
-    if (_tpv == 0 || _pv == 0) {
+  function determine(bytes32 docId) external view returns (uint256) {
+    require(docId != 0);
+    require(address(_rewardPool) != address(0));
+    require(_rewardPool._registry().contains(docId));
+    (address owner,,,) = _rewardPool._registry().getDocument(docId);
+    require(msg.sender == owner);
+
+    return totalReward(docId, uint(block.timestamp/86400) * 86400000);
+  }
+
+  function recentEarnings(bytes32 docId, uint256 day) external view returns (uint256) {
+    uint256 sum = 0;
+    uint256 next = 0;
+    uint256 todayMillis = uint(block.timestamp/86400) * 86400000;
+    uint256 listed;
+    (,listed,,) = _rewardPool._registry().getDocument(docId);
+    next = (todayMillis - (day * 86400000)) < listed ? listed : (todayMillis - (day * 86400000));
+    while (next < todayMillis) {
+      sum += dailyReward(docId, next);
+      next += 86400000;
+    }
+    return sum;
+  }
+
+  function determineAt(bytes32 docId, uint256 dateMillis) external view returns (uint256) {
+    require(msg.sender == address(_rewardPool));
+    require(address(_rewardPool) != address(0));
+    return totalReward(docId, dateMillis);
+  }
+
+  function totalReward(bytes32 docId, uint256 dateMillis) private view returns (uint256) {
+    uint256 sum = 0;
+    uint256 next = 0;
+    uint256 listed;
+    uint256 last;
+    (,listed,last,) = _rewardPool._registry().getDocument(docId);
+    while (last < dateMillis) {
+      if (last == 0) {
+        last = listed;
+      }
+      sum += dailyReward(docId, last);
+      next = last + 86400000;
+      assert(last < next);
+      last = next;
+    }
+    return sum;
+  }
+
+  function dailyReward(bytes32 docId, uint256 dateMillis) private view returns (uint) {
+    uint pv = _rewardPool._registry().getPageView(docId, dateMillis);
+    uint tpv = _rewardPool._registry().getTotalPageView(dateMillis);
+    if (tpv == 0 || pv == 0) {
       return uint(0);
     }
-
-    uint drp = getDailyRewardPool(uint(70), _dateMillis);
-    return uint(_pv * uint(drp / _tpv));
+    return uint(pv * uint(_rewardPool.getDailyRewardPool(uint(70), dateMillis) / tpv));
   }
 
-  function getDailyRewardPool(uint _percent, uint _createTime) private view returns (uint) {
-    uint offsetYears = getOffsetYears(_createTime);
-    // initial daily reward pool tokens : (60000000 / 365) * decimals(10 ** 18) / percent(100)
-    uint initialTokens = 16438356164 * (10 ** 11);
-    return uint((initialTokens * _percent) / (2 ** offsetYears));
-  }
-
-  function getOffsetYears(uint _from) private view returns (uint) {
-    uint curTimeSec = block.timestamp;
-    uint createTimeSec = uint(_from / 1000);
-    uint offsetSec = curTimeSec - createTimeSec;
-    uint offsetDays = uint(offsetSec / uint(86400));
-    return uint(offsetDays / 365);
-  }
 }
