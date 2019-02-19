@@ -56,7 +56,7 @@ contract("DocumentRegistry - register", accounts => {
 
     const DOC_COUNT_S0 = await _documentRegistry.count();
     assert.equal(0, DOC_COUNT_S0, "the doc map is not empty");
-    await _documentRegistry.registerByCreator(accounts[0], DOC1, { from: accounts[0] } );
+    await _documentRegistry.register(accounts[0], DOC1, { from: accounts[0] } );
     const DOC_COUNT_S1 = await _documentRegistry.count();
     assert.equal(1, DOC_COUNT_S1*1, "the doc map is still empty");
 
@@ -67,7 +67,7 @@ contract("DocumentRegistry - register", accounts => {
     assert.equal(0, doc1[2]*1, "wrong lastClaimedDate");
     assert.equal(0, doc1[3]*1, "wrong withdraw");
   });
-
+/*
   // DOC #1 : ACCOUNTS[0]
   // DOC #2 : ACCOUNTS[1]
   it("register a document with a user account", async () => {
@@ -85,7 +85,7 @@ contract("DocumentRegistry - register", accounts => {
     assert.equal(0, doc1[2]*1, "wrong lastClaimedDate");
     assert.equal(0, doc1[3]*1, "wrong withdraw");
   });
-
+*/
   // DOC #1 : ACCOUNTS[0]
   // DOC #2 : ACCOUNTS[1]
   // DOC #3 : ACCOUNTS[2]
@@ -93,9 +93,9 @@ contract("DocumentRegistry - register", accounts => {
   // DOC #5 : ACCOUNTS[2]
   it("register multi document with a user account", async () => {
 
-    await _documentRegistry.register(DOC3, { from: accounts[2] });
-    await _documentRegistry.register(DOC4, { from: accounts[2] });
-    await _documentRegistry.register(DOC5, { from: accounts[2] });
+    await _documentRegistry.register(accounts[2], DOC3, { from: accounts[0] });
+    await _documentRegistry.register(accounts[2], DOC4, { from: accounts[0] });
+    await _documentRegistry.register(accounts[2], DOC5, { from: accounts[0] });
 
     const doc3 = await _documentRegistry.getDocument(DOC3);
     const doc4 = await _documentRegistry.getDocument(DOC4);

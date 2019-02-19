@@ -4,11 +4,11 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract DocumentRegistry is Ownable {
 
-  event RegisterDocument(bytes32 docId, uint256 dateMillis, address creator);
-  event UpdateDocument(bytes32 docId, uint256 createTime, uint256 lastClaimedDate, uint256 withdraw);
-  event UpdateWithdraw(bytes32 docId, uint256 claimedDate, uint256 withdraw);
-  event DeletePageView(bytes32 docId, uint256 dateMillis);
-  event AddPageView(bytes32 docId, uint256 dateMillis, uint256 pv);
+  event Register(bytes32 docId, uint256 createTime, address owner);
+  event Update(bytes32 docId, uint256 createTime, uint256 lastClaimedDate, uint256 withdraw);
+  event Withdraw(bytes32 docId, uint256 claimedDate, uint256 amount);
+  event PutPageView(bytes32 docId, uint256 dateMillis, uint256 pv);
+  event DelPageView(bytes32 docId, uint256 dateMillis);
 
   struct PageView {
     uint256 pv;
@@ -50,17 +50,18 @@ contract DocumentRegistry is Ownable {
   function count() public view returns (uint256) {
     return _docIds.length;
   }
-
+/*
   function register(bytes32 docId) external {
     registerDocument(msg.sender, docId);
   }
 
-  function registerByCreator(address owner, bytes32 docId) external {
+  function register(address owner, bytes32 docId) external {
     require(msg.sender == _creator);
     registerDocument(owner, docId);
   }
-
-  function registerDocument(address owner, bytes32 docId) private {
+*/
+  function register(address owner, bytes32 docId) external {
+    require(msg.sender == _creator);
     require(_docByDocId[docId].createTime == 0); // register once
 
     // adding to document registry
@@ -82,7 +83,7 @@ contract DocumentRegistry is Ownable {
     // adding to doc id list by owner
     _docIdsByAddr[owner].push(docId);
 
-    emit RegisterDocument(docId, _docByDocId[docId].createTime, _docByDocId[docId].owner);
+    emit Register(docId, _docByDocId[docId].createTime, _docByDocId[docId].owner);
   }
 
   function update(address owner, bytes32 docId, uint256 createTime, uint256 lastClaimedDate, uint256 withdraw) public {
@@ -96,7 +97,7 @@ contract DocumentRegistry is Ownable {
     _docByDocId[docId].lastClaimedDate = lastClaimedDate;
     _docByDocId[docId].withdraw = withdraw;
 
-    emit UpdateDocument(docId, createTime, lastClaimedDate, withdraw);
+    emit Update(docId, createTime, lastClaimedDate, withdraw);
   }
 
   function updateWithdraw(bytes32 docId, uint256 claimedDate, uint256 withdraw) external {
@@ -104,7 +105,7 @@ contract DocumentRegistry is Ownable {
     require(_docByDocId[docId].createTime != 0);
     _docByDocId[docId].lastClaimedDate = claimedDate;
     _docByDocId[docId].withdraw += withdraw;
-    emit UpdateWithdraw(docId, claimedDate, withdraw);
+    emit Withdraw(docId, claimedDate, withdraw);
   }
 
   function getDocuments(address owner) external view returns (bytes32[]) {
@@ -161,7 +162,7 @@ contract DocumentRegistry is Ownable {
     _tpvByDate[dateMillis] += pv;
     _tpvsByDate[dateMillis] += (pv ** 2);
 
-    emit AddPageView(docId, dateMillis, pv);
+    emit PutPageView(docId, dateMillis, pv);
   }
 
   function updatePageView(bytes32 docId, uint dateMillis, uint pv) public {
@@ -188,7 +189,7 @@ contract DocumentRegistry is Ownable {
       (_docByDocId[docId].pvMap)[dateMillis].idx = 0;
       (_docByDocId[docId].pvMap)[dateMillis].pv = 0;
       // emit a delete event
-      emit DeletePageView(docId, dateMillis);
+      emit DelPageView(docId, dateMillis);
     }
   }
 

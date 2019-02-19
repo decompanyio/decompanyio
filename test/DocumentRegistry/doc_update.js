@@ -57,7 +57,7 @@ contract("DocumentRegistry - upadte", accounts => {
 
     const DOC_COUNT_S0 = await _documentRegistry.count();
     assert.equal(0, DOC_COUNT_S0, "the doc map is not empty");
-    await _documentRegistry.register(DOC1);
+    await _documentRegistry.register(accounts[0], DOC1);
     const DOC_COUNT_S1 = await _documentRegistry.count();
     assert.equal(1, DOC_COUNT_S1*1, "the doc map is still empty");
 

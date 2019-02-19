@@ -2,7 +2,7 @@ const Utility = artifacts.require("./Utility.sol");
 const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
 //var moment = require('moment');
 
-contract("DocumentRegistry - writing page views", accounts => {
+contract("DocumentRegistry - reading page views", accounts => {
 
   const DOC1 = "10000000000000000000000000000001";  // accounts[1]
   const DOC2 = "10000000000000000000000000000002";  // accounts[1]
@@ -56,11 +56,11 @@ contract("DocumentRegistry - writing page views", accounts => {
     // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
     // DOC #5 : ACOUNT[2], PV(0, 300)
 
-    await _documentRegistry.register(DOC1, { from: accounts[1] });
-    await _documentRegistry.register(DOC2, { from: accounts[1] });
-    await _documentRegistry.register(DOC3, { from: accounts[1] });
-    await _documentRegistry.register(DOC4, { from: accounts[2] });
-    await _documentRegistry.register(DOC5, { from: accounts[2] });
+    await _documentRegistry.register(accounts[1], DOC1, { from: accounts[0] });
+    await _documentRegistry.register(accounts[1], DOC2, { from: accounts[0] });
+    await _documentRegistry.register(accounts[1], DOC3, { from: accounts[0] });
+    await _documentRegistry.register(accounts[2], DOC4, { from: accounts[0] });
+    await _documentRegistry.register(accounts[2], DOC5, { from: accounts[0] });
 
     await _documentRegistry.update(accounts[1], DOC1, DAYS_5, 0, 0, { from: accounts[0] });
     await _documentRegistry.update(accounts[1], DOC2, DAYS_1, 0, 0, { from: accounts[0] });

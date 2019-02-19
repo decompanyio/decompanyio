@@ -40,6 +40,7 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
 
     await _ballot.setRewardPool(_curatorPool.address);
     await _ballot.setCurator(_curatorPool.address);
+    await _ballot.setFoundation(accounts[0]);
 
     await _authorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
     await _curatorPool.transferOwnership(_documentReg.address, { from: accounts[0] });
@@ -386,6 +387,7 @@ contract("DocumentReg - estimate, determine & claim curator rewards", accounts =
     const reward_A3_D1_4 = web3.fromWei(await _documentReg.determineCuratorReward(DOC1, { from: accounts[3] }));
     const sample_4 = Math.floor((reward_A3_D1_4 * 1));
     assert.equal(reference, sample_4, "wrong amount of determined token : curator #3, doc #1, day 4");
+    //console.log('reward_A3_D1_4 : ' + reward_A3_D1_4);
 
     await _documentReg.claimCuratorReward(DOC1, { from: accounts[3] })
     const balance_A3_S2 = web3.fromWei(await _deck.balanceOf(accounts[3]), "ether");

@@ -15,47 +15,43 @@ contract Ballot is Ownable {
     uint256 claimed;
   }
 
-  // maps voteId to the vote data
+  // voteId to the vote data
   mapping (uint256 => Vote) internal _mapById;
+
+  // address to the curator's vote data
+  mapping (address => uint256[]) internal _mapByAddr;
+
+  // docId to the curator's vote data
+  mapping (bytes32 => uint256[]) internal _mapByDoc;
+
+  // for user document list
+  mapping (address => mapping (bytes32 => bool)) internal _mapUserDocAdded;
+  mapping (address => bytes32[]) internal _mapUserDoc;
 
   // number of total votes
   uint256 _length;
 
+  // accessibility
+  address private _foundation;
   address private _rewardPool;
   address private _curator;
 
-  function setRewardPool(address addr) external
-    onlyOwner()
-  {
-    if (addr != _rewardPool) {
-      _rewardPool = addr;
-    }
-  }
-
-  function setCurator(address addr) external
-    onlyOwner()
-  {
-    if (addr != _curator) {
-      _curator = addr;
-    }
-  }
-
-  function count() public view returns (uint256) {
+  function count() external view returns (uint256) {
     return uint256(_length);
   }
 
-  function next() public view returns (uint256) {
+  function next() external view returns (uint256) {
     return uint256(_length + 1);
   }
 
   // adding a new vote
-  function create(uint256 i, address addr, bytes32 docId, uint256 deposit) public {
+  function create(uint256 i, address addr, bytes32 docId, uint256 deposit) external {
     require(msg.sender == _curator);
     add(i, addr, docId, deposit, uint(block.timestamp/86400) * 86400000);
   }
 
-  function insert(uint256 i, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) public {
-    require(msg.sender == _curator);
+  function insert(uint256 i, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) external {
+    require(msg.sender == _foundation);
     add(i, addr, docId, deposit, dateMillis);
   }
 
@@ -65,12 +61,19 @@ contract Ballot is Ownable {
 
     Vote memory vote = Vote(addr, docId, dateMillis, deposit, 0);
     _mapById[i] = vote;
+    _mapByAddr[addr].push(i);
+    _mapByDoc[docId].push(i);
     _length++;
+
+    if (_mapUserDocAdded[addr][docId] == false) {
+      _mapUserDoc[addr].push(docId);
+      _mapUserDocAdded[addr][docId] = true;
+    }
 
     emit CreateVote(i, addr, docId, dateMillis, deposit);
   }
 
-  function updateClaimed(uint256 i, uint256 amount) public {
+  function updateClaimed(uint256 i, uint256 amount) external {
     require(amount != 0);
     require(msg.sender == _rewardPool);
     require(address(_mapById[i].addr) != 0);
@@ -82,7 +85,52 @@ contract Ballot is Ownable {
     emit ClaimVote(i, amount);
   }
 
-  function getVote(uint256 i) public view returns (address, bytes32, uint256, uint256, uint256) {
+  function getVote(uint256 i) external view returns (address, bytes32, uint256, uint256, uint256) {
     return (_mapById[i].addr, _mapById[i].docId, _mapById[i].startDate, _mapById[i].deposit, _mapById[i].claimed);
+  }
+
+  function getActiveVotes(bytes32 docId, uint dateMillis, uint vestingMillis) external view returns (uint256) {
+    uint256 sum = 0;
+    for (uint i=0; i<_mapByDoc[docId].length; i++) {
+      if (dateMillis - _mapById[_mapByDoc[docId][i]].startDate >= 0
+       && dateMillis - _mapById[_mapByDoc[docId][i]].startDate < vestingMillis) {
+        sum += _mapById[_mapByDoc[docId][i]].deposit;
+      }
+    }
+    return sum;
+  }
+
+  function getUserActiveVotes(address addr, bytes32 docId, uint dateMillis, uint vestingMillis) external view returns (uint256) {
+    uint256 sum = 0;
+    for (uint i=0; i<_mapByAddr[addr].length; i++) {
+      if (docId == _mapById[_mapByAddr[addr][i]].docId
+       && dateMillis - _mapById[_mapByAddr[addr][i]].startDate >= 0
+       && dateMillis - _mapById[_mapByAddr[addr][i]].startDate < vestingMillis) {
+        sum += _mapById[_mapByAddr[addr][i]].deposit;
+      }
+    }
+    return sum;
+  }
+
+  function getUserDocuments(address addr) external view returns (bytes32[]) {
+    return _mapUserDoc[addr];
+  }
+
+  function setRewardPool(address addr) external onlyOwner() {
+    if (addr != _rewardPool) {
+      _rewardPool = addr;
+    }
+  }
+
+  function setCurator(address addr) external onlyOwner() {
+    if (addr != _curator) {
+      _curator = addr;
+    }
+  }
+
+  function setFoundation(address addr) external onlyOwner() {
+    if (addr != _foundation) {
+      _foundation = addr;
+    }
   }
 }

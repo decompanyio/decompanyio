@@ -255,7 +255,7 @@ contract CuratorPool is Ownable {
   }
 
   function getSumDepositByDoc(bytes32 _docId, uint _dateMillis) public view returns (uint) {
-    uint sumDeposit = 0;
+/*    uint sumDeposit = 0;
     uint[] memory voteList = mapByDoc[_docId];
     for (uint i=0; i<voteList.length; i++) {
       (,, uint256 t, uint256 p,) = _ballot.getVote(voteList[i]);
@@ -264,7 +264,8 @@ contract CuratorPool is Ownable {
         sumDeposit += p;
       }
     }
-    return sumDeposit;
+*/
+    return getTotalVoted(_docId, _dateMillis);
   }
 
   function getSumWithdrawByAddr(address _addr, bytes32 _docId, uint _dateMillis) public view returns (uint) {

@@ -2,10 +2,9 @@ pragma solidity ^0.4.24;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./RewardPool.sol";
-import "./DocumentRegistry.sol";
-import "./IReward.sol";
+import "./IAsset.sol";
 
-contract Creator is IReward, Ownable {
+contract Creator is IAsset, Ownable {
 
   RewardPool public _rewardPool;
 
@@ -15,6 +14,15 @@ contract Creator is IReward, Ownable {
     require(address(rewardPool) != address(0));
     require(address(_rewardPool) == address(0));
     _rewardPool = RewardPool(rewardPool);
+  }
+
+  // register a new document
+  function register(bytes32 docId) public {
+    _rewardPool._registry().register(msg.sender, docId);
+  }
+
+  function update(address owner, bytes32 docId, uint256 createTime, uint256 lastClaimedDate, uint256 withdraw) public {
+    _rewardPool._registry().update(owner, docId, createTime, lastClaimedDate, withdraw);
   }
 
   function determine(bytes32 docId) external view returns (uint256) {

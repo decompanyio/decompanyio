@@ -1,11 +1,12 @@
-const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
-const RewardPool = artifacts.require("./RewardPool.sol");
+const Deck = artifacts.require("./Deck.sol");
 const Creator = artifacts.require("./Creator.sol");
 const Curator = artifacts.require("./Curator.sol");
+const RewardPool = artifacts.require("./RewardPool.sol");
+const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
+const Ballot = artifacts.require("./Ballot.sol");
 const Utility = artifacts.require("./Utility.sol");
-const Deck = artifacts.require("./Deck.sol");
 
-contract("Creator - reward", accounts => {
+contract("Asset - creator", accounts => {
 
   const DOC1 = web3.fromAscii("10000000000000000000000000000001");
   const DOC2 = web3.fromAscii("10000000000000000000000000000002");
@@ -25,6 +26,7 @@ contract("Creator - reward", accounts => {
 
   let _deck = undefined;
   let _registry = undefined;
+  let _ballot = undefined;
   let _creator = undefined;
   let _curator = undefined;
   let _pool = undefined;
@@ -33,6 +35,7 @@ contract("Creator - reward", accounts => {
   it("Setting up...", async () => {
 
     _registry = await DocumentRegistry.deployed();
+    _ballot = await Ballot.deployed();
     _creator = await Creator.deployed();
     _curator = await Curator.deployed();
     _pool = await RewardPool.deployed();
@@ -40,15 +43,20 @@ contract("Creator - reward", accounts => {
     _deck = await Deck.deployed();
 
     await _creator.init(_pool.address);
-    await _pool.init(_deck.address, _registry.address);
+    await _curator.init(_pool.address);
+    await _pool.init(_deck.address, _registry.address, _ballot.address);
 
     await _pool.setCurator(_curator.address);
     await _pool.setCreator(_creator.address);
     await _pool.setFoundation(accounts[0]);
 
     await _registry.setRewardPool(_pool.address);
-    await _registry.setCreator(accounts[0]);
+    await _registry.setCreator(_creator.address);
     await _registry.setFoundation(accounts[0]);
+
+    await _ballot.setRewardPool(_pool.address);
+    await _ballot.setCurator(_curator.address);
+    await _ballot.setFoundation(accounts[0]);
 
     DAYS_0 = ((await _utility.getDateMillis()) * 1) - 0 * (await _utility.getOneDayMillis());
     DAYS_1 = ((await _utility.getDateMillis()) * 1) - 1 * (await _utility.getOneDayMillis());
@@ -92,17 +100,17 @@ contract("Creator - reward", accounts => {
     // ACOUNT[2] : DOC #4, +8 DAYS
     // ACOUNT[2] : DOC #5, +1 DAYS
 
-    await _registry.register(DOC1, { from: accounts[1] });
-    await _registry.register(DOC2, { from: accounts[1] });
-    await _registry.register(DOC3, { from: accounts[1] });
-    await _registry.register(DOC4, { from: accounts[2] });
-    await _registry.register(DOC5, { from: accounts[2] });
+    await _creator.register(DOC1, { from: accounts[1] });
+    await _creator.register(DOC2, { from: accounts[1] });
+    await _creator.register(DOC3, { from: accounts[1] });
+    await _creator.register(DOC4, { from: accounts[2] });
+    await _creator.register(DOC5, { from: accounts[2] });
 
-    await _registry.update(accounts[1], DOC1, DAYS_5, 0, 0, { from: accounts[0] });
-    await _registry.update(accounts[1], DOC2, DAYS_1, 0, 0, { from: accounts[0] });
-    await _registry.update(accounts[1], DOC3, DAYS_0, 0, 0, { from: accounts[0] });
-    await _registry.update(accounts[2], DOC4, DAYS_8, 0, 0, { from: accounts[0] });
-    await _registry.update(accounts[2], DOC5, DAYS_1, 0, 0, { from: accounts[0] });
+    await _creator.update(accounts[1], DOC1, DAYS_5, 0, 0, { from: accounts[0] });
+    await _creator.update(accounts[1], DOC2, DAYS_1, 0, 0, { from: accounts[0] });
+    await _creator.update(accounts[1], DOC3, DAYS_0, 0, 0, { from: accounts[0] });
+    await _creator.update(accounts[2], DOC4, DAYS_8, 0, 0, { from: accounts[0] });
+    await _creator.update(accounts[2], DOC5, DAYS_1, 0, 0, { from: accounts[0] });
 
     // ---------------------------
     // Page Views

@@ -72,7 +72,9 @@ contract DocumentReg is Ownable {
     foundation = msg.sender;
 
     ballot = Ballot(_ballot);
-    //ballot.transferOwnership(_curator);
+    ballot.setRewardPool(_curator);
+    ballot.setFoundation(_curator);
+    ballot.setCurator(_curator);
 
     documentRegistry = DocumentRegistry(_documentRegistry);
     documentRegistry.setRewardPool(address(this));
@@ -116,7 +118,7 @@ contract DocumentReg is Ownable {
     //uint index = docList.push(_docId);
 
     // creating user document mapping
-    documentRegistry.registerByCreator(msg.sender, _docId);
+    documentRegistry.register(msg.sender, _docId);
     //authorPool.registerUserDocument(_docId, msg.sender);
     assert(authorPool.containsUserDocument(msg.sender, _docId));
 
