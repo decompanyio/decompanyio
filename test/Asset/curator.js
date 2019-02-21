@@ -149,16 +149,17 @@ contract("Asset - curator", accounts => {
     // ---------------------------
     // CURATOR POOL
     // ---------------------------
-    // ACOUNT[3] : DOC #1(100), +2 DAYS
+    // ACOUNT[3] : DOC #1(100), +4 DAYS
     // ACOUNT[3] : DOC #2(200), +1 DAYS
     // ACOUNT[4] : DOC #1(100), +3 DAYS
-    // ACOUNT[4] : DOC #4(400), +2 DAYS
+    // ACOUNT[4] : DOC #4(400), +7 DAYS
     // ACOUNT[4] : DOC #3(100), +0 DAYS
+    // ACOUNT[4] : DOC #4(100), +5 DAYS
 
-    // DOC #1 : Active Votes (100, 200, 200, 100)
+    // DOC #1 : Active Votes (0, 100, 200, 200, 100)
     // DOC #2 : Active Votes (200, 200)
     // DOC #3 : Active Votes (100)
-    // DOC #4 : Active Votes (400, 400, 400)
+    // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
     // DOC #5 : Active Votes (0)
 
     VOTE100 = new web3.BigNumber('100000000000000000000');
@@ -171,41 +172,16 @@ contract("Asset - curator", accounts => {
     VOTE800 = new web3.BigNumber('800000000000000000000');
     VOTE900 = new web3.BigNumber('900000000000000000000');
 
-    await _ballot.insert(await _ballot.next(), accounts[3], DOC1, VOTE100, DAYS_2, { from: accounts[0] });
+    await _ballot.insert(await _ballot.next(), accounts[3], DOC1, VOTE100, DAYS_4, { from: accounts[0] });
     await _ballot.insert(await _ballot.next(), accounts[3], DOC2, VOTE200, DAYS_1, { from: accounts[0] });
     await _ballot.insert(await _ballot.next(), accounts[4], DOC1, VOTE100, DAYS_3, { from: accounts[0] });
-    await _ballot.insert(await _ballot.next(), accounts[4], DOC4, VOTE400, DAYS_2, { from: accounts[0] });
+    await _ballot.insert(await _ballot.next(), accounts[4], DOC4, VOTE400, DAYS_7, { from: accounts[0] });
     await _ballot.insert(await _ballot.next(), accounts[4], DOC3, VOTE100, DAYS_0, { from: accounts[0] });
+    await _ballot.insert(await _ballot.next(), accounts[4], DOC4, VOTE100, DAYS_5, { from: accounts[0] });
 
     // assert
     assert.isTrue(true);
   });
-
-  // 보상액 산정하기 1 : 당일 등록한 문서의 보상액은 0
-  //  - 오늘(DAY_0) 등록한 문서에 대해서
-  //  - pv 발생 여부와 상관 없이 보상액은 0
-
-  // 보상액 산정하기 2 : 보상액 산정은 문서의 소유자만 가능
-  //  - 문서의 소유자가 아닌 경우 exception을 발생함
-  //  - 문서의 소유자인 경우 산정된 보상액을 리턴
-
-  // 보상액 산정하기 3 : 하루 전 등록한 문서는 pv에 따른 보상액 발생
-  //  - 1일전(DAY_1) 등록한 문서에 대해서
-  //  - 어제는 pv가 0이고 오늘 pv가 0초과이면 보상액은 0
-  //  - 어제 하루 동안의 pv가 0이면 보상액은 0
-  //  - 어제 하루 동안의 pv가 0초과면 pv에 따른 보상액 산정
-
-  // 보상액 산정하기 4 : 매일 발생하는 보상액을 합산하여 제공
-
-  // 보상액 청구하기 #1 : 보상금은 소유자 본인만 청구할 수 있습니다.
-  // 보상액 청구하기 #2 : 보상액을 청구하면 산정된 보상액과 동일한 금액을 지급받습니다.
-
-  // 보상액 청구하기 #3 : 보상금은 한 번만 청구할 수 있습니다.
-
-  // 보상액 산정하기 5 : 이미 인출한 보상액은 제외
-
-  // 보상금 열람하기 #1 : 최근 N일간의 해당 문서에서 발생한 보상액 열람하기
-  // 보상금 열람하기 #2 : 누구나 열람할 수 있음
 
   // ============================================
   // 투표하기 1 : 문서에 투표하기
@@ -223,17 +199,18 @@ contract("Asset - curator", accounts => {
 
   // ---- Votes ----
   // ** ACOUNT[5] : DOC #2(100), +0 DAYS
-  // ACOUNT[3] : DOC #1(100), +2 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
   // ACOUNT[3] : DOC #2(200), +1 DAYS
   // ACOUNT[4] : DOC #1(100), +3 DAYS
-  // ACOUNT[4] : DOC #4(400), +2 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
   // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
 
   // ---- Active Votes ----
-  // DOC #1 : Active Votes (100, 200, 200, 100)
+  // DOC #1 : Active Votes (0, 100, 200, 200, 100)
   // DOC #2 : Active Votes (300, 200)
   // DOC #3 : Active Votes (100)
-  // DOC #4 : Active Votes (400, 400, 400)
+  // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
   // DOC #5 : Active Votes (0)
   it("Vote #1: Add vote on a document", async () => {
 
@@ -274,17 +251,18 @@ contract("Asset - curator", accounts => {
   // ---- Votes ----
   // ** ACOUNT[5] : DOC #2(100), +0 DAYS
   // ACOUNT[5] : DOC #2(100), +0 DAYS
-  // ACOUNT[3] : DOC #1(100), +2 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
   // ACOUNT[3] : DOC #2(200), +1 DAYS
   // ACOUNT[4] : DOC #1(100), +3 DAYS
-  // ACOUNT[4] : DOC #4(400), +2 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
   // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
 
   // ---- Active Votes ----
-  // DOC #1 : Active Votes (100, 200, 200, 100)
+  // DOC #1 : Active Votes (0, 100, 200, 200, 100)
   // DOC #2 : Active Votes (400, 200)
   // DOC #3 : Active Votes (100)
-  // DOC #4 : Active Votes (400, 400, 400)
+  // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
   // DOC #5 : Active Votes (0)
   it("Vote #2: Add vote on a same document", async () => {
 
@@ -334,28 +312,29 @@ contract("Asset - curator", accounts => {
   // ---- Votes ----
   // ACOUNT[5] : DOC #2(100), +0 DAYS
   // ACOUNT[5] : DOC #2(100), +0 DAYS
-  // ACOUNT[3] : DOC #1(100), +2 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
   // ACOUNT[3] : DOC #2(200), +1 DAYS
   // ACOUNT[4] : DOC #1(100), +3 DAYS
-  // ACOUNT[4] : DOC #4(400), +2 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
   // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
 
   // ---- Active Votes ----
-  // DOC #1 : Active Votes (100, 200, 200, 100)
+  // DOC #1 : Active Votes (0, 100, 200, 200, 100)
   // DOC #2 : Active Votes (400, 200)
   // DOC #3 : Active Votes (100)
-  // DOC #4 : Active Votes (400, 400, 400)
+  // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
   // DOC #5 : Active Votes (0)
   it("Active Votes #1: The active votes of a document", async () => {
     // check active votes
     const av_doc_1 = web3.fromWei(await _curator.getActiveVotes(DOC1), "ether");
-    assert.equal(100, av_doc_1 * 1);
+    assert.equal(0, av_doc_1 * 1);
     const av_doc_2 = web3.fromWei(await _curator.getActiveVotes(DOC2), "ether");
     assert.equal(400, av_doc_2 * 1);
     const av_doc_3 = web3.fromWei(await _curator.getActiveVotes(DOC3), "ether");
     assert.equal(100, av_doc_3 * 1);
     const av_doc_4 = web3.fromWei(await _curator.getActiveVotes(DOC4), "ether");
-    assert.equal(400, av_doc_4 * 1);
+    assert.equal(0, av_doc_4 * 1);
     const av_doc_5 = web3.fromWei(await _curator.getActiveVotes(DOC5), "ether");
     assert.equal(0, av_doc_5 * 1);
   });
@@ -374,22 +353,23 @@ contract("Asset - curator", accounts => {
   // ---- Votes ----
   // ACOUNT[5] : DOC #2(100), +0 DAYS
   // ACOUNT[5] : DOC #2(100), +0 DAYS
-  // ACOUNT[3] : DOC #1(100), +2 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
   // ACOUNT[3] : DOC #2(200), +1 DAYS
   // ACOUNT[4] : DOC #1(100), +3 DAYS
-  // ACOUNT[4] : DOC #4(400), +2 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
   // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
 
   // ---- Active Votes ----
-  // DOC #1 : Active Votes (100, 200, 200, 100)
+  // DOC #1 : Active Votes (0, 100, 200, 200, 100)
   // DOC #2 : Active Votes (400, 200)
   // DOC #3 : Active Votes (100)
-  // DOC #4 : Active Votes (400, 400, 400)
+  // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
   // DOC #5 : Active Votes (0)
   it("Active Votes #2: Active votes for a document from a specific user", async () => {
     // check active votes
     const av_doc_1_a3 = web3.fromWei(await _curator.getUserActiveVotes(accounts[3], DOC1), "ether");
-    assert.equal(100, av_doc_1_a3 * 1);
+    assert.equal(0, av_doc_1_a3 * 1);
     const av_doc_1_a4 = web3.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC1), "ether");
     assert.equal(0, av_doc_1_a4 * 1);
     const av_doc_2_a5 = web3.fromWei(await _curator.getUserActiveVotes(accounts[5], DOC2), "ether");
@@ -399,7 +379,7 @@ contract("Asset - curator", accounts => {
     const av_doc_3_a4 = web3.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC3), "ether");
     assert.equal(100, av_doc_3_a4 * 1);
     const av_doc_4_a4 = web3.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC4), "ether");
-    assert.equal(400, av_doc_4_a4 * 1);
+    assert.equal(0, av_doc_4_a4 * 1);
     const av_doc_5_a4 = web3.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC5), "ether");
     assert.equal(0, av_doc_5_a4 * 1);
   });
@@ -419,17 +399,18 @@ contract("Asset - curator", accounts => {
   // ---- Votes ----
   // ACOUNT[5] : DOC #2(100), +0 DAYS
   // ACOUNT[5] : DOC #2(100), +0 DAYS
-  // ACOUNT[3] : DOC #1(100), +2 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
   // ACOUNT[3] : DOC #2(200), +1 DAYS
   // ACOUNT[4] : DOC #1(100), +3 DAYS
-  // ACOUNT[4] : DOC #4(400), +2 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
   // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
 
   // ---- Active Votes ----
-  // DOC #1 : Active Votes (100, 200, 200, 100)
+  // DOC #1 : Active Votes (0, 100, 200, 200, 100)
   // DOC #2 : Active Votes (400, 200)
   // DOC #3 : Active Votes (100)
-  // DOC #4 : Active Votes (400, 400, 400)
+  // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
   // DOC #5 : Active Votes (0)
   it("Voted Documents #1: List of documents that a user has voted for", async () => {
     // Testing for ACCOUNT[1]
@@ -454,7 +435,7 @@ contract("Asset - curator", accounts => {
 
   // ============================================
   // 보상액 산정하기 1 : 투표가 vesting 기간이 지나 만료되지 않은 경우 보상액은 0
-  //  - ACCOUNT[4]가 DOC4에 +2 DAYS에 실행한 투표는
+  //  - ACCOUNT[4]가 DOC1에 +3 DAYS에 실행한 투표는
   //  - 아직 vesting 기간인 3 days + 1day(정산처리일)를 지나지 않았으므로
   //  - 보상액은 0임을 확인하기
 
@@ -468,36 +449,108 @@ contract("Asset - curator", accounts => {
   // ---- Votes ----
   // ACOUNT[5] : DOC #2(100), +0 DAYS
   // ACOUNT[5] : DOC #2(100), +0 DAYS
-  // ACOUNT[3] : DOC #1(100), +2 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
   // ACOUNT[3] : DOC #2(200), +1 DAYS
   // ACOUNT[4] : DOC #1(100), +3 DAYS
-  // ACOUNT[4] : DOC #4(400), +2 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
   // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
 
   // ---- Active Votes ----
-  // DOC #1 : Active Votes (100, 200, 200, 100)
+  // DOC #1 : Active Votes (0, 100, 200, 200, 100)
   // DOC #2 : Active Votes (400, 200)
   // DOC #3 : Active Votes (100)
-  // DOC #4 : Active Votes (400, 400, 400)
+  // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
   // DOC #5 : Active Votes (0)
   it("Determine #1: The amount of reward for unexpired votes is 0.", async () => {
-    assert.isTrue(false);
+    const determined_doc1_a4 = web3.fromWei(await _curator.determine(DOC1, { from: accounts[4]}), "ether") * 1;
+    assert.equal(0, determined_doc1_a4, "wrong determined amount on doc1 for account[4]");
   });
 
-/*
+  // ============================================
+  // 보상액 산정하기 2 : 투표 보상액을 인출하지 않은 경우 보상액 산정하기
 
-  // 보상액 산정하기 1 : 당일 등록한 문서의 보상액은 0
-  //  - 오늘(DAY_0) 등록한 문서에 대해서
-  //  - pv 또는 vote 여부와 상관 없이 보상액은 0
-  it("Determine #1: The amount of reward for documents registered on that day is 0", async () => {
-    const docId = DOC3;
-    const wei = await _curator.determine(docId, { from: accounts[1] });
-    const doc3 = web3.fromWei(wei, "ether");
-    //console.log('reward of doc3 : ' + doc3);
-    assert.equal(0, doc3 * 1);
+  // ---- Page View ----
+  // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
+  // DOC #2 : ACOUNT[1], PV(0, 200)
+  // DOC #3 : ACOUNT[1], PV(0, )
+  // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
+  // DOC #5 : ACOUNT[2], PV(0, 300)
+
+  // ---- Votes ----
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
+  // ACOUNT[3] : DOC #2(200), +1 DAYS
+  // ACOUNT[4] : DOC #1(100), +3 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
+  // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
+
+  // ---- Active Votes ----
+  // DOC #1 : Active Votes (  0, 100, 200, 200, 100)
+  // DOC #2 : Active Votes (400, 200)
+  // DOC #3 : Active Votes (100)
+  // DOC #4 : Active Votes (  0,   0,   0, 100, 100, 500, 400, 400)
+  // DOC #5 : Active Votes (0)
+  it("Determine #2: The amount of reward for unexpired votes is 0.", async () => {
+
+    const todayMillis = (await _utility.getTimeMillis()) * 1;
+    const dayMillis = (await _utility.getOneDayMillis()) * 1;
+    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
+    const drp_6 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 6 * dayMillis));
+    const drp_7 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 7 * dayMillis));
+
+    // ACCOUNT[3], DOC1
+    const ref_A3_DOC1_DAY1 = 0; //((drp_1 * 1) * (100 / (100))) / (10000 + 40000 + 10000 + 90000) * 10000;
+    const ref_A3_DOC1_DAY2 = ((drp_2 * 1) * (100 / (100 + 100))) / (40000 + 40000) * 40000;
+    const ref_A3_DOC1_DAY3 = ((drp_3 * 1) * (100 / (100 + 100))) / (90000 + 90000) * 90000;
+    const ref_A3_DOC1_DAY4 = ((drp_4 * 1) * (100 / (100))) / (160000 + 160000) * 160000;
+    const ref_A3_DOC1_DAY5 = 0; //((drp_5 * 1) * (100 / (100))) / (250000 + 250000) * 250000;
+    const determined_doc1_a3 = web3.fromWei(await _curator.determine(DOC1, { from: accounts[3]}), "ether") * 1;
+    const sample_doc1_a3 = Math.floor((determined_doc1_a3 * 1));
+    const reference_doc1_a3 = Math.floor(ref_A3_DOC1_DAY2 + ref_A3_DOC1_DAY3 + ref_A3_DOC1_DAY4);
+    assert.equal(reference_doc1_a3, sample_doc1_a3, "wrong amount of determined token : curator #3, doc #1, day 4");
+
+    // ACCOUNT[3], DOC2
+    const determined_doc2_a3 = web3.fromWei(await _curator.determine(DOC2, { from: accounts[3]}), "ether") * 1;
+    const sample_doc2_a3 = Math.floor((determined_doc2_a3 * 1));
+    assert.equal(0, sample_doc2_a3, "wrong amount of determined token : curator #3, doc #2, day 1");
+
+    // ACCOUNT[4], DOC1
+    const determined_doc1_a4 = web3.fromWei(await _curator.determine(DOC2, { from: accounts[3]}), "ether") * 1;
+    const sample_doc1_a4 = Math.floor((determined_doc1_a4 * 1));
+    assert.equal(0, sample_doc1_a4, "wrong amount of determined token : curator #4, doc #1, day 3");
+
+    // ACCOUNT[4], DOC3
+    const determined_doc3_a4 = web3.fromWei(await _curator.determine(DOC2, { from: accounts[3]}), "ether") * 1;
+    const sample_doc3_a4 = Math.floor((determined_doc3_a4 * 1));
+    assert.equal(0, sample_doc3_a4, "wrong amount of determined token : curator #4, doc #3, day 0");
+
+    // ACCOUNT[4], DOC4
+    const ref_A4_DOC4_DAY1 = 0; //((drp_1 * 1) * (100 / (100))) / (10000 + 40000 + 10000 + 90000) * 10000;
+    const ref_A4_DOC4_DAY2 = 0; // ((drp_2 * 1) * (100 / (100))) / (40000 + 40000) * 40000;
+    const ref_A4_DOC4_DAY3 = ((drp_3 * 1) * (100 / (100))) / (90000 + 90000) * 90000;
+    const ref_A4_DOC4_DAY4 = ((drp_4 * 1) * (100 / (100))) / (160000 + 160000) * 160000;
+    const ref_A4_DOC4_DAY5 = ((drp_5 * 1) * (500 / (500))) / (250000 + 250000) * 250000;
+    const ref_A4_DOC4_DAY6 = ((drp_6 * 1) * (400 / (400))) / (360000) * 360000;
+    const ref_A4_DOC4_DAY7 = ((drp_7 * 1) * (400 / (400))) / (490000) * 490000;
+    const determined_doc4_a4 = web3.fromWei(await _curator.determine(DOC4, { from: accounts[4]}), "ether") * 1;
+    const sample_doc4_a4 = Math.floor((determined_doc4_a4 * 1));
+    const reference_doc4_a4 = Math.floor(ref_A4_DOC4_DAY3 + ref_A4_DOC4_DAY4 + ref_A4_DOC4_DAY5 + ref_A4_DOC4_DAY6 + ref_A4_DOC4_DAY7);
+    assert.equal(reference_doc4_a4, sample_doc4_a4, "wrong amount of determined token : curator #4, doc #4, day 5,7");
+
+    // ACCOUNT[5], DOC2
+    const determined_doc2_a5 = web3.fromWei(await _curator.determine(DOC2, { from: accounts[5]}), "ether") * 1;
+    const sample_doc2_a5 = Math.floor((determined_doc2_a5 * 1));
+    assert.equal(0, sample_doc2_a5, "wrong amount of determined token : curator #5, doc #2, day 0");
   });
-/*
-  // 보상액 산정하기 2 : 보상액 산정은 문서의 소유자만 가능
+
+  // 보상액 산정하기 3 : 보상액 산정은 투/*의 소유자만 가능
   //  - 문서의 소유자가 아닌 경우 exception을 발생함
   //  - 문서의 소유자인 경우 산정된 보상액을 리턴
   it("Determine #2: Only the owner of the document can determine the amount of reward", async () => {
@@ -514,81 +567,15 @@ contract("Asset - curator", accounts => {
     assert.isTrue(false);
   });
 
-  // 보상액 산정하기 3 : 하루 전 등록한 문서는 pv에 따른 보상액 발생
-  //  - 1일전(DAY_1) 등록한 문서에 대해서
-  //  - 어제는 pv가 0이고 오늘 pv가 0초과이면 보상액은 0
-  //  - 어제 하루 동안의 pv가 0이면 보상액은 0
-  //  - 어제 하루 동안의 pv가 0초과면 pv에 따른 보상액 산정
-  //  -----------------------------------
-  //  DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
-  //  DOC #2 : ACOUNT[1], PV(0, 200)
-  //  DOC #3 : ACOUNT[1], PV(0, )
-  //  DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
-  //  DOC #5 : ACOUNT[2], PV(0, 300)
-  //  -----------------------------------
 
-  it("Determine #3: Documents registered before the day have reward according to pv", async () => {
-
-    // prepare
-    const todayMillis = (await _utility.getTimeMillis()) * 1;
-    const yesterdayMillis = todayMillis - (await _utility.getOneDayMillis()) * 1;
-
-    // stage 1 :
-    const docId = DOC2;
-
-    const drp = web3.fromWei(await _utility.getDailyRewardPool(70, yesterdayMillis));
-    const doc2 = web3.fromWei(await _creator.determine(docId, { from: accounts[1] }));
-    //console.log('reward of doc2 : ' + doc2);
-
-    const sample = Math.round((doc2 * 1) / 100);
-    const reference = Math.round((drp * 1) * (200 / (100 + 200 + 100 + 300)) / 100);
-    assert.equal(reference, sample, "wrong amount of reward token determined doc #2");
-  });
-
-  // 보상액 산정하기 4 : 매일 발생하는 보상액을 합산하여 제공
-  //  -----------------------------------
-  //  DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
-  //  DOC #2 : ACOUNT[1], PV(0, 200)
-  //  DOC #3 : ACOUNT[1], PV(0, )
-  //  DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
-  //  DOC #5 : ACOUNT[2], PV(0, 300)
-  //  -----------------------------------
-  //  - 5일전(DAY_5) 등록한 문서(DOC #1)에 대해서
-  //  - 등록이후 보상액을 한 번도 인출하지 않은 경우,
-  //  - 최종 산정된 보상액은 DAY_5부터 DAY_1까지의 보상액을 합산한 금액
-  //
-  //  - DAY_5 보상액 : (70% of Daily Reward Pool) * (500 / (500 + 500))
-  //  - DAY_4 보상액 : (70% of Daily Reward Pool) * (400 / (400 + 400))
-  //  - DAY_3 보상액 : (70% of Daily Reward Pool) * (300 / (300 + 300))
-  //  - DAY_2 보상액 : (70% of Daily Reward Pool) * (200 / (200 + 200))
-  //  - DAY_1 보상액 : (70% of Daily Reward Pool) * (100 / (100 + 200 + 100 + 300))
-  it("Determine #4: Daily reward is added up to determine the final amount of reward", async () => {
-
-    const todayMillis = (await _utility.getTimeMillis()) * 1;
-    const dayMillis = (await _utility.getOneDayMillis()) * 1;
-
-    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
-
-    // stage 1 :
-    const docId = DOC1;
-    const determined = web3.fromWei(await _creator.determine(docId, { from: accounts[1] }));
-    //console.log('reward of doc1 : ' + doc1);
-
-    const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
-    const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
-    const ref_3 = (drp_3 * 1) * (300 / (300 + 300));
-    const ref_4 = (drp_4 * 1) * (400 / (400 + 400));
-    const ref_5 = (drp_5 * 1) * (500 / (500 + 500));
-
-    const sample = Math.round((determined * 1) / 100);
-    const reference = Math.round((ref_1 + ref_2 + ref_3 + ref_4 + ref_5) / 100);
-    assert.equal(reference, sample, "wrong amount of reward token determined doc #1");
-  });
-
+    // 보상액 청구하기 #1 : 보상금은 소유자 본인만 청구할 수 있습니다.
+    // 보상액 청구하기 #2 : 보상액을 청구하면 산정된 보상액과 동일한 금액을 지급받습니다.
+    // 보상액 청구하기 #3 : 보상금은 한 번만 청구할 수 있습니다.
+    // 보상액 산정하기 5 : 이미 인출한 보상액은 제외
+    // 보상금 열람하기 #1 : 최근 N일간의 해당 문서에서 발생한 보상액 열람하기
+    // 보상금 열람하기 #2 : 누구나 열람할 수 있음
+    
+/*
   // 보상액 청구하기 #1 : 보상금은 소유자 본인만 청구할 수 있습니다.
   it("Claim #1: can only be claimed by the owner", async () => {
 

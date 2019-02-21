@@ -49,9 +49,10 @@ contract Creator is IAsset, Ownable {
     return sum;
   }
 
-  function determineAt(bytes32 docId, uint256 dateMillis) external view returns (uint256) {
+  function determineAt(address addr, bytes32 docId, uint256 dateMillis) external view returns (uint256) {
     require(msg.sender == address(_rewardPool));
     require(address(_rewardPool) != address(0));
+    require(_rewardPool._registry().isOwner(addr, docId));
     return totalReward(docId, dateMillis);
   }
 

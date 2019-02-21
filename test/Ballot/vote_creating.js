@@ -2,7 +2,7 @@ const Utility = artifacts.require("./Utility.sol");
 const Ballot = artifacts.require("./Ballot.sol");
 //var moment = require('moment');
 
-contract("Ballot", accounts => {
+contract("Ballot - creating votes", accounts => {
 
 /*
   it("Get view count through the oraclize api", async () => {
@@ -38,6 +38,7 @@ contract("Ballot", accounts => {
     // prepare
     _ballot = await Ballot.deployed();
     await _ballot.setCurator(accounts[0]);
+    await _ballot.setFoundation(accounts[0]);
     //await _ballot.init(_util.address);
 
     // assert
@@ -47,7 +48,7 @@ contract("Ballot", accounts => {
   it("Create a Vote", async () => {
 
     const ADDR = accounts[5];
-    const DOC = "10000000000000000000000000000001";
+    const DOC = web3.fromAscii("10000000000000000000000000000001");
     const DEPOSIT = new web3.BigNumber('100000000000000000000');
 
     const voteId = await _ballot.next();
@@ -68,7 +69,7 @@ contract("Ballot", accounts => {
   it("Read a Vote", async () => {
 
     const ADDR = accounts[5];
-    const DOC = "10000000000000000000000000000001";
+    const DOC = web3.fromAscii("10000000000000000000000000000001");
     const DEPOSIT = new web3.BigNumber('100000000000000000000');
 
     let voteId = await _ballot.count();

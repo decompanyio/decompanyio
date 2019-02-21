@@ -41,11 +41,102 @@ contract Curator is IAsset, Ownable {
   }
 
   function determine(bytes32 docId) external view returns (uint256) {
-      return docId == 0 ? 0 : 1;
+    require(docId != 0);
+    require(address(_rewardPool) != address(0));
+    require(_rewardPool._registry().contains(docId));
+    return totalReward(msg.sender, docId, uint(block.timestamp/86400) * 86400000);
   }
 
-  function determineAt(bytes32 docId, uint256 dateMillis) external view returns (uint256) {
-      return docId == 0 ? 0 : dateMillis;
+  function totalReward(address addr, bytes32 docId, uint256 claimMillis) private view returns (uint256) {
+    uint256 sum = 0;
+    uint256 next = 0;
+    uint256 listed;
+    uint256 last;
+    (,listed,last,) = _rewardPool._registry().getDocument(docId);
+    while (last < claimMillis) {
+      if (last == 0) {
+        last = listed;
+      }
+      sum += dailyReward(addr, docId, last, claimMillis);
+      next = last + 86400000;
+      assert(last < next);
+      last = next;
+    }
+    return sum;
+  }
+
+  function dailyReward(address addr, bytes32 docId, uint dateMillis, uint claimMillis) private view returns (uint) {
+    uint pv = _rewardPool._registry().getPageView(docId, dateMillis);
+    uint tpvs = _rewardPool._registry().getTotalPageViewSquare(dateMillis);
+    if (tpvs == 0 || pv == 0) {
+      return uint(0);
+    }
+    return calculate(addr, docId, dateMillis, claimMillis, pv, tpvs);
+  }
+
+  /*
+  // validation check
+  require(curatorPool.createTime() != 0);
+
+  uint numVotes = 0;
+  int idx = curatorPool.indexOfNextVoteForClaim(msg.sender, _docId, uint(0));
+  while(idx >= 0)
+  {
+    numVotes++;
+    idx = curatorPool.indexOfNextVoteForClaim(msg.sender, _docId, uint(idx));
+  }
+
+  uint reward = 0;
+  idx = curatorPool.indexOfNextVoteForClaim(msg.sender, _docId, uint(0));
+  for(uint i=0; i<numVotes; i++)
+  {
+    uint dt = curatorPool.getStartDateByAddr(msg.sender, uint(idx));
+    for (uint j=0; j<util.getVoteDepositDays(); j++) {
+      uint pv = getPageView(_docId, dt);
+      uint tpvs = getTotalPageViewSquare(dt);
+      reward += curatorPool.determineReward(msg.sender, uint(idx), dt, pv, tpvs);
+      dt += util.getOneDayMillis();
+    }
+    idx = curatorPool.indexOfNextVoteForClaim(msg.sender, _docId, uint(idx));
+  }
+
+  return reward;
+  */
+/*
+  function determineReward(address _addr, uint _idx, uint _dateMillis, uint _pv, uint _tpvs) public view returns (uint) {
+
+    require(_addr != 0);
+    require(_dateMillis > 0);
+
+    (, bytes32 d, uint256 t, uint256 p,) = _rewardPool._ballot().getVote(mapByAddr[_addr][_idx]);
+
+    if (t > _dateMillis
+     || (p == 0)
+     || (_dateMillis - t) > util.getVoteDepositMillis()) {
+      return uint(0);
+    }
+
+    return calculateReward(d, _dateMillis, _pv, _tpvs, p);
+  }
+*/
+  function calculate(address addr, bytes32 docId, uint dateMillis, uint claimMillis, uint pv, uint tpvs) private view returns (uint) {
+    uint tvd = _rewardPool._ballot().getActiveVotes(docId, dateMillis, _rewardPool.getVestingMillis());
+    if (tvd == 0) {
+      return uint(0);
+    }
+    uint deposit = _rewardPool._ballot().getUserClaimableVotes(addr, docId, dateMillis, claimMillis, _rewardPool.getVestingMillis());
+    assert(tvd >= deposit);
+    assert(tpvs >= (pv ** 2));
+    uint drp = _rewardPool.getDailyRewardPool(uint(30), dateMillis);
+    uint reward = uint(uint((drp * (pv ** 2)) / tpvs) * deposit / tvd);
+    assert(drp >= reward);
+    return reward;
+  }
+
+  function determineAt(address addr, bytes32 docId, uint256 dateMillis) external view returns (uint256) {
+    require(msg.sender == address(_rewardPool));
+    require(address(_rewardPool) != address(0));
+    return totalReward(addr, docId, dateMillis);
   }
 
 }

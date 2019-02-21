@@ -6,6 +6,7 @@ contract Ballot is Ownable {
 
   event CreateVote(uint256 voteId, address addr, bytes32 docId, uint256 dateMillis, uint256 deposit);
   event ClaimVote(uint256 voteId, uint256 amount);
+  event Withdraw(address addr, bytes32 docId, uint256 claimedDate, uint256 amount);
 
   struct Vote {
     address addr;
@@ -13,6 +14,12 @@ contract Ballot is Ownable {
     uint256 startDate;
     uint256 deposit;
     uint256 claimed;
+  }
+
+  struct Status {
+    uint lastClaimedDate;
+    uint withdraw;
+    bool added;
   }
 
   // voteId to the vote data
@@ -25,7 +32,7 @@ contract Ballot is Ownable {
   mapping (bytes32 => uint256[]) internal _mapByDoc;
 
   // for user document list
-  mapping (address => mapping (bytes32 => bool)) internal _mapUserDocAdded;
+  mapping (address => mapping (bytes32 => Status)) internal _mapUserDocAdded;
   mapping (address => bytes32[]) internal _mapUserDoc;
 
   // number of total votes
@@ -65,12 +72,62 @@ contract Ballot is Ownable {
     _mapByDoc[docId].push(i);
     _length++;
 
-    if (_mapUserDocAdded[addr][docId] == false) {
+    if (_mapUserDocAdded[addr][docId].added == false) {
       _mapUserDoc[addr].push(docId);
-      _mapUserDocAdded[addr][docId] = true;
+      _mapUserDocAdded[addr][docId].added = true;
     }
 
     emit CreateVote(i, addr, docId, dateMillis, deposit);
+  }
+
+  function getVote(uint256 i) external view returns (address, bytes32, uint256, uint256, uint256) {
+    return (_mapById[i].addr, _mapById[i].docId, _mapById[i].startDate, _mapById[i].deposit, _mapById[i].claimed);
+  }
+
+  function getActiveVotes(bytes32 docId, uint dateMillis, uint vestingMillis) external view returns (uint256) {
+    uint256 sum = 0;
+    for (uint i=0; i<_mapByDoc[docId].length; i++) {
+      if (isActive(_mapById[_mapByDoc[docId][i]], dateMillis, vestingMillis)) {
+        sum += _mapById[_mapByDoc[docId][i]].deposit;
+      }
+    }
+    return sum;
+  }
+
+  function getUserActiveVotes(address addr, bytes32 docId, uint dateMillis, uint vestingMillis) external view returns (uint256) {
+    uint256 sum = 0;
+    for (uint i=0; i<_mapByAddr[addr].length; i++) {
+      if (sameDoc(_mapById[_mapByAddr[addr][i]], docId)
+       && isActive(_mapById[_mapByAddr[addr][i]], dateMillis, vestingMillis)) {
+        sum += _mapById[_mapByAddr[addr][i]].deposit;
+      }
+    }
+    return sum;
+  }
+
+  function getUserClaimableVotes(address addr, bytes32 docId, uint dateMillis, uint claimDateMillis, uint vestingMillis) external view returns (uint256) {
+    uint256 sum = 0;
+    uint256 lastDateMillis = _mapUserDocAdded[addr][docId].lastClaimedDate;
+    for (uint i=0; i<_mapByAddr[addr].length; i++) {
+      if (sameDoc(_mapById[_mapByAddr[addr][i]], docId)
+       && isActive(_mapById[_mapByAddr[addr][i]], dateMillis, vestingMillis)
+       && isClaimable(_mapById[_mapByAddr[addr][i]], lastDateMillis, claimDateMillis, vestingMillis)) {
+        sum += _mapById[_mapByAddr[addr][i]].deposit;
+      }
+    }
+    return sum;
+  }
+
+  function getUserDocuments(address addr) external view returns (bytes32[]) {
+    return _mapUserDoc[addr];
+  }
+
+  function updateWithdraw(address addr, bytes32 docId, uint256 claimedDate, uint256 withdraw) external {
+    require(msg.sender == _rewardPool);
+    require(_mapUserDocAdded[addr][docId].added);
+    _mapUserDocAdded[addr][docId].lastClaimedDate = claimedDate;
+    _mapUserDocAdded[addr][docId].withdraw += withdraw;
+    emit Withdraw(addr, docId, claimedDate, withdraw);
   }
 
   function updateClaimed(uint256 i, uint256 amount) external {
@@ -85,35 +142,17 @@ contract Ballot is Ownable {
     emit ClaimVote(i, amount);
   }
 
-  function getVote(uint256 i) external view returns (address, bytes32, uint256, uint256, uint256) {
-    return (_mapById[i].addr, _mapById[i].docId, _mapById[i].startDate, _mapById[i].deposit, _mapById[i].claimed);
+  function sameDoc(Vote vote, bytes32 docId) private view returns (bool) {
+    return (docId == vote.docId);
   }
 
-  function getActiveVotes(bytes32 docId, uint dateMillis, uint vestingMillis) external view returns (uint256) {
-    uint256 sum = 0;
-    for (uint i=0; i<_mapByDoc[docId].length; i++) {
-      if (dateMillis - _mapById[_mapByDoc[docId][i]].startDate >= 0
-       && dateMillis - _mapById[_mapByDoc[docId][i]].startDate < vestingMillis) {
-        sum += _mapById[_mapByDoc[docId][i]].deposit;
-      }
-    }
-    return sum;
+  function isActive(Vote vote, uint dateMillis, uint vestingMillis) private view returns (bool) {
+    return (dateMillis >= vote.startDate) && (dateMillis - vestingMillis < vote.startDate);
   }
 
-  function getUserActiveVotes(address addr, bytes32 docId, uint dateMillis, uint vestingMillis) external view returns (uint256) {
-    uint256 sum = 0;
-    for (uint i=0; i<_mapByAddr[addr].length; i++) {
-      if (docId == _mapById[_mapByAddr[addr][i]].docId
-       && dateMillis - _mapById[_mapByAddr[addr][i]].startDate >= 0
-       && dateMillis - _mapById[_mapByAddr[addr][i]].startDate < vestingMillis) {
-        sum += _mapById[_mapByAddr[addr][i]].deposit;
-      }
-    }
-    return sum;
-  }
-
-  function getUserDocuments(address addr) external view returns (bytes32[]) {
-    return _mapUserDoc[addr];
+  function isClaimable(Vote vote, uint lastDateMillis, uint claimDateMillis, uint vestingMillis) private view returns (bool) {
+    lastDateMillis = lastDateMillis == 0 ? vestingMillis : lastDateMillis;
+    return (lastDateMillis - vestingMillis <= vote.startDate) && (claimDateMillis - vestingMillis > vote.startDate);
   }
 
   function setRewardPool(address addr) external onlyOwner() {

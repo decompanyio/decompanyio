@@ -34,9 +34,8 @@ contract RewardPool is Ownable {
   function claim(bytes32 docId, IAsset source) external {
     require(address(_registry) != address(0));
     require(address(source) == _creator || address(source) == _curator);
-    require(_registry.isOwner(msg.sender, docId));
     uint256 dateMillis = uint(block.timestamp/86400) * 86400000;
-    uint256 amount = source.determineAt(docId, dateMillis);
+    uint256 amount = source.determineAt(msg.sender, docId, dateMillis);
     if (amount > 0 && _token.balanceOf(address(this)) > amount) {
       _token.transfer(msg.sender, amount);
       _registry.updateWithdraw(docId, dateMillis, amount);
