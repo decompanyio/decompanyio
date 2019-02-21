@@ -118,6 +118,19 @@ contract Ballot is Ownable {
     return sum;
   }
 
+  function getUserRefundableDeposit(address addr, bytes32 docId, uint dateMillis, uint claimDateMillis, uint vestingMillis) external view returns (uint256) {
+    uint256 sum = 0;
+    uint256 lastDateMillis = _mapUserDocAdded[addr][docId].lastClaimedDate;
+    for (uint i=0; i<_mapByAddr[addr].length; i++) {
+      if (sameDoc(_mapById[_mapByAddr[addr][i]], docId)
+       && isRefundable(_mapById[_mapByAddr[addr][i]], dateMillis, vestingMillis)
+       && isClaimable(_mapById[_mapByAddr[addr][i]], lastDateMillis, claimDateMillis, vestingMillis)) {
+        sum += _mapById[_mapByAddr[addr][i]].deposit;
+      }
+    }
+    return sum;
+  }
+
   function getUserDocuments(address addr) external view returns (bytes32[]) {
     return _mapUserDoc[addr];
   }
@@ -147,12 +160,16 @@ contract Ballot is Ownable {
   }
 
   function isActive(Vote vote, uint dateMillis, uint vestingMillis) private view returns (bool) {
-    return (dateMillis >= vote.startDate) && (dateMillis - vestingMillis < vote.startDate);
+    return (vote.startDate <= dateMillis) && (dateMillis < vote.startDate + vestingMillis);
   }
 
   function isClaimable(Vote vote, uint lastDateMillis, uint claimDateMillis, uint vestingMillis) private view returns (bool) {
     lastDateMillis = lastDateMillis == 0 ? vestingMillis : lastDateMillis;
-    return (lastDateMillis - vestingMillis <= vote.startDate) && (claimDateMillis - vestingMillis > vote.startDate);
+    return (lastDateMillis <= vote.startDate + vestingMillis) && (vote.startDate + vestingMillis < claimDateMillis);
+  }
+
+  function isRefundable(Vote vote, uint dateMillis, uint vestingMillis) private view returns (bool) {
+    return (dateMillis == vote.startDate + vestingMillis);
   }
 
   function setRewardPool(address addr) external onlyOwner() {

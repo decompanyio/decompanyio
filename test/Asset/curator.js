@@ -493,7 +493,7 @@ contract("Asset - curator", accounts => {
   // DOC #3 : Active Votes (100)
   // DOC #4 : Active Votes (  0,   0,   0, 100, 100, 500, 400, 400)
   // DOC #5 : Active Votes (0)
-  it("Determine #2: The amount of reward for unexpired votes is 0.", async () => {
+  it("Determine #2: The amount of reward that has not been withdrawn", async () => {
 
     const todayMillis = (await _utility.getTimeMillis()) * 1;
     const dayMillis = (await _utility.getOneDayMillis()) * 1;
@@ -514,6 +514,7 @@ contract("Asset - curator", accounts => {
     const determined_doc1_a3 = web3.fromWei(await _curator.determine(DOC1, { from: accounts[3]}), "ether") * 1;
     const sample_doc1_a3 = Math.floor((determined_doc1_a3 * 1));
     const reference_doc1_a3 = Math.floor(ref_A3_DOC1_DAY2 + ref_A3_DOC1_DAY3 + ref_A3_DOC1_DAY4);
+    //console.log("sample_doc1_a3: " + sample_doc1_a3);
     assert.equal(reference_doc1_a3, sample_doc1_a3, "wrong amount of determined token : curator #3, doc #1, day 4");
 
     // ACCOUNT[3], DOC2
@@ -550,57 +551,41 @@ contract("Asset - curator", accounts => {
     assert.equal(0, sample_doc2_a5, "wrong amount of determined token : curator #5, doc #2, day 0");
   });
 
-  // 보상액 산정하기 3 : 보상액 산정은 투/*의 소유자만 가능
-  //  - 문서의 소유자가 아닌 경우 exception을 발생함
-  //  - 문서의 소유자인 경우 산정된 보상액을 리턴
-  it("Determine #2: Only the owner of the document can determine the amount of reward", async () => {
+  // 보상액 청구하기 #1 : 보상액을 청구하면 산정된 보상액과 동일한 금액을 지급받습니다.
+  //  - ACCOUNT[3], DOC1
+  //  - 보상액 : 49315.068492 DECK
 
-    const docId = DOC3;
+  // ---- Page View ----
+  // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
+  // DOC #2 : ACOUNT[1], PV(0, 200)
+  // DOC #3 : ACOUNT[1], PV(0, )
+  // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
+  // DOC #5 : ACOUNT[2], PV(0, 300)
 
-    try {
-      await _creator.determine(docId, { from: accounts[5] });
-    } catch (error) {
-      const revertFound = error.message.search('revert') >= 0;
-      assert.strictEqual(revertFound, true);
-      return;
-    }
-    assert.isTrue(false);
-  });
+  // ---- Votes ----
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
+  // ACOUNT[3] : DOC #2(200), +1 DAYS
+  // ACOUNT[4] : DOC #1(100), +3 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
+  // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
 
-
-    // 보상액 청구하기 #1 : 보상금은 소유자 본인만 청구할 수 있습니다.
-    // 보상액 청구하기 #2 : 보상액을 청구하면 산정된 보상액과 동일한 금액을 지급받습니다.
-    // 보상액 청구하기 #3 : 보상금은 한 번만 청구할 수 있습니다.
-    // 보상액 산정하기 5 : 이미 인출한 보상액은 제외
-    // 보상금 열람하기 #1 : 최근 N일간의 해당 문서에서 발생한 보상액 열람하기
-    // 보상금 열람하기 #2 : 누구나 열람할 수 있음
-    
-/*
-  // 보상액 청구하기 #1 : 보상금은 소유자 본인만 청구할 수 있습니다.
-  it("Claim #1: can only be claimed by the owner", async () => {
-
-    const src = _creator.address;
-    const docId = DOC1;
-
-    try {
-      await _pool.claim(docId, src, { from: accounts[5] });
-    } catch (error) {
-      const revertFound = error.message.search('revert') >= 0;
-      assert.strictEqual(revertFound, true);
-      return;
-    }
-    assert.isTrue(false);
-  });
-
-  // 보상액 청구하기 #2 : 보상액을 청구하면 산정된 보상액과 동일한 금액을 지급받습니다.
-  it("Claim #2: By claiming reward, be paid the same amount as the reward determined", async () => {
-
+  // ---- Active Votes ----
+  // DOC #1 : Active Votes (  0, 100, 200, 200, 100)
+  // DOC #2 : Active Votes (400, 200)
+  // DOC #3 : Active Votes (100)
+  // DOC #4 : Active Votes (  0,   0,   0, 100, 100, 500, 400, 400)
+  // DOC #5 : Active Votes (0)
+  it("Claim #1: By claiming reward, be paid the same amount as the reward determined", async () => {
     // -------------------------
     // Preparing : 초기 잔고 및 보상액 확인하기
     // -------------------------
-    const owner = accounts[1];
+    const owner = accounts[3];
     const token = _deck.address;
-    const source = _creator.address;
+    const source = _curator.address;
+    const refund = web3.fromWei(VOTE100, "ether") * 1;
     const docId = DOC1;
 
     // Account #1 유저의 초기 잔고
@@ -609,7 +594,7 @@ contract("Asset - curator", accounts => {
     //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
 
     // determined된 보상액
-    const reward_wei = await _creator.determine(docId, { from: owner });
+    const reward_wei = await _curator.determine(docId, { from: owner });
     const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
 
@@ -619,36 +604,60 @@ contract("Asset - curator", accounts => {
     await _pool.claim(docId, source, { from: owner });
     //console.log('claimed');
 
-    const bal_wei_S2 = await _deck.balanceOf(accounts[1]);
+    const bal_wei_S2 = await _deck.balanceOf(owner);
     const bal_ether_S2 = web3.fromWei(bal_wei_S2, "ether") * 1;
     //console.log('bal_ether_S2 : ' + bal_ether_S2.toString());
 
     // -------------------------
     // Check result
     // -------------------------
-    var reference = bal_ether_S1 + reward_ether;
+    var reference = bal_ether_S1 + reward_ether + refund;
     var sample = bal_ether_S2;
     assert.equal(reference, sample);
   });
 
-  // 보상액 청구하기 #3 : 보상금은 한 번만 청구할 수 있습니다.
-  it("Claim #3: can only claim one's reward once", async () => {
+  // 보상액 청구하기 #2 : 보상금은 한 번만 청구할 수 있습니다.
+
+  // ---- Page View ----
+  // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
+  // DOC #2 : ACOUNT[1], PV(0, 200)
+  // DOC #3 : ACOUNT[1], PV(0, )
+  // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
+  // DOC #5 : ACOUNT[2], PV(0, 300)
+
+  // ---- Votes ----
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
+  // ACOUNT[3] : DOC #2(200), +1 DAYS
+  // ACOUNT[4] : DOC #1(100), +3 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
+  // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
+
+  // ---- Active Votes ----
+  // DOC #1 : Active Votes (  0, 100, 200, 200, 100)
+  // DOC #2 : Active Votes (400, 200)
+  // DOC #3 : Active Votes (100)
+  // DOC #4 : Active Votes (  0,   0,   0, 100, 100, 500, 400, 400)
+  // DOC #5 : Active Votes (0)
+  it("Claim #2: can only claim one's reward once", async () => {
 
     // -------------------------
     // Preparing : 초기 잔고 및 보상액 확인하기
     // -------------------------
-    const owner = accounts[1];
+    const owner = accounts[3];
     const token = _deck.address;
-    const source = _creator.address;
+    const source = _curator.address;
     const docId = DOC1;
 
-    // Account #1 유저의 초기 잔고
+    // Account #3 유저의 초기 잔고
     const bal_wei_S1 = await _deck.balanceOf(owner);
     const bal_ether_S1 = web3.fromWei(bal_wei_S1, "ether") * 1;
     //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
 
     // determined된 보상액
-    const reward_wei = await _creator.determine(docId, { from: owner });
+    const reward_wei = await _curator.determine(docId, { from: owner });
     const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
     assert.equal(0, reward_ether, "determined amount is not 0");
@@ -659,7 +668,7 @@ contract("Asset - curator", accounts => {
     await _pool.claim(docId, source, { from: owner });
     //console.log('claimed');
 
-    const bal_wei_S2 = await _deck.balanceOf(accounts[1]);
+    const bal_wei_S2 = await _deck.balanceOf(owner);
     const bal_ether_S2 = web3.fromWei(bal_wei_S2, "ether") * 1;
     //console.log('bal_ether_S2 : ' + bal_ether_S2.toString());
 
@@ -671,88 +680,90 @@ contract("Asset - curator", accounts => {
     assert.equal(reference, sample);
   });
 
-  // 보상액 산정하기 5 : 이미 인출한 보상액은 제외
-  //  -----------------------------------
-  //  DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
-  //  DOC #2 : ACOUNT[1], PV(0, 200)
-  //  DOC #3 : ACOUNT[1], PV(0, )
-  //  DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
-  //  DOC #5 : ACOUNT[2], PV(0, 300)
-  //  -----------------------------------
-  //  - 8일전(DAY_8) 등록한 문서(DOC #4)에 대해서
+  // 보상액 산정하기 3 : 이미 인출한 보상액은 제외
+
+  // ---- Page View ----
+  // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
+  // DOC #2 : ACOUNT[1], PV(0, 200)
+  // DOC #3 : ACOUNT[1], PV(0, )
+  // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
+  // DOC #5 : ACOUNT[2], PV(0, 300)
+
+  // ---- Votes ----
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
+  // ACOUNT[3] : DOC #2(200), +1 DAYS
+  // ACOUNT[4] : DOC #1(100), +3 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
+  // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
+
+  // ---- Active Votes ----
+  // DOC #1 : Active Votes (  0, 100, 200, 200, 100)
+  // DOC #2 : Active Votes (400, 200)
+  // DOC #3 : Active Votes (100)
+  // DOC #4 : Active Votes (  0,   0,   0, 100, 100, 500, 400, 400)
+  // DOC #5 : Active Votes (0)
+
+  //  - 7일전(DAY_7) 투표한 문서(DOC #4)에 대해서
   //  - 3일전(DAY_3)에 보상을 인출한 경우,
-  //  - 최종 산정된 보상액은 DAY_3부터 DAY_1까지의 보상액을 합산한 금액
-  //
-  //  - DAY_3 보상액 : (70% of Daily Reward Pool) * (300 / (300 + 300))
-  //  - DAY_2 보상액 : (70% of Daily Reward Pool) * (200 / (200 + 200))
-  //  - DAY_1 보상액 : (70% of Daily Reward Pool) * (100 / (100 + 200 + 100 + 300))
-  it("Determine #5: Excludes the amount of reward already claimed.", async () => {
+  //  - 최종 산정된 보상액은 DAY_5부터 DAY_3까지의 보상액을 합산한 금액
+
+  //  - DAY_5 보상액 : (30% of Daily Reward Pool) * (100 / (500))) / (250000 + 250000) * 250000
+  //  - DAY_4 보상액 : (30% of Daily Reward Pool) * (100 / (100))) / (160000 + 160000) * 160000
+  //  - DAY_3 보상액 : (30% of Daily Reward Pool) * (100 / (100))) / (90000 + 90000) * 90000
+  it("Determine #3: Excludes the amount of reward already claimed.", async () => {
 
     // -------------------------
     // Preparing : 초기 잔고 및 보상액 확인하기
     // -------------------------
     const docId = DOC4;
-    const owner = accounts[2];
+    const owner = accounts[4];
     const foundation = accounts[0];
 
     const token = _deck.address;
-    const source = _creator.address;
+    const source = _curator.address;
 
-    // Account #2 유저의 초기 잔고
+    // Account #4 유저의 초기 잔고
     const bal_wei_S1 = await _deck.balanceOf(owner);
     const bal_ether_S1 = web3.fromWei(bal_wei_S1, "ether") * 1;
     //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
 
     // determined된 보상액
-    const reward_wei = await _creator.determine(docId, { from: owner });
+    const reward_wei = await _curator.determine(docId, { from: owner });
     const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
 
     // -------------------------
-    // Testing : DAYS_3에 지급 후 청구하고 입급된 잔고 확인하기
+    // Testing : DAYS_3에 지급
     // -------------------------
 
     //  - DAY_3기준으로 보상 지급하기
-    const amount = await _creator.determineAt(docId, DAYS_3, { from: _pool.address });
-    await _pool.pay(docId, owner, amount, DAYS_3, { from: foundation });
+    const amount = await _curator.determineAt(owner, docId, DAYS_3, { from: _pool.address });
+    await _pool.pay(docId, owner, amount, 400, DAYS_3, { from: foundation });
     //console.log('paid');
 
-    const bal_wei_S2 = await _deck.balanceOf(owner);
-    const bal_ether_S2 = web3.fromWei(bal_wei_S2, "ether") * 1;
-    //console.log('bal_ether_S2 : ' + bal_ether_S2.toString());
-
-    const paid_ether = bal_ether_S2 - bal_ether_S1;
-    assert.isTrue(paid_ether > 0, "DAYS_3 reward wasn't paid");
-
-    //  - 보상 청구하기
-    await _pool.claim(docId, source, { from: owner });
-    //console.log('claimed');
-
-    const bal_wei_S3 = await _deck.balanceOf(owner);
-    const bal_ether_S3 = web3.fromWei(bal_wei_S3, "ether") * 1;
-    //console.log('bal_ether_S3 : ' + bal_ether_S3.toString());
+    //  - determine
+    const reward_s2_wei = await _curator.determine(docId, { from: owner });
+    const reward_s2_ether = web3.fromWei(reward_s2_wei, "ether") * 1;
+    //console.log('reward_s2_ether : ' + reward_s2_ether.toString());
 
     // -------------------------
     // Check result
     // -------------------------
     const todayMillis = (await _utility.getTimeMillis()) * 1;
     const dayMillis = (await _utility.getOneDayMillis()) * 1;
-    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-
-    const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
-    const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
-    const ref_3 = (drp_3 * 1) * (300 / (300 + 300));
-
-    const sample1 = reward_ether;
-    const sample2 = bal_ether_S3 - bal_ether_S1;
-    const reference = paid_ether + ref_1 + ref_2 + ref_3;
-
-    assert.equal(reference, sample1, "determined wrong amount");
-    assert.equal(sample1, sample2, "paid wrong amount");
+    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
+    const ref_3 = ((drp_3 * 1) * (100 / (100))) / (90000 + 90000) * 90000;
+    const ref_4 = ((drp_4 * 1) * (100 / (100))) / (160000 + 160000) * 160000;
+    const ref_5 = ((drp_5 * 1) * (100 / (500))) / (250000 + 250000) * 250000;
+    const reference = Math.floor(ref_3 + ref_4 + ref_5);
+    assert.equal(reference, Math.floor(reward_s2_ether), "determined wrong amount");
   });
-
+/*
   // 보상금 열람하기 #1 : 최근 N일간의 해당 문서에서 발생한 보상액 열람하기
   //  -----------------------------------
   //  DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
@@ -778,7 +789,7 @@ contract("Asset - curator", accounts => {
     const docId = DOC4;
 
     // Testing
-    const earnings_wei = await _creator.recentEarnings(docId, 7);
+    const earnings_wei = await _curator.recentEarnings(docId, 7);
     const earnings_ether = web3.fromWei(earnings_wei, "ether") * 1;
     //console.log('earnings_ether : ' + earnings_ether.toString());
 
@@ -815,7 +826,7 @@ contract("Asset - curator", accounts => {
     const docId = DOC1;
 
     // Testing
-    const earnings_wei = await _creator.recentEarnings(docId, 7, { from: accounts[7] });
+    const earnings_wei = await _curator.recentEarnings(docId, 7, { from: accounts[7] });
     const earnings_ether = web3.fromWei(earnings_wei, "ether") * 1;
     //console.log('earnings_ether : ' + earnings_ether.toString());
 
@@ -857,7 +868,7 @@ contract("Asset - curator", accounts => {
     const owner = accounts[1];
 
     // Testing
-    const rp = await _creator._rewardPool();
+    const rp = await _curator._rewardPool();
     assert.equal(_pool.address, rp);
     const rg = await _pool._registry();
     assert.equal(_registry.address, rg);

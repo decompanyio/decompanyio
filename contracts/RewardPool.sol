@@ -36,20 +36,28 @@ contract RewardPool is Ownable {
     require(address(source) == _creator || address(source) == _curator);
     uint256 dateMillis = uint(block.timestamp/86400) * 86400000;
     uint256 amount = source.determineAt(msg.sender, docId, dateMillis);
-    if (amount > 0 && _token.balanceOf(address(this)) > amount) {
-      _token.transfer(msg.sender, amount);
-      _registry.updateWithdraw(docId, dateMillis, amount);
+    uint256 refund = source.refundableAt(msg.sender, docId, dateMillis);
+    if ((amount + refund) > 0 && _token.balanceOf(address(this)) > (amount + refund)) {
+      _token.transfer(msg.sender, (amount + refund));
+      if (refund == 0) {
+        _registry.updateWithdraw(docId, dateMillis, amount);
+      } else {
+        _ballot.updateWithdraw(msg.sender, docId, dateMillis, amount);
+      }
     }
   }
 
-  function pay(bytes32 docId, address owner, uint256 amount, uint256 dateMillis) external {
+  function pay(bytes32 docId, address owner, uint256 amount, uint256 refund, uint256 dateMillis) external {
     require(msg.sender == _foundation);
     require(address(_registry) != address(0));
-    require(amount > 0);
-    require(_token.balanceOf(address(this)) > amount);
-
-    _token.transfer(owner, amount);
-    _registry.updateWithdraw(docId, dateMillis, amount);
+    require(amount + refund > 0);
+    require(_token.balanceOf(address(this)) > amount + refund);
+    _token.transfer(owner, amount + refund);
+    if (refund == 0) {
+      _registry.updateWithdraw(docId, dateMillis, amount);
+    } else {
+      _ballot.updateWithdraw(owner, docId, dateMillis, amount);
+    }
   }
 
   function revoke() external onlyOwner() {

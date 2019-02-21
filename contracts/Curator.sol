@@ -53,11 +53,29 @@ contract Curator is IAsset, Ownable {
     uint256 listed;
     uint256 last;
     (,listed,last,) = _rewardPool._registry().getDocument(docId);
-    while (last < claimMillis) {
+    while (last <= claimMillis) {
       if (last == 0) {
         last = listed;
       }
       sum += dailyReward(addr, docId, last, claimMillis);
+      next = last + 86400000;
+      assert(last < next);
+      last = next;
+    }
+    return sum;
+  }
+
+  function totalRefund(address addr, bytes32 docId, uint256 claimMillis) private view returns (uint256) {
+    uint256 sum = 0;
+    uint256 next = 0;
+    uint256 listed;
+    uint256 last;
+    (,listed,last,) = _rewardPool._registry().getDocument(docId);
+    while (last <= claimMillis) {
+      if (last == 0) {
+        last = listed;
+      }
+      sum += dailyRefund(addr, docId, last, claimMillis);
       next = last + 86400000;
       assert(last < next);
       last = next;
@@ -74,51 +92,10 @@ contract Curator is IAsset, Ownable {
     return calculate(addr, docId, dateMillis, claimMillis, pv, tpvs);
   }
 
-  /*
-  // validation check
-  require(curatorPool.createTime() != 0);
-
-  uint numVotes = 0;
-  int idx = curatorPool.indexOfNextVoteForClaim(msg.sender, _docId, uint(0));
-  while(idx >= 0)
-  {
-    numVotes++;
-    idx = curatorPool.indexOfNextVoteForClaim(msg.sender, _docId, uint(idx));
+  function dailyRefund(address addr, bytes32 docId, uint dateMillis, uint claimMillis) private view returns (uint) {
+    return _rewardPool._ballot().getUserRefundableDeposit(addr, docId, dateMillis, claimMillis, _rewardPool.getVestingMillis());
   }
 
-  uint reward = 0;
-  idx = curatorPool.indexOfNextVoteForClaim(msg.sender, _docId, uint(0));
-  for(uint i=0; i<numVotes; i++)
-  {
-    uint dt = curatorPool.getStartDateByAddr(msg.sender, uint(idx));
-    for (uint j=0; j<util.getVoteDepositDays(); j++) {
-      uint pv = getPageView(_docId, dt);
-      uint tpvs = getTotalPageViewSquare(dt);
-      reward += curatorPool.determineReward(msg.sender, uint(idx), dt, pv, tpvs);
-      dt += util.getOneDayMillis();
-    }
-    idx = curatorPool.indexOfNextVoteForClaim(msg.sender, _docId, uint(idx));
-  }
-
-  return reward;
-  */
-/*
-  function determineReward(address _addr, uint _idx, uint _dateMillis, uint _pv, uint _tpvs) public view returns (uint) {
-
-    require(_addr != 0);
-    require(_dateMillis > 0);
-
-    (, bytes32 d, uint256 t, uint256 p,) = _rewardPool._ballot().getVote(mapByAddr[_addr][_idx]);
-
-    if (t > _dateMillis
-     || (p == 0)
-     || (_dateMillis - t) > util.getVoteDepositMillis()) {
-      return uint(0);
-    }
-
-    return calculateReward(d, _dateMillis, _pv, _tpvs, p);
-  }
-*/
   function calculate(address addr, bytes32 docId, uint dateMillis, uint claimMillis, uint pv, uint tpvs) private view returns (uint) {
     uint tvd = _rewardPool._ballot().getActiveVotes(docId, dateMillis, _rewardPool.getVestingMillis());
     if (tvd == 0) {
@@ -137,6 +114,12 @@ contract Curator is IAsset, Ownable {
     require(msg.sender == address(_rewardPool));
     require(address(_rewardPool) != address(0));
     return totalReward(addr, docId, dateMillis);
+  }
+
+  function refundableAt(address addr, bytes32 docId, uint256 dateMillis) external view returns (uint256) {
+    require(msg.sender == address(_rewardPool));
+    require(address(_rewardPool) != address(0));
+    return totalRefund(addr, docId, dateMillis);
   }
 
 }

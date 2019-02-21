@@ -56,6 +56,10 @@ contract Creator is IAsset, Ownable {
     return totalReward(docId, dateMillis);
   }
 
+  function refundableAt(address, bytes32, uint256) external view returns (uint256) {
+    return uint256(0);
+  }
+
   function totalReward(bytes32 docId, uint256 dateMillis) private view returns (uint256) {
     uint256 sum = 0;
     uint256 next = 0;

@@ -383,7 +383,7 @@ contract("Asset - creator", accounts => {
 
     //  - DAY_3기준으로 보상 지급하기
     const amount = await _creator.determineAt(owner, docId, DAYS_3, { from: _pool.address });
-    await _pool.pay(docId, owner, amount, DAYS_3, { from: foundation });
+    await _pool.pay(docId, owner, amount, 0, DAYS_3, { from: foundation });
     //console.log('paid');
 
     const bal_wei_S2 = await _deck.balanceOf(owner);
