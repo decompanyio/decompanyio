@@ -85,10 +85,13 @@ contract Creator is IAsset, Ownable {
   function dailyReward(bytes32 docId, uint256 dateMillis) private view returns (uint) {
     uint pv = _rewardPool._registry().getPageView(docId, dateMillis);
     uint tpv = _rewardPool._registry().getTotalPageView(dateMillis);
-    if (tpv == 0 || pv == 0) {
-      return uint(0);
-    }
-    return uint(pv * uint(_rewardPool.getDailyRewardPool(uint(70), dateMillis) / tpv));
+    uint drp = _rewardPool.getDailyRewardPool(uint(70), dateMillis);
+    return calculate(pv, tpv, drp);
+  }
+
+  function calculate(uint pv, uint tpv, uint drp) public pure returns (uint) {
+    if (tpv == 0 || pv == 0 || drp == 0) return uint(0);
+    return uint(pv * uint(drp / tpv));
   }
 
 }

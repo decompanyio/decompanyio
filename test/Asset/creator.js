@@ -4,7 +4,6 @@ const Curator = artifacts.require("./Curator.sol");
 const RewardPool = artifacts.require("./RewardPool.sol");
 const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
 const Ballot = artifacts.require("./Ballot.sol");
-const Utility = artifacts.require("./Utility.sol");
 
 contract("Asset - creator", accounts => {
 
@@ -30,7 +29,6 @@ contract("Asset - creator", accounts => {
   let _creator = undefined;
   let _curator = undefined;
   let _pool = undefined;
-  let _utility = undefined;
 
   it("Setting up...", async () => {
 
@@ -39,7 +37,6 @@ contract("Asset - creator", accounts => {
     _creator = await Creator.deployed();
     _curator = await Curator.deployed();
     _pool = await RewardPool.deployed();
-    _utility = await Utility.deployed();
     _deck = await Deck.deployed();
 
     await _creator.init(_pool.address);
@@ -58,15 +55,15 @@ contract("Asset - creator", accounts => {
     await _ballot.setCurator(_curator.address);
     await _ballot.setFoundation(accounts[0]);
 
-    DAYS_0 = ((await _utility.getDateMillis()) * 1) - 0 * (await _utility.getOneDayMillis());
-    DAYS_1 = ((await _utility.getDateMillis()) * 1) - 1 * (await _utility.getOneDayMillis());
-    DAYS_2 = ((await _utility.getDateMillis()) * 1) - 2 * (await _utility.getOneDayMillis());
-    DAYS_3 = ((await _utility.getDateMillis()) * 1) - 3 * (await _utility.getOneDayMillis());
-    DAYS_4 = ((await _utility.getDateMillis()) * 1) - 4 * (await _utility.getOneDayMillis());
-    DAYS_5 = ((await _utility.getDateMillis()) * 1) - 5 * (await _utility.getOneDayMillis());
-    DAYS_6 = ((await _utility.getDateMillis()) * 1) - 6 * (await _utility.getOneDayMillis());
-    DAYS_7 = ((await _utility.getDateMillis()) * 1) - 7 * (await _utility.getOneDayMillis());
-    DAYS_8 = ((await _utility.getDateMillis()) * 1) - 8 * (await _utility.getOneDayMillis());
+    DAYS_0 = ((await _pool.getDateMillis()) * 1) - 0 * (await _pool.getOneDayMillis());
+    DAYS_1 = ((await _pool.getDateMillis()) * 1) - 1 * (await _pool.getOneDayMillis());
+    DAYS_2 = ((await _pool.getDateMillis()) * 1) - 2 * (await _pool.getOneDayMillis());
+    DAYS_3 = ((await _pool.getDateMillis()) * 1) - 3 * (await _pool.getOneDayMillis());
+    DAYS_4 = ((await _pool.getDateMillis()) * 1) - 4 * (await _pool.getOneDayMillis());
+    DAYS_5 = ((await _pool.getDateMillis()) * 1) - 5 * (await _pool.getOneDayMillis());
+    DAYS_6 = ((await _pool.getDateMillis()) * 1) - 6 * (await _pool.getOneDayMillis());
+    DAYS_7 = ((await _pool.getDateMillis()) * 1) - 7 * (await _pool.getOneDayMillis());
+    DAYS_8 = ((await _pool.getDateMillis()) * 1) - 8 * (await _pool.getOneDayMillis());
 
     // ---------------------------
     // DECK
@@ -186,13 +183,13 @@ contract("Asset - creator", accounts => {
   it("Determine #3: Documents registered before the day have reward according to pv", async () => {
 
     // prepare
-    const todayMillis = (await _utility.getTimeMillis()) * 1;
-    const yesterdayMillis = todayMillis - (await _utility.getOneDayMillis()) * 1;
+    const todayMillis = (await _pool.getDateMillis()) * 1;
+    const yesterdayMillis = todayMillis - (await _pool.getOneDayMillis()) * 1;
 
     // stage 1 :
     const docId = DOC2;
 
-    const drp = web3.fromWei(await _utility.getDailyRewardPool(70, yesterdayMillis));
+    const drp = web3.fromWei(await _pool.getDailyRewardPool(70, yesterdayMillis));
     const doc2 = web3.fromWei(await _creator.determine(docId, { from: accounts[1] }));
     //console.log('reward of doc2 : ' + doc2);
 
@@ -220,14 +217,14 @@ contract("Asset - creator", accounts => {
   //  - DAY_1 보상액 : (70% of Daily Reward Pool) * (100 / (100 + 200 + 100 + 300))
   it("Determine #4: Daily reward is added up to determine the final amount of reward", async () => {
 
-    const todayMillis = (await _utility.getTimeMillis()) * 1;
-    const dayMillis = (await _utility.getOneDayMillis()) * 1;
+    const todayMillis = (await _pool.getDateMillis()) * 1;
+    const dayMillis = (await _pool.getOneDayMillis()) * 1;
 
-    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
+    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
 
     // stage 1 :
     const docId = DOC1;
@@ -404,11 +401,11 @@ contract("Asset - creator", accounts => {
     // -------------------------
     // Check result
     // -------------------------
-    const todayMillis = (await _utility.getTimeMillis()) * 1;
-    const dayMillis = (await _utility.getOneDayMillis()) * 1;
-    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
+    const todayMillis = (await _pool.getDateMillis()) * 1;
+    const dayMillis = (await _pool.getOneDayMillis()) * 1;
+    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
 
     const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
     const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
@@ -454,16 +451,16 @@ contract("Asset - creator", accounts => {
     // -------------------------
     // Check result
     // -------------------------
-    const todayMillis = (await _utility.getTimeMillis()) * 1;
-    const dayMillis = (await _utility.getOneDayMillis()) * 1;
+    const todayMillis = (await _pool.getDateMillis()) * 1;
+    const dayMillis = (await _pool.getOneDayMillis()) * 1;
 
-    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
-    const drp_6 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 6 * dayMillis));
-    const drp_7 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 7 * dayMillis));
+    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
+    const drp_6 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 6 * dayMillis));
+    const drp_7 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 7 * dayMillis));
 
     const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
     const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
@@ -491,14 +488,14 @@ contract("Asset - creator", accounts => {
     // -------------------------
     // Check result
     // -------------------------
-    const todayMillis = (await _utility.getTimeMillis()) * 1;
-    const dayMillis = (await _utility.getOneDayMillis()) * 1;
+    const todayMillis = (await _pool.getDateMillis()) * 1;
+    const dayMillis = (await _pool.getOneDayMillis()) * 1;
 
-    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
+    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
 
     const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
     const ref_2 = (drp_2 * 1) * (200 / (200 + 200));

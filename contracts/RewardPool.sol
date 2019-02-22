@@ -98,4 +98,13 @@ contract RewardPool is Ownable {
     if (_curator != addr) _curator = addr;
   }
 
+  function getDateMillis() public view returns (uint) {
+    uint tDay = uint(block.timestamp / uint(86400000 / 1000));
+    uint tMillis = tDay * 86400000;
+    return tMillis;
+  }
+
+  function getOneDayMillis() public pure returns (uint) {
+    return 86400000;
+  }
 }

@@ -155,20 +155,20 @@ contract Ballot is Ownable {
     emit ClaimVote(i, amount);
   }
 
-  function sameDoc(Vote vote, bytes32 docId) private view returns (bool) {
+  function sameDoc(Vote vote, bytes32 docId) private pure returns (bool) {
     return (docId == vote.docId);
   }
 
-  function isActive(Vote vote, uint dateMillis, uint vestingMillis) private view returns (bool) {
+  function isActive(Vote vote, uint dateMillis, uint vestingMillis) private pure returns (bool) {
     return (vote.startDate <= dateMillis) && (dateMillis < vote.startDate + vestingMillis);
   }
 
-  function isClaimable(Vote vote, uint lastDateMillis, uint claimDateMillis, uint vestingMillis) private view returns (bool) {
+  function isClaimable(Vote vote, uint lastDateMillis, uint claimDateMillis, uint vestingMillis) private pure returns (bool) {
     lastDateMillis = lastDateMillis == 0 ? vestingMillis : lastDateMillis;
     return (lastDateMillis <= vote.startDate + vestingMillis) && (vote.startDate + vestingMillis < claimDateMillis);
   }
 
-  function isRefundable(Vote vote, uint dateMillis, uint vestingMillis) private view returns (bool) {
+  function isRefundable(Vote vote, uint dateMillis, uint vestingMillis) private pure returns (bool) {
     return (dateMillis == vote.startDate + vestingMillis);
   }
 

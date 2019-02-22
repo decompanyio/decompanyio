@@ -1,4 +1,4 @@
-const Utility = artifacts.require("./Utility.sol");
+const RewardPool = artifacts.require("./RewardPool.sol");
 const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
 //var moment = require('moment');
 
@@ -21,32 +21,32 @@ contract("DocumentRegistry - reading page views", accounts => {
   var DAYS_8;
   var DAYS_9;
 
-  let _util = undefined;
+  let _pool = undefined;
   let _documentRegistry = undefined;
   let _startTime = undefined;
   let _endTime = undefined;
 
   it("Setting up...", async () => {
 
-    _util = await Utility.deployed();
+    _pool = await RewardPool.deployed();
 
     // prepare
     _documentRegistry = await DocumentRegistry.deployed();
     await _documentRegistry.setRewardPool(accounts[0]);
     await _documentRegistry.setCreator(accounts[0]);
     await _documentRegistry.setFoundation(accounts[0]);
-    //await _documentRegistry.init(_util.address);
+    //await _documentRegistry.init(_pool.address);
 
-    DAYS_0 = ((await _util.getDateMillis()) * 1) - 0 * (await _util.getOneDayMillis());
-    DAYS_1 = ((await _util.getDateMillis()) * 1) - 1 * (await _util.getOneDayMillis());
-    DAYS_2 = ((await _util.getDateMillis()) * 1) - 2 * (await _util.getOneDayMillis());
-    DAYS_3 = ((await _util.getDateMillis()) * 1) - 3 * (await _util.getOneDayMillis());
-    DAYS_4 = ((await _util.getDateMillis()) * 1) - 4 * (await _util.getOneDayMillis());
-    DAYS_5 = ((await _util.getDateMillis()) * 1) - 5 * (await _util.getOneDayMillis());
-    DAYS_6 = ((await _util.getDateMillis()) * 1) - 6 * (await _util.getOneDayMillis());
-    DAYS_7 = ((await _util.getDateMillis()) * 1) - 7 * (await _util.getOneDayMillis());
-    DAYS_8 = ((await _util.getDateMillis()) * 1) - 8 * (await _util.getOneDayMillis());
-    DAYS_9 = ((await _util.getDateMillis()) * 1) - 9 * (await _util.getOneDayMillis());
+    DAYS_0 = ((await _pool.getDateMillis()) * 1) - 0 * (await _pool.getOneDayMillis());
+    DAYS_1 = ((await _pool.getDateMillis()) * 1) - 1 * (await _pool.getOneDayMillis());
+    DAYS_2 = ((await _pool.getDateMillis()) * 1) - 2 * (await _pool.getOneDayMillis());
+    DAYS_3 = ((await _pool.getDateMillis()) * 1) - 3 * (await _pool.getOneDayMillis());
+    DAYS_4 = ((await _pool.getDateMillis()) * 1) - 4 * (await _pool.getOneDayMillis());
+    DAYS_5 = ((await _pool.getDateMillis()) * 1) - 5 * (await _pool.getOneDayMillis());
+    DAYS_6 = ((await _pool.getDateMillis()) * 1) - 6 * (await _pool.getOneDayMillis());
+    DAYS_7 = ((await _pool.getDateMillis()) * 1) - 7 * (await _pool.getOneDayMillis());
+    DAYS_8 = ((await _pool.getDateMillis()) * 1) - 8 * (await _pool.getOneDayMillis());
+    DAYS_9 = ((await _pool.getDateMillis()) * 1) - 9 * (await _pool.getOneDayMillis());
 
     // ------------------
     // ACCOUNT[1]

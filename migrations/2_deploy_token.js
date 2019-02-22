@@ -1,5 +1,5 @@
 const Deck = artifacts.require("Deck");
-const Utility = artifacts.require("Utility");
+//const Utility = artifacts.require("Utility");
 //const ether = (n) => new web3.BigNumber(web3.toWei(n, 'ether'));
 
 const duration = {
@@ -22,6 +22,6 @@ module.exports = function(deployer, network, accounts) {
     const symbol = "KTA";
     const decimals = 18;
     await deployer.deploy(Deck , name, symbol, decimals);
-    await deployer.deploy(Utility);
+    //await deployer.deploy(Utility);
   });
 };

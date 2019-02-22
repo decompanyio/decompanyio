@@ -62,7 +62,7 @@ contract Curator is IAsset, Ownable {
         last = listed;
       }
       uint deposit = _rewardPool._ballot().getUserClaimableVotes(addr, docId, last, claimMillis, _rewardPool.getVestingMillis());
-      sum += dailyReward(addr, docId, last, claimMillis, deposit);
+      sum += dailyReward(docId, last, deposit);
       next = last + 86400000;
       assert(last < next);
       last = next;
@@ -88,20 +88,20 @@ contract Curator is IAsset, Ownable {
     return sum;
   }
 
-  function dailyReward(address addr, bytes32 docId, uint dateMillis, uint claimMillis, uint deposit) private view returns (uint) {
+  function dailyReward(bytes32 docId, uint dateMillis, uint deposit) private view returns (uint) {
     uint pv = _rewardPool._registry().getPageView(docId, dateMillis);
     uint tpvs = _rewardPool._registry().getTotalPageViewSquare(dateMillis);
     if (tpvs == 0 || pv == 0) {
       return uint(0);
     }
-    return calculate(addr, docId, dateMillis, claimMillis, pv, tpvs, deposit);
+    return calculate(docId, dateMillis, pv, tpvs, deposit);
   }
 
   function dailyRefund(address addr, bytes32 docId, uint dateMillis, uint claimMillis) private view returns (uint) {
     return _rewardPool._ballot().getUserRefundableDeposit(addr, docId, dateMillis, claimMillis, _rewardPool.getVestingMillis());
   }
 
-  function calculate(address addr, bytes32 docId, uint dateMillis, uint claimMillis, uint pv, uint tpvs, uint deposit) private view returns (uint) {
+  function calculate(bytes32 docId, uint dateMillis, uint pv, uint tpvs, uint deposit) private view returns (uint) {
     uint tvd = _rewardPool._ballot().getActiveVotes(docId, dateMillis, _rewardPool.getVestingMillis());
     if (tvd == 0) {
       return uint(0);
@@ -135,7 +135,7 @@ contract Curator is IAsset, Ownable {
     next = (todayMillis - (day * 86400000)) < listed ? listed : (todayMillis - (day * 86400000));
     while (next < todayMillis) {
       uint deposit = _rewardPool._ballot().getUserActiveVotes(addr, docId, next, _rewardPool.getVestingMillis());
-      sum += dailyReward(addr, docId, next, todayMillis, deposit);
+      sum += dailyReward(docId, next, deposit);
       next += 86400000;
     }
     return sum;

@@ -1,4 +1,4 @@
-const Utility = artifacts.require("./Utility.sol");
+const RewardPool = artifacts.require("./RewardPool.sol");
 const Ballot = artifacts.require("./Ballot.sol");
 //var moment = require('moment');
 
@@ -21,14 +21,14 @@ contract("Ballot - reading votes", accounts => {
   var DAYS_8;
   var DAYS_9;
 
-  let _util = undefined;
+  let _pool = undefined;
   let _ballot = undefined;
   let _startTime = undefined;
   let _endTime = undefined;
 
   it("Setting up...", async () => {
 
-    _util = await Utility.deployed();
+    _pool = await RewardPool.deployed();
 
     // prepare
     _ballot = await Ballot.deployed();
@@ -36,16 +36,16 @@ contract("Ballot - reading votes", accounts => {
     await _ballot.setFoundation(accounts[0]);
     await _ballot.setRewardPool(accounts[0]);
 
-    DAYS_0 = ((await _util.getDateMillis()) * 1) - 0 * (await _util.getOneDayMillis());
-    DAYS_1 = ((await _util.getDateMillis()) * 1) - 1 * (await _util.getOneDayMillis());
-    DAYS_2 = ((await _util.getDateMillis()) * 1) - 2 * (await _util.getOneDayMillis());
-    DAYS_3 = ((await _util.getDateMillis()) * 1) - 3 * (await _util.getOneDayMillis());
-    DAYS_4 = ((await _util.getDateMillis()) * 1) - 4 * (await _util.getOneDayMillis());
-    DAYS_5 = ((await _util.getDateMillis()) * 1) - 5 * (await _util.getOneDayMillis());
-    DAYS_6 = ((await _util.getDateMillis()) * 1) - 6 * (await _util.getOneDayMillis());
-    DAYS_7 = ((await _util.getDateMillis()) * 1) - 7 * (await _util.getOneDayMillis());
-    DAYS_8 = ((await _util.getDateMillis()) * 1) - 8 * (await _util.getOneDayMillis());
-    DAYS_9 = ((await _util.getDateMillis()) * 1) - 9 * (await _util.getOneDayMillis());
+    DAYS_0 = ((await _pool.getDateMillis()) * 1) - 0 * (await _pool.getOneDayMillis());
+    DAYS_1 = ((await _pool.getDateMillis()) * 1) - 1 * (await _pool.getOneDayMillis());
+    DAYS_2 = ((await _pool.getDateMillis()) * 1) - 2 * (await _pool.getOneDayMillis());
+    DAYS_3 = ((await _pool.getDateMillis()) * 1) - 3 * (await _pool.getOneDayMillis());
+    DAYS_4 = ((await _pool.getDateMillis()) * 1) - 4 * (await _pool.getOneDayMillis());
+    DAYS_5 = ((await _pool.getDateMillis()) * 1) - 5 * (await _pool.getOneDayMillis());
+    DAYS_6 = ((await _pool.getDateMillis()) * 1) - 6 * (await _pool.getOneDayMillis());
+    DAYS_7 = ((await _pool.getDateMillis()) * 1) - 7 * (await _pool.getOneDayMillis());
+    DAYS_8 = ((await _pool.getDateMillis()) * 1) - 8 * (await _pool.getOneDayMillis());
+    DAYS_9 = ((await _pool.getDateMillis()) * 1) - 9 * (await _pool.getOneDayMillis());
 
     const ADDR1 = accounts[1];
     const ADDR2 = accounts[2];
@@ -94,7 +94,7 @@ contract("Ballot - reading votes", accounts => {
   // CLAIMABLE (ADDR1, DAYS_4)               A       A       B       B       B     B,C
   // ---------------------------------------------------------------------------------
   it("Get active votes", async () => {
-    const vestingMillis = await _util.getVoteDepositMillis();
+    const vestingMillis = await _pool.getVestingMillis();
     const active_votes_day_9 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_9, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_9, "wrong active_votes_day_9");
     const active_votes_day_8 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_8, vestingMillis), "ether") * 1;
@@ -134,7 +134,7 @@ contract("Ballot - reading votes", accounts => {
   // ---------------------------------------------------------------------------------
   it("Get active user votes", async () => {
     const ADDR1 = accounts[1];
-    const vestingMillis = await _util.getVoteDepositMillis();
+    const vestingMillis = await _pool.getVestingMillis();
     const active_votes_day_9 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_9, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_9, "wrong active_votes_day_9");
     const active_votes_day_8 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_8, vestingMillis), "ether") * 1;
@@ -174,7 +174,7 @@ contract("Ballot - reading votes", accounts => {
   // ---------------------------------------------------------------------------------
   it("Get claimable user votes before claiming", async () => {
     const ADDR1 = accounts[1];
-    const vestingMillis = await _util.getVoteDepositMillis();
+    const vestingMillis = await _pool.getVestingMillis();
     const claimable_day_9 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_9, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_9, "wrong claimable_day_9");
     const claimable_day_8 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_8, DAYS_0, vestingMillis), "ether") * 1;
@@ -216,7 +216,7 @@ contract("Ballot - reading votes", accounts => {
     const ADDR1 = accounts[1];
     const withdraw = new web3.BigNumber('100000000000000000000');
     await _ballot.updateWithdraw(ADDR1, DOC1, DAYS_4, withdraw);
-    const vestingMillis = await _util.getVoteDepositMillis();
+    const vestingMillis = await _pool.getVestingMillis();
     const claimable_day_9 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_9, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_9, "wrong claimable_day_9");
     const claimable_day_8 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_8, DAYS_0, vestingMillis), "ether") * 1;
@@ -238,5 +238,5 @@ contract("Ballot - reading votes", accounts => {
     const claimable_day_0 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_0, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_0, "wrong claimable_day_0");
   });
-  
+
 });

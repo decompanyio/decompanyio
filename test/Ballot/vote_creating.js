@@ -1,4 +1,4 @@
-const Utility = artifacts.require("./Utility.sol");
+const RewardPool = artifacts.require("./RewardPool.sol");
 const Ballot = artifacts.require("./Ballot.sol");
 //var moment = require('moment');
 
@@ -26,20 +26,20 @@ contract("Ballot - creating votes", accounts => {
   });
 */
 
-  let _util = undefined;
+  let _pool = undefined;
   let _ballot = undefined;
   let _startTime = undefined;
   let _endTime = undefined;
 
   it("Setting up...", async () => {
 
-    _util = await Utility.deployed();
+    _pool = await RewardPool.deployed();
 
     // prepare
     _ballot = await Ballot.deployed();
     await _ballot.setCurator(accounts[0]);
     await _ballot.setFoundation(accounts[0]);
-    //await _ballot.init(_util.address);
+    //await _ballot.init(_pool.address);
 
     // assert
     assert.equal(1, 1, "failed to set up");
@@ -54,9 +54,9 @@ contract("Ballot - creating votes", accounts => {
     const voteId = await _ballot.next();
     //console.log("voteId : " + voteId);
 
-    _startTime = await _util.getDateMillis();
+    _startTime = await _pool.getDateMillis();
     await _ballot.create(voteId, ADDR, DOC, DEPOSIT);
-    _endTime = await _util.getDateMillis();
+    _endTime = await _pool.getDateMillis();
     //console.log("created");
 
     const vote = await _ballot.getVote(voteId);
