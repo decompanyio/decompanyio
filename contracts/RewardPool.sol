@@ -35,8 +35,7 @@ contract RewardPool is Ownable {
     require(address(_registry) != address(0));
     require(address(source) == _creator || address(source) == _curator);
     uint256 dateMillis = uint(block.timestamp/86400) * 86400000;
-    uint256 amount = source.determineAt(msg.sender, docId, dateMillis);
-    uint256 refund = source.refundableAt(msg.sender, docId, dateMillis);
+    (uint256 amount, uint256 refund) = source.determineAt(msg.sender, docId, dateMillis);
     if ((amount + refund) > 0 && _token.balanceOf(address(this)) > (amount + refund)) {
       _token.transfer(msg.sender, (amount + refund));
       if (refund == 0) {

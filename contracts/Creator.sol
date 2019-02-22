@@ -29,7 +29,7 @@ contract Creator is IAsset, Ownable {
     _rewardPool._registry().update(owner, docId, createTime, lastClaimedDate, withdraw);
   }
 
-  function determine(bytes32 docId) external view returns (uint256) {
+  function determine(bytes32 docId) external view returns (uint256, uint256) {
     require(docId != 0);
     require(address(_rewardPool) != address(0));
     require(_rewardPool._registry().contains(docId));
@@ -53,18 +53,14 @@ contract Creator is IAsset, Ownable {
     return sum;
   }
 
-  function determineAt(address addr, bytes32 docId, uint256 dateMillis) external view returns (uint256) {
+  function determineAt(address addr, bytes32 docId, uint256 dateMillis) external view returns (uint256, uint256) {
     require(msg.sender == address(_rewardPool));
     require(address(_rewardPool) != address(0));
     require(_rewardPool._registry().isOwner(addr, docId));
     return totalReward(docId, dateMillis);
   }
 
-  function refundableAt(address, bytes32, uint256) external view returns (uint256) {
-    return uint256(0);
-  }
-
-  function totalReward(bytes32 docId, uint256 dateMillis) private view returns (uint256) {
+  function totalReward(bytes32 docId, uint256 dateMillis) private view returns (uint256, uint256) {
     uint256 sum = 0;
     uint256 next = 0;
     uint256 listed;
@@ -79,7 +75,7 @@ contract Creator is IAsset, Ownable {
       assert(last < next);
       last = next;
     }
-    return sum;
+    return (sum, uint256(0));
   }
 
   function dailyReward(bytes32 docId, uint256 dateMillis) private view returns (uint) {

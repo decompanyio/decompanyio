@@ -145,7 +145,7 @@ contract("Asset - creator", accounts => {
     const docId = DOC3;
 
     const wei = await _creator.determine(docId, { from: accounts[1] });
-    const doc3 = web3.fromWei(wei, "ether");
+    const doc3 = web3.fromWei(wei[0], "ether");
     //console.log('reward of doc3 : ' + doc3);
     assert.equal(0, doc3 * 1);
   });
@@ -190,10 +190,11 @@ contract("Asset - creator", accounts => {
     const docId = DOC2;
 
     const drp = web3.fromWei(await _pool.getDailyRewardPool(70, yesterdayMillis));
-    const doc2 = web3.fromWei(await _creator.determine(docId, { from: accounts[1] }));
-    //console.log('reward of doc2 : ' + doc2);
+    const doc2_wei = await _creator.determine(docId, { from: accounts[1] });
+    const doc2_ether = web3.fromWei(doc2_wei[0], "ether");
+    //console.log('reward of doc2 : ' + doc2_ether);
 
-    const sample = Math.round((doc2 * 1) / 100);
+    const sample = Math.round((doc2_ether * 1) / 100);
     const reference = Math.round((drp * 1) * (200 / (100 + 200 + 100 + 300)) / 100);
     assert.equal(reference, sample, "wrong amount of reward token determined doc #2");
   });
@@ -228,7 +229,8 @@ contract("Asset - creator", accounts => {
 
     // stage 1 :
     const docId = DOC1;
-    const determined = web3.fromWei(await _creator.determine(docId, { from: accounts[1] }));
+    const determined_wei = await _creator.determine(docId, { from: accounts[1] });
+    const determined = web3.fromWei(determined_wei[0], "ether");
     //console.log('reward of doc1 : ' + doc1);
 
     const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
@@ -276,7 +278,7 @@ contract("Asset - creator", accounts => {
 
     // determined된 보상액
     const reward_wei = await _creator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
+    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
 
     // -------------------------
@@ -315,7 +317,7 @@ contract("Asset - creator", accounts => {
 
     // determined된 보상액
     const reward_wei = await _creator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
+    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
     assert.equal(0, reward_ether, "determined amount is not 0");
 
@@ -371,7 +373,7 @@ contract("Asset - creator", accounts => {
 
     // determined된 보상액
     const reward_wei = await _creator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
+    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
 
     // -------------------------
@@ -380,7 +382,7 @@ contract("Asset - creator", accounts => {
 
     //  - DAY_3기준으로 보상 지급하기
     const amount = await _creator.determineAt(owner, docId, DAYS_3, { from: _pool.address });
-    await _pool.pay(docId, owner, amount, 0, DAYS_3, { from: foundation });
+    await _pool.pay(docId, owner, amount[0], 0, DAYS_3, { from: foundation });
     //console.log('paid');
 
     const bal_wei_S2 = await _deck.balanceOf(owner);

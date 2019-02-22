@@ -44,18 +44,19 @@ contract Curator is IAsset, Ownable {
     return _rewardPool._ballot().getUserDocuments(addr);
   }
 
-  function determine(bytes32 docId) external view returns (uint256) {
+  function determine(bytes32 docId) external view returns (uint256, uint256) {
     require(docId != 0);
     require(address(_rewardPool) != address(0));
     require(_rewardPool._registry().contains(docId));
     return totalReward(msg.sender, docId, uint(block.timestamp/86400) * 86400000);
   }
 
-  function totalReward(address addr, bytes32 docId, uint256 claimMillis) private view returns (uint256) {
+  function totalReward(address addr, bytes32 docId, uint256 claimMillis) private view returns (uint256, uint256) {
     uint256 sum = 0;
+    uint256 refund = 0;
     uint256 next = 0;
-    uint256 listed;
-    uint256 last;
+    uint256 listed = 0;
+    uint256 last = 0;
     (,listed,last,) = _rewardPool._registry().getDocument(docId);
     while (last <= claimMillis) {
       if (last == 0) {
@@ -63,67 +64,41 @@ contract Curator is IAsset, Ownable {
       }
       uint deposit = _rewardPool._ballot().getUserClaimableVotes(addr, docId, last, claimMillis, _rewardPool.getVestingMillis());
       sum += dailyReward(docId, last, deposit);
+      refund += dailyRefund(addr, docId, last, claimMillis);
       next = last + 86400000;
       assert(last < next);
       last = next;
     }
-    return sum;
-  }
-
-  function totalRefund(address addr, bytes32 docId, uint256 claimMillis) private view returns (uint256) {
-    uint256 sum = 0;
-    uint256 next = 0;
-    uint256 listed;
-    uint256 last;
-    (,listed,last,) = _rewardPool._registry().getDocument(docId);
-    while (last <= claimMillis) {
-      if (last == 0) {
-        last = listed;
-      }
-      sum += dailyRefund(addr, docId, last, claimMillis);
-      next = last + 86400000;
-      assert(last < next);
-      last = next;
-    }
-    return sum;
+    return (sum, refund);
   }
 
   function dailyReward(bytes32 docId, uint dateMillis, uint deposit) private view returns (uint) {
+    uint pool = _rewardPool.getDailyRewardPool(uint(30), dateMillis);
+    uint tvd = _rewardPool._ballot().getActiveVotes(docId, dateMillis, _rewardPool.getVestingMillis());
     uint pv = _rewardPool._registry().getPageView(docId, dateMillis);
     uint tpvs = _rewardPool._registry().getTotalPageViewSquare(dateMillis);
-    if (tpvs == 0 || pv == 0) {
-      return uint(0);
-    }
-    return calculate(docId, dateMillis, pv, tpvs, deposit);
+    return calculate(pool, deposit, tvd, pv, tpvs);
   }
 
   function dailyRefund(address addr, bytes32 docId, uint dateMillis, uint claimMillis) private view returns (uint) {
     return _rewardPool._ballot().getUserRefundableDeposit(addr, docId, dateMillis, claimMillis, _rewardPool.getVestingMillis());
   }
 
-  function calculate(bytes32 docId, uint dateMillis, uint pv, uint tpvs, uint deposit) private view returns (uint) {
-    uint tvd = _rewardPool._ballot().getActiveVotes(docId, dateMillis, _rewardPool.getVestingMillis());
-    if (tvd == 0) {
+  function calculate(uint pool, uint v, uint tv, uint pv, uint tpvs) public pure returns (uint) {
+    if (tpvs == 0 || pv == 0 || tv == 0) {
       return uint(0);
     }
-    assert(tvd >= deposit);
+    assert(tv >= v);
     assert(tpvs >= (pv ** 2));
-    uint drp = _rewardPool.getDailyRewardPool(uint(30), dateMillis);
-    uint reward = uint(uint((drp * (pv ** 2)) / tpvs) * deposit / tvd);
-    assert(drp >= reward);
+    uint reward = uint(uint((pool * (pv ** 2)) / tpvs) * v / tv);
+    assert(pool >= reward);
     return reward;
   }
 
-  function determineAt(address addr, bytes32 docId, uint256 dateMillis) external view returns (uint256) {
+  function determineAt(address addr, bytes32 docId, uint256 dateMillis) external view returns (uint256, uint256) {
     require(msg.sender == address(_rewardPool));
     require(address(_rewardPool) != address(0));
     return totalReward(addr, docId, dateMillis);
-  }
-
-  function refundableAt(address addr, bytes32 docId, uint256 dateMillis) external view returns (uint256) {
-    require(msg.sender == address(_rewardPool));
-    require(address(_rewardPool) != address(0));
-    return totalRefund(addr, docId, dateMillis);
   }
 
   function recentEarnings(address addr, bytes32 docId, uint256 day) external view returns (uint256) {

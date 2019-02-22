@@ -460,7 +460,8 @@ contract("Asset - curator", accounts => {
   // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
   // DOC #5 : Active Votes (0)
   it("Determine #1: The amount of reward for unexpired votes is 0.", async () => {
-    const determined_doc1_a4 = web3.fromWei(await _curator.determine(DOC1, { from: accounts[4]}), "ether") * 1;
+    const determined_doc1_a4_wei = await _curator.determine(DOC1, { from: accounts[4]});
+    const determined_doc1_a4 = web3.fromWei(determined_doc1_a4_wei[0], "ether") * 1;
     assert.equal(0, determined_doc1_a4, "wrong determined amount on doc1 for account[4]");
   });
 
@@ -508,24 +509,28 @@ contract("Asset - curator", accounts => {
     const ref_A3_DOC1_DAY3 = ((drp_3 * 1) * (100 / (100 + 100))) / (90000 + 90000) * 90000;
     const ref_A3_DOC1_DAY4 = ((drp_4 * 1) * (100 / (100))) / (160000 + 160000) * 160000;
     const ref_A3_DOC1_DAY5 = 0; //((drp_5 * 1) * (100 / (100))) / (250000 + 250000) * 250000;
-    const determined_doc1_a3 = web3.fromWei(await _curator.determine(DOC1, { from: accounts[3]}), "ether") * 1;
+    const determined_doc1_a3_wei = await _curator.determine(DOC1, { from: accounts[3]})
+    const determined_doc1_a3 = web3.fromWei(determined_doc1_a3_wei[0], "ether") * 1;
     const sample_doc1_a3 = Math.floor((determined_doc1_a3 * 1));
     const reference_doc1_a3 = Math.floor(ref_A3_DOC1_DAY2 + ref_A3_DOC1_DAY3 + ref_A3_DOC1_DAY4);
     //console.log("sample_doc1_a3: " + sample_doc1_a3);
     assert.equal(reference_doc1_a3, sample_doc1_a3, "wrong amount of determined token : curator #3, doc #1, day 4");
 
     // ACCOUNT[3], DOC2
-    const determined_doc2_a3 = web3.fromWei(await _curator.determine(DOC2, { from: accounts[3]}), "ether") * 1;
+    const determined_doc2_a3_wei = await _curator.determine(DOC2, { from: accounts[3]})
+    const determined_doc2_a3 = web3.fromWei(determined_doc2_a3_wei[0], "ether") * 1;
     const sample_doc2_a3 = Math.floor((determined_doc2_a3 * 1));
     assert.equal(0, sample_doc2_a3, "wrong amount of determined token : curator #3, doc #2, day 1");
 
     // ACCOUNT[4], DOC1
-    const determined_doc1_a4 = web3.fromWei(await _curator.determine(DOC2, { from: accounts[3]}), "ether") * 1;
+    const determined_doc1_a4_wei = await _curator.determine(DOC1, { from: accounts[4]});
+    const determined_doc1_a4 = web3.fromWei(determined_doc1_a4_wei[0], "ether") * 1;
     const sample_doc1_a4 = Math.floor((determined_doc1_a4 * 1));
     assert.equal(0, sample_doc1_a4, "wrong amount of determined token : curator #4, doc #1, day 3");
 
     // ACCOUNT[4], DOC3
-    const determined_doc3_a4 = web3.fromWei(await _curator.determine(DOC2, { from: accounts[3]}), "ether") * 1;
+    const determined_doc3_a4_wei = await _curator.determine(DOC3, { from: accounts[4]});
+    const determined_doc3_a4 = web3.fromWei(determined_doc3_a4_wei[0], "ether") * 1;
     const sample_doc3_a4 = Math.floor((determined_doc3_a4 * 1));
     assert.equal(0, sample_doc3_a4, "wrong amount of determined token : curator #4, doc #3, day 0");
 
@@ -537,13 +542,15 @@ contract("Asset - curator", accounts => {
     const ref_A4_DOC4_DAY5 = ((drp_5 * 1) * (500 / (500))) / (250000 + 250000) * 250000;
     const ref_A4_DOC4_DAY6 = ((drp_6 * 1) * (400 / (400))) / (360000) * 360000;
     const ref_A4_DOC4_DAY7 = ((drp_7 * 1) * (400 / (400))) / (490000) * 490000;
-    const determined_doc4_a4 = web3.fromWei(await _curator.determine(DOC4, { from: accounts[4]}), "ether") * 1;
+    const determined_doc4_a4_wei = await _curator.determine(DOC4, { from: accounts[4]});
+    const determined_doc4_a4 = web3.fromWei(determined_doc4_a4_wei[0], "ether") * 1;
     const sample_doc4_a4 = Math.floor((determined_doc4_a4 * 1));
     const reference_doc4_a4 = Math.floor(ref_A4_DOC4_DAY3 + ref_A4_DOC4_DAY4 + ref_A4_DOC4_DAY5 + ref_A4_DOC4_DAY6 + ref_A4_DOC4_DAY7);
     assert.equal(reference_doc4_a4, sample_doc4_a4, "wrong amount of determined token : curator #4, doc #4, day 5,7");
 
     // ACCOUNT[5], DOC2
-    const determined_doc2_a5 = web3.fromWei(await _curator.determine(DOC2, { from: accounts[5]}), "ether") * 1;
+    const determined_doc2_a5_wei = await _curator.determine(DOC2, { from: accounts[5]});
+    const determined_doc2_a5 = web3.fromWei(determined_doc2_a5_wei[0], "ether") * 1;
     const sample_doc2_a5 = Math.floor((determined_doc2_a5 * 1));
     assert.equal(0, sample_doc2_a5, "wrong amount of determined token : curator #5, doc #2, day 0");
   });
@@ -592,7 +599,7 @@ contract("Asset - curator", accounts => {
 
     // determined된 보상액
     const reward_wei = await _curator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
+    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
 
     // -------------------------
@@ -655,7 +662,7 @@ contract("Asset - curator", accounts => {
 
     // determined된 보상액
     const reward_wei = await _curator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
+    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
     assert.equal(0, reward_ether, "determined amount is not 0");
 
@@ -728,12 +735,12 @@ contract("Asset - curator", accounts => {
 
     //  - DAY_3기준으로 보상 지급하기
     const amount = await _curator.determineAt(owner, docId, DAYS_3, { from: _pool.address });
-    await _pool.pay(docId, owner, amount, 400, DAYS_3, { from: foundation });
+    await _pool.pay(docId, owner, amount[0], 400, DAYS_3, { from: foundation });
     //console.log('paid');
 
     //  - determine
     const reward_s2_wei = await _curator.determine(docId, { from: owner });
-    const reward_s2_ether = web3.fromWei(reward_s2_wei, "ether") * 1;
+    const reward_s2_ether = web3.fromWei(reward_s2_wei[0], "ether") * 1;
     //console.log('reward_s2_ether : ' + reward_s2_ether.toString());
 
     // -------------------------
