@@ -725,16 +725,6 @@ contract("Asset - curator", accounts => {
     const token = _deck.address;
     const source = _curator.address;
 
-    // Account #4 유저의 초기 잔고
-    const bal_wei_S1 = await _deck.balanceOf(owner);
-    const bal_ether_S1 = web3.fromWei(bal_wei_S1, "ether") * 1;
-    //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
-
-    // determined된 보상액
-    const reward_wei = await _curator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei, "ether") * 1;
-    //console.log('reward_ether : ' + reward_ether.toString());
-
     // -------------------------
     // Testing : DAYS_3에 지급
     // -------------------------
@@ -763,33 +753,52 @@ contract("Asset - curator", accounts => {
     const reference = Math.floor(ref_3 + ref_4 + ref_5);
     assert.equal(reference, Math.floor(reward_s2_ether), "determined wrong amount");
   });
-/*
+
   // 보상금 열람하기 #1 : 최근 N일간의 해당 문서에서 발생한 보상액 열람하기
-  //  -----------------------------------
-  //  DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
-  //  DOC #2 : ACOUNT[1], PV(0, 200)
-  //  DOC #3 : ACOUNT[1], PV(0, )
-  //  DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
-  //  DOC #5 : ACOUNT[2], PV(0, 300)
-  //  -----------------------------------
-  //  - 8일전(DAY_8) 등록한 문서(DOC #4)에 대해서
+
+  // ---- Page View ----
+  // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
+  // DOC #2 : ACOUNT[1], PV(0, 200)
+  // DOC #3 : ACOUNT[1], PV(0, )
+  // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
+  // DOC #5 : ACOUNT[2], PV(0, 300)
+
+  // ---- Votes ----
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
+  // ACOUNT[3] : DOC #2(200), +1 DAYS
+  // ACOUNT[4] : DOC #1(100), +3 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
+  // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
+
+  // ---- Active Votes ----
+  // DOC #1 : Active Votes (  0, 100, 200, 200, 100)
+  // DOC #2 : Active Votes (400, 200)
+  // DOC #3 : Active Votes (100)
+  // DOC #4 : Active Votes (  0,   0,   0, 100, 100, 500, 400, 400)
+  // DOC #5 : Active Votes (0)
+
+  //  - 7일전(DAY_7) 투표한 문서(DOC #4)에 대해서
   //  - 3일전(DAY_3)에 보상을 인출한 경우,
   //  - 최근 7일간 합산 보상금은 DAY_7부터 DAY_1까지의 보상액을 합산한 금액
 
-  //  - DAY_7 보상액 : (70% of Daily Reward Pool) * (700 / 700)
-  //  - DAY_6 보상액 : (70% of Daily Reward Pool) * (600 / 600)
-  //  - DAY_5 보상액 : (70% of Daily Reward Pool) * (500 / (500 + 500))
-  //  - DAY_4 보상액 : (70% of Daily Reward Pool) * (400 / (400 + 400))
-  //  - DAY_3 보상액 : (70% of Daily Reward Pool) * (300 / (300 + 300))
-  //  - DAY_2 보상액 : (70% of Daily Reward Pool) * (200 / (200 + 200))
-  //  - DAY_1 보상액 : (70% of Daily Reward Pool) * (100 / (100 + 200 + 100 + 300))
+  //  - DAY_7 보상액 : (30% of Daily Reward Pool) * (700 / 700)
+  //  - DAY_6 보상액 : (30% of Daily Reward Pool) * (600 / 600)
+  //  - DAY_5 보상액 : (30% of Daily Reward Pool) * (500 / (500 + 500))
+  //  - DAY_4 보상액 : (30% of Daily Reward Pool) * (400 / (400 + 400))
+  //  - DAY_3 보상액 : (30% of Daily Reward Pool) * (300 / (300 + 300))
+  //  - DAY_2 보상액 : (30% of Daily Reward Pool) * (200 / (200 + 200))
+  //  - DAY_1 보상액 : (30% of Daily Reward Pool) * (100 / (100 + 200 + 100 + 300))
   it("Estimate #1: The amount of reward that occurred in the document for the last N days.", async () => {
 
     // preparing
+    const addr = accounts[4];
     const docId = DOC4;
 
     // Testing
-    const earnings_wei = await _curator.recentEarnings(docId, 7);
+    const earnings_wei = await _curator.recentEarnings(addr, docId, 7);
     const earnings_ether = web3.fromWei(earnings_wei, "ether") * 1;
     //console.log('earnings_ether : ' + earnings_ether.toString());
 
@@ -799,96 +808,62 @@ contract("Asset - curator", accounts => {
     const todayMillis = (await _utility.getTimeMillis()) * 1;
     const dayMillis = (await _utility.getOneDayMillis()) * 1;
 
-    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
-    const drp_6 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 6 * dayMillis));
-    const drp_7 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 7 * dayMillis));
+    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
+    const drp_6 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 6 * dayMillis));
+    const drp_7 = web3.fromWei(await _utility.getDailyRewardPool(30, todayMillis - 7 * dayMillis));
 
-    const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
-    const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
-    const ref_3 = (drp_3 * 1) * (300 / (300 + 300));
-    const ref_4 = (drp_4 * 1) * (400 / (400 + 400));
-    const ref_5 = (drp_5 * 1) * (500 / (500 + 500));
-    const ref_6 = (drp_6 * 1) * (600 / (600));
-    const ref_7 = (drp_7 * 1) * (700 / (700));
+    const ref_3 = ((drp_3 * 1) * (100 / (100))) / (90000 + 90000) * 90000;
+    const ref_4 = ((drp_4 * 1) * (100 / (100))) / (160000 + 160000) * 160000;
+    const ref_5 = ((drp_5 * 1) * (500 / (500))) / (250000 + 250000) * 250000;
+    const ref_6 = ((drp_6 * 1) * (400 / (400))) / (360000) * 360000;
+    const ref_7 = ((drp_7 * 1) * (700 / (700))) / (490000) * 490000;
 
-    // check to 2 decimal places
-    const reference = Math.round((ref_1 + ref_2 + ref_3 + ref_4 + ref_5 + ref_6 + ref_7) / 100);
-    const sample = Math.round(earnings_ether / 100);
+    const reference = Math.floor(ref_3 + ref_4 + ref_5 + ref_6 + ref_7);
+    const sample = Math.floor(earnings_ether);
     assert.equal(reference, sample, "wrong amount of earnings");
   });
 
-  it("Estimate #2: Anyone can read the estimation of reward amount.", async () => {
-    // preparing
-    const docId = DOC1;
+  // 문서 목록 보기 #1 : 특정 유저가 투표한 문서 전체 목록 열람하기
 
-    // Testing
-    const earnings_wei = await _curator.recentEarnings(docId, 7, { from: accounts[7] });
-    const earnings_ether = web3.fromWei(earnings_wei, "ether") * 1;
-    //console.log('earnings_ether : ' + earnings_ether.toString());
+  // ---- Page View ----
+  // DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
+  // DOC #2 : ACOUNT[1], PV(0, 200)
+  // DOC #3 : ACOUNT[1], PV(0, )
+  // DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
+  // DOC #5 : ACOUNT[2], PV(0, 300)
 
-    // -------------------------
-    // Check result
-    // -------------------------
-    const todayMillis = (await _utility.getTimeMillis()) * 1;
-    const dayMillis = (await _utility.getOneDayMillis()) * 1;
+  // ---- Votes ----
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[5] : DOC #2(100), +0 DAYS
+  // ACOUNT[3] : DOC #1(100), +4 DAYS
+  // ACOUNT[3] : DOC #2(200), +1 DAYS
+  // ACOUNT[4] : DOC #1(100), +3 DAYS
+  // ACOUNT[4] : DOC #4(400), +7 DAYS
+  // ACOUNT[4] : DOC #3(100), +0 DAYS
+  // ACOUNT[4] : DOC #4(100), +5 DAYS
 
-    const drp_1 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _utility.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
+  // ---- Active Votes ----
+  // DOC #1 : Active Votes (  0, 100, 200, 200, 100)
+  // DOC #2 : Active Votes (400, 200, )
+  // DOC #3 : Active Votes (100, )
+  // DOC #4 : Active Votes (  0,   0,   0, 100, 100, 500, 400, 400)
+  // DOC #5 : Active Votes (  0, )
 
-    const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
-    const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
-    const ref_3 = (drp_3 * 1) * (300 / (300 + 300));
-    const ref_4 = (drp_4 * 1) * (400 / (400 + 400));
-    const ref_5 = (drp_5 * 1) * (500 / (500 + 500));
+  it("Document List #1: A list of entire documents voted by a specific user.", async () => {
 
-    // check to 2 decimal places
-    const reference = Math.round((ref_1 + ref_2 + ref_3 + ref_4 + ref_5) / 100);
-    const sample = Math.round(earnings_ether / 100);
-    assert.equal(reference, sample, "wrong amount of earnings");
+    const docIds_a3 = await _curator.getDocuments(accounts[3]);
+    assert.equal(web3.toAscii(DOC1), web3.toAscii(docIds_a3[0]), "wrong doc id #1 on docIds_a3");
+    assert.equal(web3.toAscii(DOC2), web3.toAscii(docIds_a3[1]), "wrong doc id #2 on docIds_a3");
+
+    const docIds_a4 = await _curator.getDocuments(accounts[4]);
+    assert.equal(web3.toAscii(DOC1), web3.toAscii(docIds_a4[0]), "wrong doc id #1 on docIds_a4");
+    assert.equal(web3.toAscii(DOC4), web3.toAscii(docIds_a4[1]), "wrong doc id #4 on docIds_a4");
+    assert.equal(web3.toAscii(DOC3), web3.toAscii(docIds_a4[2]), "wrong doc id #3 on docIds_a4");
+
+    const docIds_a5 = await _curator.getDocuments(accounts[5]);
+    assert.equal(web3.toAscii(DOC2), web3.toAscii(docIds_a5[0]), "wrong doc id #2 on docIds_a5");
   });
 
-  // 문서 목록 보기 #1 : 특정 유저가 소유한 문서 전체의 목록 열람하기
-  //  -----------------------------------
-  //  DOC #1 : ACOUNT[1], PV(0, 100, 200, 300, 400, 500)
-  //  DOC #2 : ACOUNT[1], PV(0, 200)
-  //  DOC #3 : ACOUNT[1], PV(0, )
-  //  DOC #4 : ACOUNT[2], PV(0, 100, 200, 300, 400, 500, 600, 700, 800)
-  //  DOC #5 : ACOUNT[2], PV(0, 300)
-  //  -----------------------------------
-  //  - ACCOUNT[1] 유저가 소유한 문서 목록 (DOC #1, DOC #2, DOC #3)
-  it("Document List #1: A list of entire documents owned by a specific user.", async () => {
-    // preparing
-    const owner = accounts[1];
-
-    // Testing
-    const rp = await _curator._rewardPool();
-    assert.equal(_pool.address, rp);
-    const rg = await _pool._registry();
-    assert.equal(_registry.address, rg);
-
-    const docIds = await _registry.getDocuments(owner);
-    assert.equal(web3.toAscii(DOC1), web3.toAscii(docIds[0]), "wrong doc id #1");
-    assert.equal(web3.toAscii(DOC2), web3.toAscii(docIds[1]), "wrong doc id #2");
-    assert.equal(web3.toAscii(DOC3), web3.toAscii(docIds[2]), "wrong doc id #3");
-  });
-
-  // 문서 목록 보기 #2 : 누구나 열람할 수 있습니다.
-  it("Document List #2: Anyone can read.", async () => {
-    // preparing
-    const owner = accounts[2];
-
-    // Testing
-    const docIds = await _registry.getDocuments(owner, { from: accounts[7] });
-
-    assert.equal(web3.toAscii(DOC4), web3.toAscii(docIds[0]), "wrong doc id #4");
-    assert.equal(web3.toAscii(DOC5), web3.toAscii(docIds[1]), "wrong doc id #5");
-  });
-*/
 });

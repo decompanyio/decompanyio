@@ -21,6 +21,10 @@ contract Creator is IAsset, Ownable {
     _rewardPool._registry().register(msg.sender, docId);
   }
 
+  function getDocuments(address owner) external view returns (bytes32[]) {
+    return _rewardPool._registry().getDocuments(owner);
+  }
+
   function update(address owner, bytes32 docId, uint256 createTime, uint256 lastClaimedDate, uint256 withdraw) public {
     _rewardPool._registry().update(owner, docId, createTime, lastClaimedDate, withdraw);
   }

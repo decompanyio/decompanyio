@@ -524,14 +524,7 @@ contract("Asset - creator", accounts => {
   it("Document List #1: A list of entire documents owned by a specific user.", async () => {
     // preparing
     const owner = accounts[1];
-
-    // Testing
-    const rp = await _creator._rewardPool();
-    assert.equal(_pool.address, rp);
-    const rg = await _pool._registry();
-    assert.equal(_registry.address, rg);
-
-    const docIds = await _registry.getDocuments(owner);
+    const docIds = await _creator.getDocuments(owner);
     assert.equal(web3.toAscii(DOC1), web3.toAscii(docIds[0]), "wrong doc id #1");
     assert.equal(web3.toAscii(DOC2), web3.toAscii(docIds[1]), "wrong doc id #2");
     assert.equal(web3.toAscii(DOC3), web3.toAscii(docIds[2]), "wrong doc id #3");
@@ -541,10 +534,7 @@ contract("Asset - creator", accounts => {
   it("Document List #2: Anyone can read.", async () => {
     // preparing
     const owner = accounts[2];
-
-    // Testing
-    const docIds = await _registry.getDocuments(owner, { from: accounts[7] });
-
+    const docIds = await _creator.getDocuments(owner, { from: accounts[7] });
     assert.equal(web3.toAscii(DOC4), web3.toAscii(docIds[0]), "wrong doc id #4");
     assert.equal(web3.toAscii(DOC5), web3.toAscii(docIds[1]), "wrong doc id #5");
   });
