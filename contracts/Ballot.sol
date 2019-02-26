@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -131,7 +131,7 @@ contract Ballot is Ownable {
     return sum;
   }
 
-  function getUserDocuments(address addr) external view returns (bytes32[]) {
+  function getUserDocuments(address addr) external view returns (bytes32[] memory) {
     return _mapUserDoc[addr];
   }
 
@@ -146,7 +146,7 @@ contract Ballot is Ownable {
   function updateClaimed(uint256 i, uint256 amount) external {
     require(amount != 0);
     require(msg.sender == _rewardPool);
-    require(address(_mapById[i].addr) != 0);
+    require(address(_mapById[i].addr) != address(0));
     require(uint256(_mapById[i].deposit) != 0);
     require(uint256(_mapById[i].claimed) == 0);
 
@@ -155,20 +155,20 @@ contract Ballot is Ownable {
     emit ClaimVote(i, amount);
   }
 
-  function sameDoc(Vote vote, bytes32 docId) private pure returns (bool) {
+  function sameDoc(Vote storage vote, bytes32 docId) private view returns (bool) {
     return (docId == vote.docId);
   }
 
-  function isActive(Vote vote, uint dateMillis, uint vestingMillis) private pure returns (bool) {
+  function isActive(Vote storage vote, uint dateMillis, uint vestingMillis) private view returns (bool) {
     return (vote.startDate <= dateMillis) && (dateMillis < vote.startDate + vestingMillis);
   }
 
-  function isClaimable(Vote vote, uint lastDateMillis, uint claimDateMillis, uint vestingMillis) private pure returns (bool) {
+  function isClaimable(Vote storage vote, uint lastDateMillis, uint claimDateMillis, uint vestingMillis) private view returns (bool) {
     lastDateMillis = lastDateMillis == 0 ? vestingMillis : lastDateMillis;
     return (lastDateMillis <= vote.startDate + vestingMillis) && (vote.startDate + vestingMillis < claimDateMillis);
   }
 
-  function isRefundable(Vote vote, uint dateMillis, uint vestingMillis) private pure returns (bool) {
+  function isRefundable(Vote storage vote, uint dateMillis, uint vestingMillis) private view returns (bool) {
     return (dateMillis == vote.startDate + vestingMillis);
   }
 

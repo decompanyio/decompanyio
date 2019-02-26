@@ -1,3 +1,7 @@
+const { getWeb3, getContractInstance } = require("../helpers");
+const web3 = getWeb3();
+const getInstance = getContractInstance(web3);
+
 const Deck = artifacts.require("./Deck.sol");
 const Creator = artifacts.require("./Creator.sol");
 const Curator = artifacts.require("./Curator.sol");
@@ -7,11 +11,11 @@ const Ballot = artifacts.require("./Ballot.sol");
 
 contract("Asset - curator", accounts => {
 
-  const DOC1 = web3.fromAscii("10000000000000000000000000000001");
-  const DOC2 = web3.fromAscii("10000000000000000000000000000002");
-  const DOC3 = web3.fromAscii("10000000000000000000000000000003");
-  const DOC4 = web3.fromAscii("10000000000000000000000000000004");
-  const DOC5 = web3.fromAscii("10000000000000000000000000000005");
+  const DOC1 = web3.utils.fromAscii("10000000000000000000000000000001");
+  const DOC2 = web3.utils.fromAscii("10000000000000000000000000000002");
+  const DOC3 = web3.utils.fromAscii("10000000000000000000000000000003");
+  const DOC4 = web3.utils.fromAscii("10000000000000000000000000000004");
+  const DOC5 = web3.utils.fromAscii("10000000000000000000000000000005");
 
   var DAYS_0;
   var DAYS_1;
@@ -86,8 +90,8 @@ contract("Asset - curator", accounts => {
     // - ACCOUNT[4] : 100,000 DECK
     // - ACCOUNT[5] : 100,000 DECK
 
-    const totalSupply = new web3.BigNumber('10000000000000000000000000000');
-    const rewardPool = new web3.BigNumber('200000000000000000000000000');
+    const totalSupply = '10000000000000000000000000000';
+    const rewardPool = '200000000000000000000000000';
 
     await _deck.mint(accounts[0], totalSupply, { from: accounts[0] });
     await _deck.transfer(_pool.address, rewardPool, { from: accounts[0] });
@@ -159,15 +163,15 @@ contract("Asset - curator", accounts => {
     // DOC #4 : Active Votes (0, 0, 0, 100, 100, 500, 400, 400)
     // DOC #5 : Active Votes (0)
 
-    VOTE100 = new web3.BigNumber('100000000000000000000');
-    VOTE200 = new web3.BigNumber('200000000000000000000');
-    VOTE300 = new web3.BigNumber('300000000000000000000');
-    VOTE400 = new web3.BigNumber('400000000000000000000');
-    VOTE500 = new web3.BigNumber('500000000000000000000');
-    VOTE600 = new web3.BigNumber('600000000000000000000');
-    VOTE700 = new web3.BigNumber('700000000000000000000');
-    VOTE800 = new web3.BigNumber('800000000000000000000');
-    VOTE900 = new web3.BigNumber('900000000000000000000');
+    VOTE100 = '100000000000000000000';
+    VOTE200 = '200000000000000000000';
+    VOTE300 = '300000000000000000000';
+    VOTE400 = '400000000000000000000';
+    VOTE500 = '500000000000000000000';
+    VOTE600 = '600000000000000000000';
+    VOTE700 = '700000000000000000000';
+    VOTE800 = '800000000000000000000';
+    VOTE900 = '900000000000000000000';
 
     await _ballot.insert(await _ballot.next(), accounts[3], DOC1, VOTE100, DAYS_4, { from: accounts[0] });
     await _ballot.insert(await _ballot.next(), accounts[3], DOC2, VOTE200, DAYS_1, { from: accounts[0] });
@@ -224,8 +228,8 @@ contract("Asset - curator", accounts => {
 
     // check value
     const vote = await _curator.getVote(vid);
-    const ref_deposit = web3.fromWei(VOTE100, "ether") * 1;
-    const sample_deposit = web3.fromWei(vote[3], "ether") * 1;
+    const ref_deposit = web3.utils.fromWei(VOTE100, "ether") * 1;
+    const sample_deposit = web3.utils.fromWei(vote[3], "ether") * 1;
     assert.equal(voter, vote[0], "wrong voter address");
     assert.equal(docId, vote[1], "wrong document id");
     assert.equal(DAYS_0, vote[2] * 1, "wrong start date");
@@ -276,8 +280,8 @@ contract("Asset - curator", accounts => {
 
     // check value
     const vote = await _curator.getVote(vid);
-    const ref_deposit = web3.fromWei(VOTE100, "ether") * 1;
-    const sample_deposit = web3.fromWei(vote[3], "ether") * 1;
+    const ref_deposit = web3.utils.fromWei(VOTE100, "ether") * 1;
+    const sample_deposit = web3.utils.fromWei(vote[3], "ether") * 1;
     assert.equal(voter, vote[0], "wrong voter address");
     assert.equal(docId, vote[1], "wrong document id");
     assert.equal(DAYS_0, vote[2] * 1, "wrong start date");
@@ -286,7 +290,7 @@ contract("Asset - curator", accounts => {
 
     // check the previously voted value also
     const vote_prev = await _curator.getVote(vid-1);
-    const sample_prev_deposit = web3.fromWei(vote_prev[3], "ether") * 1;
+    const sample_prev_deposit = web3.utils.fromWei(vote_prev[3], "ether") * 1;
     assert.equal(voter, vote_prev[0], "wrong voter address prev");
     assert.equal(docId, vote_prev[1], "wrong document id prev");
     assert.equal(DAYS_0, vote_prev[2] * 1, "wrong start date prev");
@@ -324,15 +328,15 @@ contract("Asset - curator", accounts => {
   // DOC #5 : Active Votes (0)
   it("Active Votes #1: The active votes of a document", async () => {
     // check active votes
-    const av_doc_1 = web3.fromWei(await _curator.getActiveVotes(DOC1), "ether");
+    const av_doc_1 = web3.utils.fromWei(await _curator.getActiveVotes(DOC1), "ether");
     assert.equal(0, av_doc_1 * 1);
-    const av_doc_2 = web3.fromWei(await _curator.getActiveVotes(DOC2), "ether");
+    const av_doc_2 = web3.utils.fromWei(await _curator.getActiveVotes(DOC2), "ether");
     assert.equal(400, av_doc_2 * 1);
-    const av_doc_3 = web3.fromWei(await _curator.getActiveVotes(DOC3), "ether");
+    const av_doc_3 = web3.utils.fromWei(await _curator.getActiveVotes(DOC3), "ether");
     assert.equal(100, av_doc_3 * 1);
-    const av_doc_4 = web3.fromWei(await _curator.getActiveVotes(DOC4), "ether");
+    const av_doc_4 = web3.utils.fromWei(await _curator.getActiveVotes(DOC4), "ether");
     assert.equal(0, av_doc_4 * 1);
-    const av_doc_5 = web3.fromWei(await _curator.getActiveVotes(DOC5), "ether");
+    const av_doc_5 = web3.utils.fromWei(await _curator.getActiveVotes(DOC5), "ether");
     assert.equal(0, av_doc_5 * 1);
   });
 
@@ -365,19 +369,19 @@ contract("Asset - curator", accounts => {
   // DOC #5 : Active Votes (0)
   it("Active Votes #2: Active votes for a document from a specific user", async () => {
     // check active votes
-    const av_doc_1_a3 = web3.fromWei(await _curator.getUserActiveVotes(accounts[3], DOC1), "ether");
+    const av_doc_1_a3 = web3.utils.fromWei(await _curator.getUserActiveVotes(accounts[3], DOC1), "ether");
     assert.equal(0, av_doc_1_a3 * 1);
-    const av_doc_1_a4 = web3.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC1), "ether");
+    const av_doc_1_a4 = web3.utils.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC1), "ether");
     assert.equal(0, av_doc_1_a4 * 1);
-    const av_doc_2_a5 = web3.fromWei(await _curator.getUserActiveVotes(accounts[5], DOC2), "ether");
+    const av_doc_2_a5 = web3.utils.fromWei(await _curator.getUserActiveVotes(accounts[5], DOC2), "ether");
     assert.equal(200, av_doc_2_a5 * 1);
-    const av_doc_2_a3 = web3.fromWei(await _curator.getUserActiveVotes(accounts[3], DOC2), "ether");
+    const av_doc_2_a3 = web3.utils.fromWei(await _curator.getUserActiveVotes(accounts[3], DOC2), "ether");
     assert.equal(200, av_doc_2_a3 * 1);
-    const av_doc_3_a4 = web3.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC3), "ether");
+    const av_doc_3_a4 = web3.utils.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC3), "ether");
     assert.equal(100, av_doc_3_a4 * 1);
-    const av_doc_4_a4 = web3.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC4), "ether");
+    const av_doc_4_a4 = web3.utils.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC4), "ether");
     assert.equal(0, av_doc_4_a4 * 1);
-    const av_doc_5_a4 = web3.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC5), "ether");
+    const av_doc_5_a4 = web3.utils.fromWei(await _curator.getUserActiveVotes(accounts[4], DOC5), "ether");
     assert.equal(0, av_doc_5_a4 * 1);
   });
 
@@ -416,18 +420,18 @@ contract("Asset - curator", accounts => {
     // Testing for ACCOUNT[3]
     const docs_a3 = await _curator.getUserDocuments(accounts[3]);
     assert.equal(2, docs_a3.length, "wrong doc list for account[3]");
-    assert.equal(web3.toAscii(DOC1), web3.toAscii(docs_a3[0]), "wrong doc list for account[3] #1");
-    assert.equal(web3.toAscii(DOC2), web3.toAscii(docs_a3[1]), "wrong doc list for account[3] #2");
+    assert.equal(web3.utils.toAscii(DOC1), web3.utils.toAscii(docs_a3[0]), "wrong doc list for account[3] #1");
+    assert.equal(web3.utils.toAscii(DOC2), web3.utils.toAscii(docs_a3[1]), "wrong doc list for account[3] #2");
     // Testing for ACCOUNT[4]
     const docs_a4 = await _curator.getUserDocuments(accounts[4]);
     assert.equal(3, docs_a4.length, "wrong doc list for account[4]");
-    assert.equal(web3.toAscii(DOC1), web3.toAscii(docs_a4[0]), "wrong doc list for account[4] #1");
-    assert.equal(web3.toAscii(DOC4), web3.toAscii(docs_a4[1]), "wrong doc list for account[4] #2");
-    assert.equal(web3.toAscii(DOC3), web3.toAscii(docs_a4[2]), "wrong doc list for account[4] #3");
+    assert.equal(web3.utils.toAscii(DOC1), web3.utils.toAscii(docs_a4[0]), "wrong doc list for account[4] #1");
+    assert.equal(web3.utils.toAscii(DOC4), web3.utils.toAscii(docs_a4[1]), "wrong doc list for account[4] #2");
+    assert.equal(web3.utils.toAscii(DOC3), web3.utils.toAscii(docs_a4[2]), "wrong doc list for account[4] #3");
     // Testing for ACCOUNT[5]
     const docs_a5 = await _curator.getUserDocuments(accounts[5]);
     assert.equal(1, docs_a5.length, "wrong doc list for account[5]");
-    assert.equal(web3.toAscii(DOC2), web3.toAscii(docs_a5[0]), "wrong doc list for account[5] #1");
+    assert.equal(web3.utils.toAscii(DOC2), web3.utils.toAscii(docs_a5[0]), "wrong doc list for account[5] #1");
   });
 
   // ============================================
@@ -461,7 +465,7 @@ contract("Asset - curator", accounts => {
   // DOC #5 : Active Votes (0)
   it("Determine #1: The amount of reward for unexpired votes is 0.", async () => {
     const determined_doc1_a4_wei = await _curator.determine(DOC1, { from: accounts[4]});
-    const determined_doc1_a4 = web3.fromWei(determined_doc1_a4_wei[0], "ether") * 1;
+    const determined_doc1_a4 = web3.utils.fromWei(determined_doc1_a4_wei[0], "ether") * 1;
     assert.equal(0, determined_doc1_a4, "wrong determined amount on doc1 for account[4]");
   });
 
@@ -495,13 +499,13 @@ contract("Asset - curator", accounts => {
 
     const todayMillis = (await _pool.getDateMillis()) * 1;
     const dayMillis = (await _pool.getOneDayMillis()) * 1;
-    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
-    const drp_6 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 6 * dayMillis));
-    const drp_7 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 7 * dayMillis));
+    const drp_1 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
+    const drp_6 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 6 * dayMillis));
+    const drp_7 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 7 * dayMillis));
 
     // ACCOUNT[3], DOC1
     const ref_A3_DOC1_DAY1 = 0; //((drp_1 * 1) * (100 / (100))) / (10000 + 40000 + 10000 + 90000) * 10000;
@@ -510,7 +514,7 @@ contract("Asset - curator", accounts => {
     const ref_A3_DOC1_DAY4 = ((drp_4 * 1) * (100 / (100))) / (160000 + 160000) * 160000;
     const ref_A3_DOC1_DAY5 = 0; //((drp_5 * 1) * (100 / (100))) / (250000 + 250000) * 250000;
     const determined_doc1_a3_wei = await _curator.determine(DOC1, { from: accounts[3]})
-    const determined_doc1_a3 = web3.fromWei(determined_doc1_a3_wei[0], "ether") * 1;
+    const determined_doc1_a3 = web3.utils.fromWei(determined_doc1_a3_wei[0], "ether") * 1;
     const sample_doc1_a3 = Math.floor((determined_doc1_a3 * 1));
     const reference_doc1_a3 = Math.floor(ref_A3_DOC1_DAY2 + ref_A3_DOC1_DAY3 + ref_A3_DOC1_DAY4);
     //console.log("sample_doc1_a3: " + sample_doc1_a3);
@@ -518,19 +522,19 @@ contract("Asset - curator", accounts => {
 
     // ACCOUNT[3], DOC2
     const determined_doc2_a3_wei = await _curator.determine(DOC2, { from: accounts[3]})
-    const determined_doc2_a3 = web3.fromWei(determined_doc2_a3_wei[0], "ether") * 1;
+    const determined_doc2_a3 = web3.utils.fromWei(determined_doc2_a3_wei[0], "ether") * 1;
     const sample_doc2_a3 = Math.floor((determined_doc2_a3 * 1));
     assert.equal(0, sample_doc2_a3, "wrong amount of determined token : curator #3, doc #2, day 1");
 
     // ACCOUNT[4], DOC1
     const determined_doc1_a4_wei = await _curator.determine(DOC1, { from: accounts[4]});
-    const determined_doc1_a4 = web3.fromWei(determined_doc1_a4_wei[0], "ether") * 1;
+    const determined_doc1_a4 = web3.utils.fromWei(determined_doc1_a4_wei[0], "ether") * 1;
     const sample_doc1_a4 = Math.floor((determined_doc1_a4 * 1));
     assert.equal(0, sample_doc1_a4, "wrong amount of determined token : curator #4, doc #1, day 3");
 
     // ACCOUNT[4], DOC3
     const determined_doc3_a4_wei = await _curator.determine(DOC3, { from: accounts[4]});
-    const determined_doc3_a4 = web3.fromWei(determined_doc3_a4_wei[0], "ether") * 1;
+    const determined_doc3_a4 = web3.utils.fromWei(determined_doc3_a4_wei[0], "ether") * 1;
     const sample_doc3_a4 = Math.floor((determined_doc3_a4 * 1));
     assert.equal(0, sample_doc3_a4, "wrong amount of determined token : curator #4, doc #3, day 0");
 
@@ -543,14 +547,14 @@ contract("Asset - curator", accounts => {
     const ref_A4_DOC4_DAY6 = ((drp_6 * 1) * (400 / (400))) / (360000) * 360000;
     const ref_A4_DOC4_DAY7 = ((drp_7 * 1) * (400 / (400))) / (490000) * 490000;
     const determined_doc4_a4_wei = await _curator.determine(DOC4, { from: accounts[4]});
-    const determined_doc4_a4 = web3.fromWei(determined_doc4_a4_wei[0], "ether") * 1;
+    const determined_doc4_a4 = web3.utils.fromWei(determined_doc4_a4_wei[0], "ether") * 1;
     const sample_doc4_a4 = Math.floor((determined_doc4_a4 * 1));
     const reference_doc4_a4 = Math.floor(ref_A4_DOC4_DAY3 + ref_A4_DOC4_DAY4 + ref_A4_DOC4_DAY5 + ref_A4_DOC4_DAY6 + ref_A4_DOC4_DAY7);
     assert.equal(reference_doc4_a4, sample_doc4_a4, "wrong amount of determined token : curator #4, doc #4, day 5,7");
 
     // ACCOUNT[5], DOC2
     const determined_doc2_a5_wei = await _curator.determine(DOC2, { from: accounts[5]});
-    const determined_doc2_a5 = web3.fromWei(determined_doc2_a5_wei[0], "ether") * 1;
+    const determined_doc2_a5 = web3.utils.fromWei(determined_doc2_a5_wei[0], "ether") * 1;
     const sample_doc2_a5 = Math.floor((determined_doc2_a5 * 1));
     assert.equal(0, sample_doc2_a5, "wrong amount of determined token : curator #5, doc #2, day 0");
   });
@@ -589,17 +593,17 @@ contract("Asset - curator", accounts => {
     const owner = accounts[3];
     const token = _deck.address;
     const source = _curator.address;
-    const refund = web3.fromWei(VOTE100, "ether") * 1;
+    const refund = web3.utils.fromWei(VOTE100, "ether") * 1;
     const docId = DOC1;
 
     // Account #1 유저의 초기 잔고
     const bal_wei_S1 = await _deck.balanceOf(owner);
-    const bal_ether_S1 = web3.fromWei(bal_wei_S1, "ether") * 1;
+    const bal_ether_S1 = web3.utils.fromWei(bal_wei_S1, "ether") * 1;
     //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
 
     // determined된 보상액
     const reward_wei = await _curator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
+    const reward_ether = web3.utils.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
 
     // -------------------------
@@ -609,7 +613,7 @@ contract("Asset - curator", accounts => {
     //console.log('claimed');
 
     const bal_wei_S2 = await _deck.balanceOf(owner);
-    const bal_ether_S2 = web3.fromWei(bal_wei_S2, "ether") * 1;
+    const bal_ether_S2 = web3.utils.fromWei(bal_wei_S2, "ether") * 1;
     //console.log('bal_ether_S2 : ' + bal_ether_S2.toString());
 
     // -------------------------
@@ -657,12 +661,12 @@ contract("Asset - curator", accounts => {
 
     // Account #3 유저의 초기 잔고
     const bal_wei_S1 = await _deck.balanceOf(owner);
-    const bal_ether_S1 = web3.fromWei(bal_wei_S1, "ether") * 1;
+    const bal_ether_S1 = web3.utils.fromWei(bal_wei_S1, "ether") * 1;
     //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
 
     // determined된 보상액
     const reward_wei = await _curator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
+    const reward_ether = web3.utils.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
     assert.equal(0, reward_ether, "determined amount is not 0");
 
@@ -673,7 +677,7 @@ contract("Asset - curator", accounts => {
     //console.log('claimed');
 
     const bal_wei_S2 = await _deck.balanceOf(owner);
-    const bal_ether_S2 = web3.fromWei(bal_wei_S2, "ether") * 1;
+    const bal_ether_S2 = web3.utils.fromWei(bal_wei_S2, "ether") * 1;
     //console.log('bal_ether_S2 : ' + bal_ether_S2.toString());
 
     // -------------------------
@@ -740,7 +744,7 @@ contract("Asset - curator", accounts => {
 
     //  - determine
     const reward_s2_wei = await _curator.determine(docId, { from: owner });
-    const reward_s2_ether = web3.fromWei(reward_s2_wei[0], "ether") * 1;
+    const reward_s2_ether = web3.utils.fromWei(reward_s2_wei[0], "ether") * 1;
     //console.log('reward_s2_ether : ' + reward_s2_ether.toString());
 
     // -------------------------
@@ -748,9 +752,9 @@ contract("Asset - curator", accounts => {
     // -------------------------
     const todayMillis = (await _pool.getDateMillis()) * 1;
     const dayMillis = (await _pool.getOneDayMillis()) * 1;
-    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
+    const drp_3 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
     const ref_3 = ((drp_3 * 1) * (100 / (100))) / (90000 + 90000) * 90000;
     const ref_4 = ((drp_4 * 1) * (100 / (100))) / (160000 + 160000) * 160000;
     const ref_5 = ((drp_5 * 1) * (100 / (500))) / (250000 + 250000) * 250000;
@@ -803,7 +807,7 @@ contract("Asset - curator", accounts => {
 
     // Testing
     const earnings_wei = await _curator.recentEarnings(addr, docId, 7);
-    const earnings_ether = web3.fromWei(earnings_wei, "ether") * 1;
+    const earnings_ether = web3.utils.fromWei(earnings_wei, "ether") * 1;
     //console.log('earnings_ether : ' + earnings_ether.toString());
 
     // -------------------------
@@ -812,11 +816,11 @@ contract("Asset - curator", accounts => {
     const todayMillis = (await _pool.getDateMillis()) * 1;
     const dayMillis = (await _pool.getOneDayMillis()) * 1;
 
-    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
-    const drp_6 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 6 * dayMillis));
-    const drp_7 = web3.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 7 * dayMillis));
+    const drp_3 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 5 * dayMillis));
+    const drp_6 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 6 * dayMillis));
+    const drp_7 = web3.utils.fromWei(await _pool.getDailyRewardPool(30, todayMillis - 7 * dayMillis));
 
     const ref_3 = ((drp_3 * 1) * (100 / (100))) / (90000 + 90000) * 90000;
     const ref_4 = ((drp_4 * 1) * (100 / (100))) / (160000 + 160000) * 160000;
@@ -858,16 +862,16 @@ contract("Asset - curator", accounts => {
   it("Document List #1: A list of entire documents voted by a specific user.", async () => {
 
     const docIds_a3 = await _curator.getDocuments(accounts[3]);
-    assert.equal(web3.toAscii(DOC1), web3.toAscii(docIds_a3[0]), "wrong doc id #1 on docIds_a3");
-    assert.equal(web3.toAscii(DOC2), web3.toAscii(docIds_a3[1]), "wrong doc id #2 on docIds_a3");
+    assert.equal(web3.utils.toAscii(DOC1), web3.utils.toAscii(docIds_a3[0]), "wrong doc id #1 on docIds_a3");
+    assert.equal(web3.utils.toAscii(DOC2), web3.utils.toAscii(docIds_a3[1]), "wrong doc id #2 on docIds_a3");
 
     const docIds_a4 = await _curator.getDocuments(accounts[4]);
-    assert.equal(web3.toAscii(DOC1), web3.toAscii(docIds_a4[0]), "wrong doc id #1 on docIds_a4");
-    assert.equal(web3.toAscii(DOC4), web3.toAscii(docIds_a4[1]), "wrong doc id #4 on docIds_a4");
-    assert.equal(web3.toAscii(DOC3), web3.toAscii(docIds_a4[2]), "wrong doc id #3 on docIds_a4");
+    assert.equal(web3.utils.toAscii(DOC1), web3.utils.toAscii(docIds_a4[0]), "wrong doc id #1 on docIds_a4");
+    assert.equal(web3.utils.toAscii(DOC4), web3.utils.toAscii(docIds_a4[1]), "wrong doc id #4 on docIds_a4");
+    assert.equal(web3.utils.toAscii(DOC3), web3.utils.toAscii(docIds_a4[2]), "wrong doc id #3 on docIds_a4");
 
     const docIds_a5 = await _curator.getDocuments(accounts[5]);
-    assert.equal(web3.toAscii(DOC2), web3.toAscii(docIds_a5[0]), "wrong doc id #2 on docIds_a5");
+    assert.equal(web3.utils.toAscii(DOC2), web3.utils.toAscii(docIds_a5[0]), "wrong doc id #2 on docIds_a5");
   });
 
 });

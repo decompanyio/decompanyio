@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -108,7 +108,7 @@ contract DocumentRegistry is Ownable {
     emit Withdraw(docId, claimedDate, withdraw);
   }
 
-  function getDocuments(address owner) external view returns (bytes32[]) {
+  function getDocuments(address owner) external view returns (bytes32[] memory) {
     return _docIdsByAddr[owner];
   }
 
@@ -131,7 +131,7 @@ contract DocumentRegistry is Ownable {
   }
 
   // creator list for iteration
-  function getCreators() public view returns (address[]) {
+  function getCreators() public view returns (address[] memory) {
     return _ownerAddrs;
   }
 
@@ -193,7 +193,7 @@ contract DocumentRegistry is Ownable {
     }
   }
 
-  function updatePageViews(uint dateMillis, bytes32[] docIds, uint[] pvs) public {
+  function updatePageViews(uint dateMillis, bytes32[] memory docIds, uint[] memory pvs) public {
     require(msg.sender == _foundation);
     require(dateMillis > 0);
     require(docIds.length > 0);

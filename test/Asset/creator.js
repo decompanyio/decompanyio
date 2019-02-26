@@ -1,3 +1,7 @@
+const { getWeb3, getContractInstance } = require("../helpers");
+const web3 = getWeb3();
+const getInstance = getContractInstance(web3);
+
 const Deck = artifacts.require("./Deck.sol");
 const Creator = artifacts.require("./Creator.sol");
 const Curator = artifacts.require("./Curator.sol");
@@ -7,11 +11,11 @@ const Ballot = artifacts.require("./Ballot.sol");
 
 contract("Asset - creator", accounts => {
 
-  const DOC1 = web3.fromAscii("10000000000000000000000000000001");
-  const DOC2 = web3.fromAscii("10000000000000000000000000000002");
-  const DOC3 = web3.fromAscii("10000000000000000000000000000003");
-  const DOC4 = web3.fromAscii("10000000000000000000000000000004");
-  const DOC5 = web3.fromAscii("10000000000000000000000000000005");
+  const DOC1 = web3.utils.fromAscii("10000000000000000000000000000001");
+  const DOC2 = web3.utils.fromAscii("10000000000000000000000000000002");
+  const DOC3 = web3.utils.fromAscii("10000000000000000000000000000003");
+  const DOC4 = web3.utils.fromAscii("10000000000000000000000000000004");
+  const DOC5 = web3.utils.fromAscii("10000000000000000000000000000005");
 
   var DAYS_0;
   var DAYS_1;
@@ -76,8 +80,8 @@ contract("Asset - creator", accounts => {
     // - ACCOUNT[4] : 100,000 DECK
     // - ACCOUNT[5] : 100,000 DECK
 
-    const totalSupply = new web3.BigNumber('10000000000000000000000000000');
-    const rewardPool = new web3.BigNumber('200000000000000000000000000');
+    const totalSupply = '10000000000000000000000000000';
+    const rewardPool = '200000000000000000000000000';
 
     await _deck.mint(accounts[0], totalSupply, { from: accounts[0] });
     await _deck.transfer(_pool.address, rewardPool, { from: accounts[0] });
@@ -145,7 +149,7 @@ contract("Asset - creator", accounts => {
     const docId = DOC3;
 
     const wei = await _creator.determine(docId, { from: accounts[1] });
-    const doc3 = web3.fromWei(wei[0], "ether");
+    const doc3 = web3.utils.fromWei(wei[0], "ether");
     //console.log('reward of doc3 : ' + doc3);
     assert.equal(0, doc3 * 1);
   });
@@ -189,9 +193,9 @@ contract("Asset - creator", accounts => {
     // stage 1 :
     const docId = DOC2;
 
-    const drp = web3.fromWei(await _pool.getDailyRewardPool(70, yesterdayMillis));
+    const drp = web3.utils.fromWei(await _pool.getDailyRewardPool(70, yesterdayMillis));
     const doc2_wei = await _creator.determine(docId, { from: accounts[1] });
-    const doc2_ether = web3.fromWei(doc2_wei[0], "ether");
+    const doc2_ether = web3.utils.fromWei(doc2_wei[0], "ether");
     //console.log('reward of doc2 : ' + doc2_ether);
 
     const sample = Math.round((doc2_ether * 1) / 100);
@@ -221,16 +225,16 @@ contract("Asset - creator", accounts => {
     const todayMillis = (await _pool.getDateMillis()) * 1;
     const dayMillis = (await _pool.getOneDayMillis()) * 1;
 
-    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
+    const drp_1 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
 
     // stage 1 :
     const docId = DOC1;
     const determined_wei = await _creator.determine(docId, { from: accounts[1] });
-    const determined = web3.fromWei(determined_wei[0], "ether");
+    const determined = web3.utils.fromWei(determined_wei[0], "ether");
     //console.log('reward of doc1 : ' + doc1);
 
     const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
@@ -273,12 +277,12 @@ contract("Asset - creator", accounts => {
 
     // Account #1 유저의 초기 잔고
     const bal_wei_S1 = await _deck.balanceOf(owner);
-    const bal_ether_S1 = web3.fromWei(bal_wei_S1, "ether") * 1;
+    const bal_ether_S1 = web3.utils.fromWei(bal_wei_S1, "ether") * 1;
     //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
 
     // determined된 보상액
     const reward_wei = await _creator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
+    const reward_ether = web3.utils.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
 
     // -------------------------
@@ -288,7 +292,7 @@ contract("Asset - creator", accounts => {
     //console.log('claimed');
 
     const bal_wei_S2 = await _deck.balanceOf(accounts[1]);
-    const bal_ether_S2 = web3.fromWei(bal_wei_S2, "ether") * 1;
+    const bal_ether_S2 = web3.utils.fromWei(bal_wei_S2, "ether") * 1;
     //console.log('bal_ether_S2 : ' + bal_ether_S2.toString());
 
     // -------------------------
@@ -312,12 +316,12 @@ contract("Asset - creator", accounts => {
 
     // Account #1 유저의 초기 잔고
     const bal_wei_S1 = await _deck.balanceOf(owner);
-    const bal_ether_S1 = web3.fromWei(bal_wei_S1, "ether") * 1;
+    const bal_ether_S1 = web3.utils.fromWei(bal_wei_S1, "ether") * 1;
     //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
 
     // determined된 보상액
     const reward_wei = await _creator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
+    const reward_ether = web3.utils.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
     assert.equal(0, reward_ether, "determined amount is not 0");
 
@@ -328,7 +332,7 @@ contract("Asset - creator", accounts => {
     //console.log('claimed');
 
     const bal_wei_S2 = await _deck.balanceOf(accounts[1]);
-    const bal_ether_S2 = web3.fromWei(bal_wei_S2, "ether") * 1;
+    const bal_ether_S2 = web3.utils.fromWei(bal_wei_S2, "ether") * 1;
     //console.log('bal_ether_S2 : ' + bal_ether_S2.toString());
 
     // -------------------------
@@ -368,12 +372,12 @@ contract("Asset - creator", accounts => {
 
     // Account #2 유저의 초기 잔고
     const bal_wei_S1 = await _deck.balanceOf(owner);
-    const bal_ether_S1 = web3.fromWei(bal_wei_S1, "ether") * 1;
+    const bal_ether_S1 = web3.utils.fromWei(bal_wei_S1, "ether") * 1;
     //console.log('bal_ether_S1 : ' + bal_ether_S1.toString());
 
     // determined된 보상액
     const reward_wei = await _creator.determine(docId, { from: owner });
-    const reward_ether = web3.fromWei(reward_wei[0], "ether") * 1;
+    const reward_ether = web3.utils.fromWei(reward_wei[0], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
 
     // -------------------------
@@ -386,7 +390,7 @@ contract("Asset - creator", accounts => {
     //console.log('paid');
 
     const bal_wei_S2 = await _deck.balanceOf(owner);
-    const bal_ether_S2 = web3.fromWei(bal_wei_S2, "ether") * 1;
+    const bal_ether_S2 = web3.utils.fromWei(bal_wei_S2, "ether") * 1;
     //console.log('bal_ether_S2 : ' + bal_ether_S2.toString());
 
     const paid_ether = bal_ether_S2 - bal_ether_S1;
@@ -397,7 +401,7 @@ contract("Asset - creator", accounts => {
     //console.log('claimed');
 
     const bal_wei_S3 = await _deck.balanceOf(owner);
-    const bal_ether_S3 = web3.fromWei(bal_wei_S3, "ether") * 1;
+    const bal_ether_S3 = web3.utils.fromWei(bal_wei_S3, "ether") * 1;
     //console.log('bal_ether_S3 : ' + bal_ether_S3.toString());
 
     // -------------------------
@@ -405,9 +409,9 @@ contract("Asset - creator", accounts => {
     // -------------------------
     const todayMillis = (await _pool.getDateMillis()) * 1;
     const dayMillis = (await _pool.getOneDayMillis()) * 1;
-    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
+    const drp_1 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
 
     const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
     const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
@@ -447,7 +451,7 @@ contract("Asset - creator", accounts => {
 
     // Testing
     const earnings_wei = await _creator.recentEarnings(docId, 7);
-    const earnings_ether = web3.fromWei(earnings_wei, "ether") * 1;
+    const earnings_ether = web3.utils.fromWei(earnings_wei, "ether") * 1;
     //console.log('earnings_ether : ' + earnings_ether.toString());
 
     // -------------------------
@@ -456,13 +460,13 @@ contract("Asset - creator", accounts => {
     const todayMillis = (await _pool.getDateMillis()) * 1;
     const dayMillis = (await _pool.getOneDayMillis()) * 1;
 
-    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
-    const drp_6 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 6 * dayMillis));
-    const drp_7 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 7 * dayMillis));
+    const drp_1 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
+    const drp_6 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 6 * dayMillis));
+    const drp_7 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 7 * dayMillis));
 
     const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
     const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
@@ -484,7 +488,7 @@ contract("Asset - creator", accounts => {
 
     // Testing
     const earnings_wei = await _creator.recentEarnings(docId, 7, { from: accounts[7] });
-    const earnings_ether = web3.fromWei(earnings_wei, "ether") * 1;
+    const earnings_ether = web3.utils.fromWei(earnings_wei, "ether") * 1;
     //console.log('earnings_ether : ' + earnings_ether.toString());
 
     // -------------------------
@@ -493,11 +497,11 @@ contract("Asset - creator", accounts => {
     const todayMillis = (await _pool.getDateMillis()) * 1;
     const dayMillis = (await _pool.getOneDayMillis()) * 1;
 
-    const drp_1 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
-    const drp_2 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
-    const drp_3 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
-    const drp_4 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
-    const drp_5 = web3.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
+    const drp_1 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 1 * dayMillis));
+    const drp_2 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 2 * dayMillis));
+    const drp_3 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 3 * dayMillis));
+    const drp_4 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 4 * dayMillis));
+    const drp_5 = web3.utils.fromWei(await _pool.getDailyRewardPool(70, todayMillis - 5 * dayMillis));
 
     const ref_1 = (drp_1 * 1) * (100 / (100 + 200 + 100 + 300));
     const ref_2 = (drp_2 * 1) * (200 / (200 + 200));
@@ -524,9 +528,9 @@ contract("Asset - creator", accounts => {
     // preparing
     const owner = accounts[1];
     const docIds = await _creator.getDocuments(owner);
-    assert.equal(web3.toAscii(DOC1), web3.toAscii(docIds[0]), "wrong doc id #1");
-    assert.equal(web3.toAscii(DOC2), web3.toAscii(docIds[1]), "wrong doc id #2");
-    assert.equal(web3.toAscii(DOC3), web3.toAscii(docIds[2]), "wrong doc id #3");
+    assert.equal(web3.utils.toAscii(DOC1), web3.utils.toAscii(docIds[0]), "wrong doc id #1");
+    assert.equal(web3.utils.toAscii(DOC2), web3.utils.toAscii(docIds[1]), "wrong doc id #2");
+    assert.equal(web3.utils.toAscii(DOC3), web3.utils.toAscii(docIds[2]), "wrong doc id #3");
   });
 
   // 문서 목록 보기 #2 : 누구나 열람할 수 있습니다.
@@ -534,8 +538,8 @@ contract("Asset - creator", accounts => {
     // preparing
     const owner = accounts[2];
     const docIds = await _creator.getDocuments(owner, { from: accounts[7] });
-    assert.equal(web3.toAscii(DOC4), web3.toAscii(docIds[0]), "wrong doc id #4");
-    assert.equal(web3.toAscii(DOC5), web3.toAscii(docIds[1]), "wrong doc id #5");
+    assert.equal(web3.utils.toAscii(DOC4), web3.utils.toAscii(docIds[0]), "wrong doc id #4");
+    assert.equal(web3.utils.toAscii(DOC5), web3.utils.toAscii(docIds[1]), "wrong doc id #5");
   });
 
 });

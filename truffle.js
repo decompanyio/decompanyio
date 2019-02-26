@@ -12,6 +12,12 @@
  *   },
  */
 var HDWalletProvider = require("truffle-hdwallet-provider");
+const NonceSubprovider = require("web3-provider-engine/subproviders/nonce-tracker");
+const createInfuraProvider = (secret, infuraUrl) => {
+  const provider = new HDWalletProvider(secret, infuraUrl);
+  provider.engine.addProvider(new NonceSubprovider());
+  return provider;
+}
 
 module.exports = {
   networks: {
@@ -23,12 +29,13 @@ module.exports = {
         gasPrice: 25000000000
     },
     rinkeby: {
-      provider: function() {
-        return new HDWalletProvider("YOUR SEED HERE",
-        "https://rinkeby.infura.io/v3/43132d938aaa4d96a453fd1c708b7f6c")
-      },
-      //from: "0xa4dA09DF8E5D0E05775c2C26ABCdFB97f3e84e15", // default address to use for any transaction Truffle makes during migrations
-      network_id: 3,
+      provider: createInfuraProvider(
+        "...",
+        "https://rinkeby.infura.io/v3/..."),
+      network_id: 4,
+      websockets: true,
+      //gas: 4698712,
+      gas: 6994701,
       //gas: 4612388 // Gas limit used for deploys
     }
   },
@@ -37,5 +44,10 @@ module.exports = {
           enabled: true,
           runs: 200
       }
+  },
+  compilers: {
+    solc: {
+      version: "0.5.0" // ex:  "0.4.20". (Default: Truffle's installed solc)
+    }
   }
 };

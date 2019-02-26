@@ -1,14 +1,18 @@
+const { getWeb3, getContractInstance } = require("../helpers");
+const web3 = getWeb3();
+const getInstance = getContractInstance(web3);
+
 const RewardPool = artifacts.require("./RewardPool.sol");
 const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
 //var moment = require('moment');
 
 contract("DocumentRegistry - reading page views", accounts => {
 
-  const DOC1 = "10000000000000000000000000000001";  // accounts[1]
-  const DOC2 = "10000000000000000000000000000002";  // accounts[1]
-  const DOC3 = "10000000000000000000000000000003";  // accounts[1]
-  const DOC4 = "10000000000000000000000000000004";  // accounts[2]
-  const DOC5 = "10000000000000000000000000000005";  // accounts[2]
+  const DOC1 = web3.utils.fromAscii("10000000000000000000000000000001");  // accounts[1]
+  const DOC2 = web3.utils.fromAscii("10000000000000000000000000000002");  // accounts[1]
+  const DOC3 = web3.utils.fromAscii("10000000000000000000000000000003");  // accounts[1]
+  const DOC4 = web3.utils.fromAscii("10000000000000000000000000000004");  // accounts[2]
+  const DOC5 = web3.utils.fromAscii("10000000000000000000000000000005");  // accounts[2]
 
   var DAYS_0;
   var DAYS_1;

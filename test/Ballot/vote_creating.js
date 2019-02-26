@@ -1,3 +1,7 @@
+const { getWeb3, getContractInstance } = require("../helpers");
+const web3 = getWeb3();
+const getInstance = getContractInstance(web3);
+
 const RewardPool = artifacts.require("./RewardPool.sol");
 const Ballot = artifacts.require("./Ballot.sol");
 //var moment = require('moment');
@@ -48,8 +52,8 @@ contract("Ballot - creating votes", accounts => {
   it("Create a Vote", async () => {
 
     const ADDR = accounts[5];
-    const DOC = web3.fromAscii("10000000000000000000000000000001");
-    const DEPOSIT = new web3.BigNumber('100000000000000000000');
+    const DOC = web3.utils.fromAscii("10000000000000000000000000000001");
+    const DEPOSIT = '100000000000000000000';
 
     const voteId = await _ballot.next();
     //console.log("voteId : " + voteId);
@@ -60,8 +64,8 @@ contract("Ballot - creating votes", accounts => {
     //console.log("created");
 
     const vote = await _ballot.getVote(voteId);
-    const deposit_D1_S1 = web3.fromWei(DEPOSIT, "ether") * 1;
-    const deposit_D1_S2 = web3.fromWei(vote[3], "ether") * 1;
+    const deposit_D1_S1 = web3.utils.fromWei(DEPOSIT, "ether") * 1;
+    const deposit_D1_S2 = web3.utils.fromWei(vote[3], "ether") * 1;
     // assert
     assert.equal(deposit_D1_S1, deposit_D1_S2, "wrong deposit");
   });
@@ -69,8 +73,8 @@ contract("Ballot - creating votes", accounts => {
   it("Read a Vote", async () => {
 
     const ADDR = accounts[5];
-    const DOC = web3.fromAscii("10000000000000000000000000000001");
-    const DEPOSIT = new web3.BigNumber('100000000000000000000');
+    const DOC = web3.utils.fromAscii("10000000000000000000000000000001");
+    const DEPOSIT = '100000000000000000000';
 
     let voteId = await _ballot.count();
     const vote = await _ballot.getVote(voteId);
@@ -91,11 +95,11 @@ contract("Ballot - creating votes", accounts => {
     assert.equal(date_D1_S2*1, date_D1_S1*1, "wrong start date - #2");
 
     const claimed_D1_S1 = 0;
-    const claimed_D1_S2 = web3.fromWei(vote[4], "ether") * 1;
+    const claimed_D1_S2 = web3.utils.fromWei(vote[4], "ether") * 1;
     assert.equal(claimed_D1_S1, claimed_D1_S2, "wrong amount of claimed");
 
-    const deposit_D1_S1 = web3.fromWei(DEPOSIT, "ether") * 1;
-    const deposit_D1_S2 = web3.fromWei(vote[3], "ether") * 1;
+    const deposit_D1_S1 = web3.utils.fromWei(DEPOSIT, "ether") * 1;
+    const deposit_D1_S2 = web3.utils.fromWei(vote[3], "ether") * 1;
     assert.equal(deposit_D1_S1, deposit_D1_S2, "wrong deposit");
   });
 

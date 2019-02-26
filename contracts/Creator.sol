@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./RewardPool.sol";
@@ -21,7 +21,7 @@ contract Creator is IAsset, Ownable {
     _rewardPool._registry().register(msg.sender, docId);
   }
 
-  function getDocuments(address owner) external view returns (bytes32[]) {
+  function getDocuments(address owner) external view returns (bytes32[] memory) {
     return _rewardPool._registry().getDocuments(owner);
   }
 

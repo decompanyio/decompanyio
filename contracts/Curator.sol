@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./RewardPool.sol";
@@ -24,7 +24,7 @@ contract Curator is IAsset, Ownable {
     return _rewardPool._ballot().getVote(i);
   }
 
-  function getDocuments(address owner) external view returns (bytes32[]) {
+  function getDocuments(address owner) external view returns (bytes32[] memory) {
     return _rewardPool._ballot().getUserDocuments(owner);
   }
 
@@ -40,7 +40,7 @@ contract Curator is IAsset, Ownable {
     return _rewardPool._ballot().getUserActiveVotes(addr, docId, uint(block.timestamp/86400) * 86400000, _rewardPool.getVestingMillis());
   }
 
-  function getUserDocuments(address addr) external view returns (bytes32[]) {
+  function getUserDocuments(address addr) external view returns (bytes32[] memory) {
     return _rewardPool._ballot().getUserDocuments(addr);
   }
 

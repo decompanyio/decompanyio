@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import "./Deck.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -17,7 +17,7 @@ contract BountyOne is Ownable {
   function init(address _token, uint256 _provision) public
     onlyOwner()
   {
-    require(_token != 0 && address(token) == 0);
+    require(_token != address(0) && address(token) == address(0));
     require(_provision != 0 && provision == 0);
 
     token = Deck(_token);
@@ -34,7 +34,7 @@ contract BountyOne is Ownable {
     return uint(claimed.length);
   }
 
-  function getClaimedUsers() public view returns (address[]) {
+  function getClaimedUsers() public view returns (address[] memory) {
     return claimed;
   }
 

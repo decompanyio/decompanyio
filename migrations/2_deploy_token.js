@@ -18,10 +18,10 @@ module.exports = function(deployer, network, accounts) {
     //const openingTime = latestTime;
     //const closingTime = openingTime + duration.weeks(1);
 
-    const name = "KT Alpha";
-    const symbol = "KTA";
+    const name = "Apple";
+    const symbol = "APL";
     const decimals = 18;
-    await deployer.deploy(Deck , name, symbol, decimals);
+    await deployer.deploy(Deck , name, symbol, decimals, {gas: 6994701});
     //await deployer.deploy(Utility);
   });
 };

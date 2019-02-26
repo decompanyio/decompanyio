@@ -1,14 +1,18 @@
+const { getWeb3, getContractInstance } = require("../helpers");
+const web3 = getWeb3();
+const getInstance = getContractInstance(web3);
+
 const RewardPool = artifacts.require("./RewardPool.sol");
 const Ballot = artifacts.require("./Ballot.sol");
 //var moment = require('moment');
 
 contract("Ballot - reading votes", accounts => {
 
-  const DOC1 = web3.fromAscii("10000000000000000000000000000001");  // accounts[1]
-  const DOC2 = web3.fromAscii("10000000000000000000000000000002");  // accounts[1]
-  const DOC3 = web3.fromAscii("10000000000000000000000000000003");  // accounts[1]
-  const DOC4 = web3.fromAscii("10000000000000000000000000000004");  // accounts[2]
-  const DOC5 = web3.fromAscii("10000000000000000000000000000005");  // accounts[2]
+  const DOC1 = web3.utils.fromAscii("10000000000000000000000000000001");  // accounts[1]
+  const DOC2 = web3.utils.fromAscii("10000000000000000000000000000002");  // accounts[1]
+  const DOC3 = web3.utils.fromAscii("10000000000000000000000000000003");  // accounts[1]
+  const DOC4 = web3.utils.fromAscii("10000000000000000000000000000004");  // accounts[2]
+  const DOC5 = web3.utils.fromAscii("10000000000000000000000000000005");  // accounts[2]
 
   var DAYS_0;
   var DAYS_1;
@@ -49,7 +53,7 @@ contract("Ballot - reading votes", accounts => {
 
     const ADDR1 = accounts[1];
     const ADDR2 = accounts[2];
-    const DEPOSIT = new web3.BigNumber('100000000000000000000');
+    const DEPOSIT = '100000000000000000000';
 
     // ---------------------------------------------------------------------------------
     //    DAYS_9, DAYS_8, DAYS_7, DAYS_6, DAYS_5, DAYS_4, DAYS_3, DAYS_2, DAYS_1, DAYS_0
@@ -95,25 +99,25 @@ contract("Ballot - reading votes", accounts => {
   // ---------------------------------------------------------------------------------
   it("Get active votes", async () => {
     const vestingMillis = await _pool.getVestingMillis();
-    const active_votes_day_9 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_9, vestingMillis), "ether") * 1;
+    const active_votes_day_9 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_9, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_9, "wrong active_votes_day_9");
-    const active_votes_day_8 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_8, vestingMillis), "ether") * 1;
+    const active_votes_day_8 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_8, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_8, "wrong active_votes_day_8");
-    const active_votes_day_7 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_7, vestingMillis), "ether") * 1;
+    const active_votes_day_7 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_7, vestingMillis), "ether") * 1;
     assert.equal(300, active_votes_day_7, "wrong active_votes_day_7");
-    const active_votes_day_6 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_6, vestingMillis), "ether") * 1;
+    const active_votes_day_6 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_6, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_6, "wrong active_votes_day_6");
-    const active_votes_day_5 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_5, vestingMillis), "ether") * 1;
+    const active_votes_day_5 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_5, vestingMillis), "ether") * 1;
     assert.equal(300, active_votes_day_5, "wrong active_votes_day_5");
-    const active_votes_day_4 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_4, vestingMillis), "ether") * 1;
+    const active_votes_day_4 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_4, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_4, "wrong active_votes_day_4");
-    const active_votes_day_3 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_3, vestingMillis), "ether") * 1;
+    const active_votes_day_3 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_3, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_3, "wrong active_votes_day_3");
-    const active_votes_day_2 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_2, vestingMillis), "ether") * 1;
+    const active_votes_day_2 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_2, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_2, "wrong active_votes_day_2");
-    const active_votes_day_1 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_1, vestingMillis), "ether") * 1;
+    const active_votes_day_1 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_1, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_1, "wrong active_votes_day_1");
-    const active_votes_day_0 = web3.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_0, vestingMillis), "ether") * 1;
+    const active_votes_day_0 = web3.utils.fromWei(await _ballot.getActiveVotes(DOC1, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_0, "wrong active_votes_day_0");
   });
 
@@ -135,25 +139,25 @@ contract("Ballot - reading votes", accounts => {
   it("Get active user votes", async () => {
     const ADDR1 = accounts[1];
     const vestingMillis = await _pool.getVestingMillis();
-    const active_votes_day_9 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_9, vestingMillis), "ether") * 1;
+    const active_votes_day_9 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_9, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_9, "wrong active_votes_day_9");
-    const active_votes_day_8 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_8, vestingMillis), "ether") * 1;
+    const active_votes_day_8 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_8, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_8, "wrong active_votes_day_8");
-    const active_votes_day_7 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_7, vestingMillis), "ether") * 1;
+    const active_votes_day_7 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_7, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_7, "wrong active_votes_day_7");
-    const active_votes_day_6 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_6, vestingMillis), "ether") * 1;
+    const active_votes_day_6 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_6, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_6, "wrong active_votes_day_6");
-    const active_votes_day_5 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_5, vestingMillis), "ether") * 1;
+    const active_votes_day_5 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_5, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_5, "wrong active_votes_day_5");
-    const active_votes_day_4 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_4, vestingMillis), "ether") * 1;
+    const active_votes_day_4 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_4, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_4, "wrong active_votes_day_4");
-    const active_votes_day_3 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_3, vestingMillis), "ether") * 1;
+    const active_votes_day_3 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_3, vestingMillis), "ether") * 1;
     assert.equal(100, active_votes_day_3, "wrong active_votes_day_3");
-    const active_votes_day_2 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_2, vestingMillis), "ether") * 1;
+    const active_votes_day_2 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_2, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_2, "wrong active_votes_day_2");
-    const active_votes_day_1 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_1, vestingMillis), "ether") * 1;
+    const active_votes_day_1 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_1, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_1, "wrong active_votes_day_1");
-    const active_votes_day_0 = web3.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_0, vestingMillis), "ether") * 1;
+    const active_votes_day_0 = web3.utils.fromWei(await _ballot.getUserActiveVotes(ADDR1, DOC1, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(200, active_votes_day_0, "wrong active_votes_day_0");
   });
 
@@ -175,25 +179,25 @@ contract("Ballot - reading votes", accounts => {
   it("Get claimable user votes before claiming", async () => {
     const ADDR1 = accounts[1];
     const vestingMillis = await _pool.getVestingMillis();
-    const claimable_day_9 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_9, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_9 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_9, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_9, "wrong claimable_day_9");
-    const claimable_day_8 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_8, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_8 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_8, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_8, "wrong claimable_day_8");
-    const claimable_day_7 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_7, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_7 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_7, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(200, claimable_day_7, "wrong claimable_day_7");
-    const claimable_day_6 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_6, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_6 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_6, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_6, "wrong claimable_day_6");
-    const claimable_day_5 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_5, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_5 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_5, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_5, "wrong claimable_day_5");
-    const claimable_day_4 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_4, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_4 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_4, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_4, "wrong claimable_day_4");
-    const claimable_day_3 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_3, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_3 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_3, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_3, "wrong claimable_day_3");
-    const claimable_day_2 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_2, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_2 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_2, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_2, "wrong claimable_day_2");
-    const claimable_day_1 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_1, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_1 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_1, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_1, "wrong claimable_day_1");
-    const claimable_day_0 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_0, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_0 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_0, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_0, "wrong claimable_day_0");
   });
 
@@ -214,28 +218,28 @@ contract("Ballot - reading votes", accounts => {
   // ---------------------------------------------------------------------------------
   it("Get claimable user votes after claiming", async () => {
     const ADDR1 = accounts[1];
-    const withdraw = new web3.BigNumber('100000000000000000000');
+    const withdraw = '100000000000000000000';
     await _ballot.updateWithdraw(ADDR1, DOC1, DAYS_4, withdraw);
     const vestingMillis = await _pool.getVestingMillis();
-    const claimable_day_9 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_9, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_9 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_9, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_9, "wrong claimable_day_9");
-    const claimable_day_8 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_8, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_8 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_8, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_8, "wrong claimable_day_8");
-    const claimable_day_7 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_7, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_7 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_7, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_7, "wrong claimable_day_7");
-    const claimable_day_6 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_6, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_6 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_6, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_6, "wrong claimable_day_6");
-    const claimable_day_5 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_5, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_5 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_5, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_5, "wrong claimable_day_5");
-    const claimable_day_4 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_4, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_4 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_4, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_4, "wrong claimable_day_4");
-    const claimable_day_3 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_3, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_3 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_3, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_3, "wrong claimable_day_3");
-    const claimable_day_2 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_2, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_2 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_2, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(100, claimable_day_2, "wrong claimable_day_2");
-    const claimable_day_1 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_1, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_1 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_1, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_1, "wrong claimable_day_1");
-    const claimable_day_0 = web3.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_0, DAYS_0, vestingMillis), "ether") * 1;
+    const claimable_day_0 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_0, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_0, "wrong claimable_day_0");
   });
 
