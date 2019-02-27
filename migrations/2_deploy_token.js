@@ -21,7 +21,7 @@ module.exports = function(deployer, network, accounts) {
     const name = "Apple";
     const symbol = "APL";
     const decimals = 18;
-    await deployer.deploy(Deck , name, symbol, decimals, {gas: 6994701});
+    await deployer.deploy(Deck , name, symbol, decimals, {gas: 4700000});
     //await deployer.deploy(Utility);
   });
 };
