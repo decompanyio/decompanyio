@@ -22,7 +22,7 @@
     "eth-sig-util": "^2.1.1",
     "eth-utils": "0.1.0-alpha.9",
     "ethereumjs-util": "^6.1.0",
-    "etherlime": "^1.0.2",
+    "ethereumjs-vm": "^2.6.0",
     "fs-extra": "^7.0.1",
     "ganache-cli": "^6.3.0",
     "graceful-fs": "^4.1.15",
