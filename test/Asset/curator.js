@@ -222,6 +222,7 @@ contract("Asset - curator", accounts => {
 
     // check count
     const count_s1 = await _curator.count();
+    await _deck.approve(_pool.address, deposit, { from: voter });
     await _curator.addVote(docId, deposit, { from: voter });
     const vid = await _curator.count();
     assert.equal((count_s1 * 1) + 1, vid * 1);
@@ -274,6 +275,7 @@ contract("Asset - curator", accounts => {
 
     // check count
     const count_s1 = await _curator.count();
+    await _deck.approve(_pool.address, deposit, { from: voter });
     await _curator.addVote(docId, deposit, { from: voter });
     const vid = await _curator.count();
     assert.equal((count_s1 * 1) + 1, vid * 1);
