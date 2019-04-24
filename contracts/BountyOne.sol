@@ -1,55 +1,55 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.0;
 
 import "./Deck.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+
 contract BountyOne is Ownable {
 
-  event _InitializeBountyOne(address token, uint provision);
-  event _ClaimBountyOne(address addr, uint provision);
+    event InitializeBountyOne(address token, uint provision);
+    event ClaimBountyOne(address addr, uint provision);
 
-  Deck private token;
-  uint256 public provision;
+    Deck private token;
+    uint256 public provision;
 
-  mapping (address => uint) private map;
-  address[] public claimed;
+    mapping (address => uint) private map;
+    address[] private claimed;
 
-  function init(address _token, uint256 _provision) public
-    onlyOwner()
-  {
-    require(_token != address(0) && address(token) == address(0));
-    require(_provision != 0 && provision == 0);
+    function init(address _token, uint256 _provision) public
+        onlyOwner()
+    {
+        require(_token != address(0) && address(token) == address(0));
+        require(_provision != 0 && provision == 0);
 
-    token = Deck(_token);
-    provision = _provision;
+        token = Deck(_token);
+        provision = _provision;
 
-    emit _InitializeBountyOne(_token, _provision);
-  }
-
-  function available() public view returns (uint) {
-    return (map[msg.sender] != 0 || token.balanceOf(address(this)) < provision) ? 0 : provision;
-  }
-
-  function count() public view returns (uint) {
-    return uint(claimed.length);
-  }
-
-  function getClaimedUsers() public view returns (address[] memory) {
-    return claimed;
-  }
-
-  function claim() public {
-    //require(address(token) != 0);
-    //require(address(msg.sender) != 0);
-    //require(map[msg.sender] == 0);
-
-    if (map[msg.sender] == 0) {
-      token.transfer(msg.sender, provision);
-      map[msg.sender] = provision;
-      claimed.push(msg.sender);
-      emit _ClaimBountyOne(msg.sender, provision);
-      return;
+        emit InitializeBountyOne(_token, _provision);
     }
-    emit _ClaimBountyOne(msg.sender, 0);
-  }
+
+    function available() public view returns (uint) {
+        return (map[msg.sender] != 0 || token.balanceOf(address(this)) < provision) ? 0 : provision;
+    }
+
+    function count() public view returns (uint) {
+        return uint(claimed.length);
+    }
+
+    function getClaimedUsers() public view returns (address[] memory) {
+        return claimed;
+    }
+
+    function claim() public {
+        require(address(token) != address(0));
+        require(address(msg.sender) != address(0));
+
+        if (map[msg.sender] == 0) {
+            map[msg.sender] = provision;
+            token.transfer(msg.sender, map[msg.sender]);
+            claimed.push(msg.sender);
+            emit ClaimBountyOne(msg.sender, map[msg.sender]);
+            return;
+        }
+        emit ClaimBountyOne(msg.sender, 0);
+    }
 }

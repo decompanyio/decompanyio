@@ -32,13 +32,15 @@ contract("DocumentRegistry - upadte", accounts => {
 
   it("Setting up...", async () => {
 
-    _pool = await RewardPool.deployed();
-
     // prepare
     _documentRegistry = await DocumentRegistry.deployed();
     await _documentRegistry.setRewardPool(accounts[0]);
     await _documentRegistry.setCreator(accounts[0]);
     await _documentRegistry.setFoundation(accounts[0]);
+    await _documentRegistry.setDateMillis("1556064000000", { from: accounts[0] });
+
+    _pool = await RewardPool.deployed();
+    await _pool.init(_documentRegistry.address, _documentRegistry.address, _documentRegistry.address);
 
     DAYS_0 = ((await _pool.getDateMillis()) * 1) - 0 * (await _pool.getOneDayMillis());
     DAYS_1 = ((await _pool.getDateMillis()) * 1) - 1 * (await _pool.getOneDayMillis());

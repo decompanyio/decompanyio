@@ -18,8 +18,8 @@ module.exports = function(deployer, network, accounts) {
     //const openingTime = latestTime;
     //const closingTime = openingTime + duration.weeks(1);
 
-    const name = "Apple";
-    const symbol = "APL";
+    const name = "Decompany Alpha Deck";
+    const symbol = "DECK";
     const decimals = 18;
     await deployer.deploy(Deck , name, symbol, decimals, {gas: 4700000});
     //await deployer.deploy(Utility);

@@ -3,6 +3,7 @@ const web3 = getWeb3();
 const getInstance = getContractInstance(web3);
 
 const RewardPool = artifacts.require("./RewardPool.sol");
+const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
 const Ballot = artifacts.require("./Ballot.sol");
 //var moment = require('moment');
 
@@ -37,13 +38,18 @@ contract("Ballot - creating votes", accounts => {
 
   it("Setting up...", async () => {
 
-    _pool = await RewardPool.deployed();
+    _registry = await DocumentRegistry.deployed();
+    await _registry.setDateMillis("1556064000000", { from: accounts[0] });
 
-    // prepare
     _ballot = await Ballot.deployed();
+
+    _pool = await RewardPool.deployed();
+    await _pool.init(_registry.address, _registry.address, _registry.address);
+
+    await _ballot.setRewardPool(_pool.address);
     await _ballot.setCurator(accounts[0]);
     await _ballot.setFoundation(accounts[0]);
-    //await _ballot.init(_pool.address);
+    await _ballot.init(_registry.address);
 
     // assert
     assert.equal(1, 1, "failed to set up");
@@ -58,9 +64,9 @@ contract("Ballot - creating votes", accounts => {
     const voteId = await _ballot.next();
     //console.log("voteId : " + voteId);
 
-    _startTime = await _pool.getDateMillis();
+    _startTime = "1556064000000";
     await _ballot.create(voteId, ADDR, DOC, DEPOSIT);
-    _endTime = await _pool.getDateMillis();
+    _endTime = "1556064000000";
     //console.log("created");
 
     const vote = await _ballot.getVote(voteId);

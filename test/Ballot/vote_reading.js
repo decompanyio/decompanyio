@@ -3,6 +3,7 @@ const web3 = getWeb3();
 const getInstance = getContractInstance(web3);
 
 const RewardPool = artifacts.require("./RewardPool.sol");
+const DocumentRegistry = artifacts.require("./DocumentRegistry.sol");
 const Ballot = artifacts.require("./Ballot.sol");
 //var moment = require('moment');
 
@@ -32,13 +33,18 @@ contract("Ballot - reading votes", accounts => {
 
   it("Setting up...", async () => {
 
-    _pool = await RewardPool.deployed();
-
     // prepare
+    _registry = await DocumentRegistry.deployed();
+    await _registry.setDateMillis("1556064000000", { from: accounts[0] });
+
+    _pool = await RewardPool.deployed();
+    await _pool.init(_registry.address, _registry.address, _registry.address);
+
     _ballot = await Ballot.deployed();
     await _ballot.setCurator(accounts[0]);
     await _ballot.setFoundation(accounts[0]);
     await _ballot.setRewardPool(accounts[0]);
+    await _ballot.init(_registry.address);
 
     DAYS_0 = ((await _pool.getDateMillis()) * 1) - 0 * (await _pool.getOneDayMillis());
     DAYS_1 = ((await _pool.getDateMillis()) * 1) - 1 * (await _pool.getOneDayMillis());

@@ -120,7 +120,7 @@ contract Curator is IAsset, Ownable {
     }
 
     function getMillis() private view returns (uint) {
-        return uint(block.timestamp/86400) * 86400000;
+        return _rewardPool.getDateMillis();
     }
 
 }

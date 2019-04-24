@@ -18,10 +18,10 @@ contract("Deck", accounts => {
     const deck = await Deck.deployed();
     const name = await deck.name.call();
     //assert.equal("KT Alpha", name, "wrong name");
-    assert.equal("Apple", name, "wrong name");
+    assert.equal("Decompany Alpha Deck", name, "wrong name");
     const symbol = await deck.symbol.call();
     //assert.equal("KTA", symbol, "wrong symbol");
-    assert.equal("APL", symbol, "wrong symbol");
+    assert.equal("DECK", symbol, "wrong symbol");
   });
 
 });

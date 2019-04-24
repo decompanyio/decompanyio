@@ -37,6 +37,8 @@ contract("Asset - creator", accounts => {
   it("Setting up...", async () => {
 
     _registry = await DocumentRegistry.deployed();
+    await _registry.setDateMillis("1556064000000", { from: accounts[0] });
+
     _ballot = await Ballot.deployed();
     _creator = await Creator.deployed();
     _curator = await Curator.deployed();
@@ -58,7 +60,8 @@ contract("Asset - creator", accounts => {
     await _ballot.setRewardPool(_pool.address);
     await _ballot.setCurator(_curator.address);
     await _ballot.setFoundation(accounts[0]);
-
+    await _ballot.init(_registry.address);
+    
     DAYS_0 = ((await _pool.getDateMillis()) * 1) - 0 * (await _pool.getOneDayMillis());
     DAYS_1 = ((await _pool.getDateMillis()) * 1) - 1 * (await _pool.getOneDayMillis());
     DAYS_2 = ((await _pool.getDateMillis()) * 1) - 2 * (await _pool.getOneDayMillis());

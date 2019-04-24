@@ -32,14 +32,13 @@ contract RewardPool is Ownable {
     function claim(bytes32 docId, IAsset source) external {
         require(address(_registry) != address(0));
         require(address(source) == _creator || address(source) == _curator);
-        uint256 dateMillis = uint(block.timestamp/86400) * 86400000;
-        (uint256 amount, uint256 refund) = source.determineAt(msg.sender, docId, dateMillis);
+        (uint256 amount, uint256 refund) = source.determineAt(msg.sender, docId, getDateMillis());
         if ((amount + refund) > 0 && _token.balanceOf(address(this)) > (amount + refund)) {
             _token.transfer(msg.sender, (amount + refund));
             if (refund == 0) {
-                _registry.updateWithdraw(docId, dateMillis, amount);
+                _registry.updateWithdraw(docId, getDateMillis(), amount);
             } else {
-                _ballot.updateWithdraw(msg.sender, docId, dateMillis, amount);
+                _ballot.updateWithdraw(msg.sender, docId, getDateMillis(), amount);
             }
         }
     }
@@ -59,6 +58,7 @@ contract RewardPool is Ownable {
 
     function revoke() external onlyOwner() {
         _token.transfer(msg.sender, _token.balanceOf(address(this)));
+        selfdestruct(msg.sender);
     }
 
     function setFoundation(address addr) external onlyOwner() {
@@ -73,36 +73,27 @@ contract RewardPool is Ownable {
         if (_curator != addr) _curator = addr;
     }
 
-    function getDailyRewardPool(uint _percent, uint _createTime) external view returns (uint) {
-        uint offsetYears = getOffsetYears(_createTime);
-        // initial daily reward pool tokens : (60000000 / 365) * decimals(10 ** 18) / percent(100)
-        uint initialTokens = 16438356164 * (10 ** 11);
-        return uint((initialTokens * _percent) / (2 ** offsetYears));
+    function getDailyRewardPool(uint256 percent, uint256 dt) external view returns (uint256) {
+        return uint256(((((_token.totalSupply() * 12 / 100) / 2) / (2 ** getOffsetYears(dt))) / 365) * percent / 100);
     }
 
-    function getVestingMillis() external pure returns (uint) {
-        return 3 * 86400000;
+    function getVestingMillis() external pure returns (uint256) {
+        return uint256(3 * getOneDayMillis());
     }
 
-    function getDateMillis() public view returns (uint) {
-        uint tDay = uint(block.timestamp / uint(86400000 / 1000));
-        uint tMillis = tDay * 86400000;
-        return tMillis;
+    function getDateMillis() public view returns (uint256) {
+        return _registry.getDateMillis();
     }
 
     function deposit(address from, uint256 amount) public {
         _token.transferFrom(from, address(this), amount);
     }
 
-    function getOneDayMillis() public pure returns (uint) {
-        return 86400000;
+    function getOneDayMillis() public pure returns (uint256) {
+        return uint256(86400000);
     }
 
-    function getOffsetYears(uint _from) private view returns (uint) {
-        uint curTimeSec = block.timestamp;
-        uint createTimeSec = uint(_from / 1000);
-        uint offsetSec = curTimeSec - createTimeSec;
-        uint offsetDays = uint(offsetSec / uint(86400));
-        return uint(offsetDays / 365);
+    function getOffsetYears(uint256 dt) private view returns (uint256) {
+        return uint256(uint256((getDateMillis() - dt) / getOneDayMillis()) / 365);
     }
 }

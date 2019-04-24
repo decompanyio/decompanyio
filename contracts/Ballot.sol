@@ -1,6 +1,8 @@
 pragma solidity 0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./RewardPool.sol";
+import "./DocumentRegistry.sol";
 
 
 contract Ballot is Ownable {
@@ -44,13 +46,23 @@ contract Ballot is Ownable {
     address private _rewardPool;
     address private _curator;
 
+    DocumentRegistry public _registry;
+
+    function init(address addr) external onlyOwner() {
+        require(address(addr) != address(0));
+        require(address(_registry) == address(0));
+        _registry = DocumentRegistry(addr);
+    }
+
     // adding a new vote
     function create(uint256 i, address addr, bytes32 docId, uint256 deposit) external {
+        require(address(_registry) != address(0));
         require(msg.sender == _curator);
-        add(i, addr, docId, deposit, uint(block.timestamp/86400) * 86400000);
+        add(i, addr, docId, deposit, _registry.getDateMillis());
     }
 
     function insert(uint256 i, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) external {
+        require(address(_registry) != address(0));
         require(msg.sender == _foundation);
         add(i, addr, docId, deposit, dateMillis);
     }
