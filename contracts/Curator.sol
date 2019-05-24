@@ -24,7 +24,7 @@ contract Curator is IAsset, Ownable {
         _rewardPool._ballot().create(_rewardPool._ballot().next(), msg.sender, docId, deposit);
     }
 
-    function getVote(uint256 i) external view returns (address, bytes32, uint256, uint256, uint256) {
+    function getVote(uint256 i) external view returns (address, bytes32, uint256, uint256) {
         return _rewardPool._ballot().getVote(i);
     }
 
@@ -91,35 +91,27 @@ contract Curator is IAsset, Ownable {
         uint256 refund = 0;
         uint256 next = 0;
         uint256 listed = 0;
-        uint256 dm = 0;
-
-        (, listed, ,) = _rewardPool._registry().getDocument(d);
-        dm = _rewardPool._ballot().getLastClaimed(a, d);
-
-        // calculate start date
-        if (dm >= (_rewardPool.getVestingMillis() + _rewardPool.getOneDayMillis())) {
-            dm -= (_rewardPool.getVestingMillis() + _rewardPool.getOneDayMillis());
-        }
-
-        while (dm <= cm) {
-            if (dm == 0) {
-                dm = listed;
+        uint256 last = 0;
+        (, listed, last,) = _rewardPool._registry().getDocument(d);
+        while (last <= cm) {
+            if (last == 0) {
+                last = listed;
             }
-            uint deposit = _rewardPool._ballot().getUserClaimableVotes(a, d, dm, cm, _rewardPool.getVestingMillis());
-            sum += dailyReward(d, dm, deposit);
-            refund += dailyRefund(a, d, dm, cm);
-            next = dm + 86400000;
-            assert(dm < next);
-            dm = next;
+            uint deposit = _rewardPool._ballot().getUserClaimableVotes(a, d, last, cm, _rewardPool.getVestingMillis());
+            sum += dailyReward(d, last, deposit);
+            refund += dailyRefund(a, d, last, cm);
+            next = last + 86400000;
+            assert(last < next);
+            last = next;
         }
         return (sum, refund);
     }
 
-    function dailyReward(bytes32 docId, uint dm, uint deposit) private view returns (uint) {
-        uint pool = _rewardPool.getDailyRewardPool(uint(30), dm);
-        uint tvd = _rewardPool._ballot().getActiveVotes(docId, dm, _rewardPool.getVestingMillis());
-        uint pv = _rewardPool._registry().getPageView(docId, dm);
-        uint tpvs = _rewardPool._registry().getTotalPageViewSquare(dm);
+    function dailyReward(bytes32 docId, uint dateMillis, uint deposit) private view returns (uint) {
+        uint pool = _rewardPool.getDailyRewardPool(uint(30), dateMillis);
+        uint tvd = _rewardPool._ballot().getActiveVotes(docId, dateMillis, _rewardPool.getVestingMillis());
+        uint pv = _rewardPool._registry().getPageView(docId, dateMillis);
+        uint tpvs = _rewardPool._registry().getTotalPageViewSquare(dateMillis);
         return calculate(pool, deposit, tvd, pv, tpvs);
     }
 

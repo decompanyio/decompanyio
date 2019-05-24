@@ -16,7 +16,6 @@ contract Ballot is Ownable {
         bytes32 docId;
         uint256 startDate;
         uint256 deposit;
-        uint256 claimed;
     }
 
     struct Status {
@@ -67,23 +66,12 @@ contract Ballot is Ownable {
         add(i, addr, docId, deposit, dateMillis);
     }
 
-    function updateWithdraw(address a, bytes32 d, uint256 cm, uint256 vm, uint256 withdraw) external {
+    function updateWithdraw(address a, bytes32 d, uint256 claimedDate, uint256 withdraw) external {
         require(msg.sender == _rewardPool);
         require(_mapUserDocAdded[a][d].added);
-
-        // update votes claimed
-        for (uint i=0; i < _mapByAddr[a].length; i++) {
-            if (sameDoc(_mapById[_mapByAddr[a][i]], d)
-            && isRefundable(_mapById[_mapByAddr[a][i]], 0, vm)
-            && isClaimable(_mapById[_mapByAddr[a][i]], cm, vm)) {
-                updateClaimed(_mapByAddr[a][i]);
-            }
-        }
-
-        // update the withdraw status
-        _mapUserDocAdded[a][d].lastClaimedDate = cm;
+        _mapUserDocAdded[a][d].lastClaimedDate = claimedDate;
         _mapUserDocAdded[a][d].withdraw += withdraw;
-        emit Withdraw(a, d, cm, withdraw);
+        emit Withdraw(a, d, claimedDate, withdraw);
     }
 
     function setRewardPool(address addr) external onlyOwner() {
@@ -104,8 +92,8 @@ contract Ballot is Ownable {
         }
     }
 
-    function getVote(uint256 i) external view returns (address, bytes32, uint256, uint256, uint256) {
-        return (_mapById[i].addr, _mapById[i].docId, _mapById[i].startDate, _mapById[i].deposit, _mapById[i].claimed);
+    function getVote(uint256 i) external view returns (address, bytes32, uint256, uint256) {
+        return (_mapById[i].addr, _mapById[i].docId, _mapById[i].startDate, _mapById[i].deposit);
     }
 
     function getActiveVotes(bytes32 docId, uint dMillis, uint vMillis) external view returns (uint256) {
@@ -131,29 +119,24 @@ contract Ballot is Ownable {
 
     function getUserClaimableVotes(address a, bytes32 d, uint dm, uint cm, uint vm) external view returns (uint256) {
         uint256 sum = 0;
-        //uint256 lm = _mapUserDocAdded[a][d].lastClaimedDate;
+        uint256 lm = _mapUserDocAdded[a][d].lastClaimedDate;
         for (uint i=0; i < _mapByAddr[a].length; i++) {
             if (sameDoc(_mapById[_mapByAddr[a][i]], d)
             && isActive(_mapById[_mapByAddr[a][i]], dm, vm)
-            && isClaimable(_mapById[_mapByAddr[a][i]], cm, vm)) {
+            && isClaimable(_mapById[_mapByAddr[a][i]], lm, cm, vm)) {
                 sum += _mapById[_mapByAddr[a][i]].deposit;
             }
         }
         return sum;
     }
 
-    function getLastClaimed(address a, bytes32 d) external view returns (uint256) {
-        return _mapUserDocAdded[a][d].lastClaimedDate;
-    }
-
     function getUserRefundableDeposit(address a, bytes32 d, uint dm, uint cm, uint vm) external view returns (uint256) {
         uint256 sum = 0;
-        //uint256 lm = _mapUserDocAdded[a][d].lastClaimedDate;
+        uint256 lm = _mapUserDocAdded[a][d].lastClaimedDate;
         for (uint i=0; i < _mapByAddr[a].length; i++) {
             if (sameDoc(_mapById[_mapByAddr[a][i]], d)
-            && _mapById[_mapByAddr[a][i]].claimed == 0
             && isRefundable(_mapById[_mapByAddr[a][i]], dm, vm)
-            && isClaimable(_mapById[_mapByAddr[a][i]], cm, vm)) {
+            && isClaimable(_mapById[_mapByAddr[a][i]], lm, cm, vm)) {
                 sum += _mapById[_mapByAddr[a][i]].deposit;
             }
         }
@@ -172,20 +155,11 @@ contract Ballot is Ownable {
         return uint256(_length + 1);
     }
 
-    function updateClaimed(uint256 i) private {
-        require(address(_mapById[i].addr) != address(0));
-        require(uint256(_mapById[i].deposit) != 0);
-        require(uint256(_mapById[i].claimed) == 0);
-
-        _mapById[i].claimed = _mapById[i].deposit;
-        emit ClaimVote(i, _mapById[i].claimed);
-    }
-
     // adding a new vote
     function add(uint256 i, address a, bytes32 d, uint256 deposit, uint256 dm) private {
         require(i == _length + 1);
 
-        Vote memory vote = Vote(a, d, dm, deposit, 0);
+        Vote memory vote = Vote(a, d, dm, deposit);
         _mapById[i] = vote;
         _mapByAddr[a].push(i);
         _mapByDoc[d].push(i);
@@ -207,12 +181,12 @@ contract Ballot is Ownable {
         return (vote.startDate <= dm) && (dm < vote.startDate + vm);
     }
 
-    function isClaimable(Vote storage vote, uint cm, uint vm) private view returns (bool) {
-        //lm = lm == 0 ? vm : lm;
-        return vote.claimed == 0 && (vote.startDate + vm < cm); //&& (lm <= vote.startDate + vm);
+    function isClaimable(Vote storage vote, uint lm, uint cm, uint vm) private view returns (bool) {
+        lm = lm == 0 ? vm : lm;
+        return (lm <= vote.startDate + vm) && (vote.startDate + vm < cm);
     }
 
     function isRefundable(Vote storage vote, uint dm, uint vm) private view returns (bool) {
-        return (vote.claimed == 0 && (dm == 0 || dm == vote.startDate + vm));
+        return (dm == vote.startDate + vm);
     }
 }

@@ -100,10 +100,6 @@ contract("Ballot - creating votes", accounts => {
     assert.equal(date_D1_S0*1, date_D1_S2*1, "wrong start date - #1");
     assert.equal(date_D1_S2*1, date_D1_S1*1, "wrong start date - #2");
 
-    const claimed_D1_S1 = 0;
-    const claimed_D1_S2 = web3.utils.fromWei(vote[4], "ether") * 1;
-    assert.equal(claimed_D1_S1, claimed_D1_S2, "wrong amount of claimed");
-
     const deposit_D1_S1 = web3.utils.fromWei(DEPOSIT, "ether") * 1;
     const deposit_D1_S2 = web3.utils.fromWei(vote[3], "ether") * 1;
     assert.equal(deposit_D1_S1, deposit_D1_S2, "wrong deposit");

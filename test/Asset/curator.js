@@ -238,7 +238,7 @@ contract("Asset - curator", accounts => {
     assert.equal(docId, vote[1], "wrong document id");
     assert.equal(DAYS_0, vote[2] * 1, "wrong start date");
     assert.equal(ref_deposit, sample_deposit, "wrong deposit");
-    assert.equal(0, vote[4] * 1, "wrong claimed date");
+    //assert.equal(0, vote[4] * 1, "wrong claimed date");
   });
 
   // ============================================
@@ -291,7 +291,7 @@ contract("Asset - curator", accounts => {
     assert.equal(docId, vote[1], "wrong document id");
     assert.equal(DAYS_0, vote[2] * 1, "wrong start date");
     assert.equal(ref_deposit, sample_deposit, "wrong deposit");
-    assert.equal(0, vote[4] * 1, "wrong claimed date");
+    //assert.equal(0, vote[4] * 1, "wrong claimed date");
 
     // check the previously voted value also
     const vote_prev = await _curator.getVote(vid-1);
@@ -300,7 +300,7 @@ contract("Asset - curator", accounts => {
     assert.equal(docId, vote_prev[1], "wrong document id prev");
     assert.equal(DAYS_0, vote_prev[2] * 1, "wrong start date prev");
     assert.equal(ref_deposit, sample_deposit, "wrong deposit prev");
-    assert.equal(0, vote_prev[4] * 1, "wrong claimed date prev");
+    //assert.equal(0, vote_prev[4] * 1, "wrong claimed date prev");
 
   });
 
@@ -609,7 +609,9 @@ contract("Asset - curator", accounts => {
     // determined된 보상액
     const reward_wei = await _curator.determine(docId, { from: owner });
     const reward_ether = web3.utils.fromWei(reward_wei[0], "ether") * 1;
+    const refund_ether = web3.utils.fromWei(reward_wei[1], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
+    //console.log('refund_ether : ' + refund_ether.toString());
 
     // -------------------------
     // Testing : 청구하고 입급된 잔고 확인하기
@@ -672,7 +674,9 @@ contract("Asset - curator", accounts => {
     // determined된 보상액
     const reward_wei = await _curator.determine(docId, { from: owner });
     const reward_ether = web3.utils.fromWei(reward_wei[0], "ether") * 1;
+    const refund_ether = web3.utils.fromWei(reward_wei[1], "ether") * 1;
     //console.log('reward_ether : ' + reward_ether.toString());
+    //console.log('refund_ether : ' + refund_ether.toString());
     assert.equal(0, reward_ether, "determined amount is not 0");
 
     // -------------------------
@@ -742,15 +746,36 @@ contract("Asset - curator", accounts => {
     // Testing : DAYS_3에 지급
     // -------------------------
 
+    //  - determine
+    const reward_s1_wei = await _curator.determine(docId, { from: owner });
+    const reward_s1_ether = web3.utils.fromWei(reward_s1_wei[0], "ether") * 1;
+    const refund_s1_ether = web3.utils.fromWei(reward_s1_wei[1], "ether") * 1;
+    //console.log('reward_s1_ether : ' + reward_s1_ether.toString());
+    //console.log('refund_s1_ether : ' + refund_s1_ether.toString());
+    assert.equal(500, refund_s1_ether, "refund_s1_ether");
+
     //  - DAY_3기준으로 보상 지급하기
     const amount = await _curator.determineAt(owner, docId, DAYS_3, { from: _pool.address });
+    const rwdamount_s1_ether = web3.utils.fromWei(amount[0], "ether") * 1;
+    const rfdamount_s1_ether = web3.utils.fromWei(amount[1], "ether") * 1;
+    //console.log('rwdamount_s1_ether : ' + rwdamount_s1_ether.toString());
+    //console.log('rfdamount_s1_ether : ' + rfdamount_s1_ether.toString());
+    assert.equal(400, rfdamount_s1_ether, "rfdamount_s1_ether");
     await _pool.pay(docId, owner, amount[0], 400, DAYS_3, { from: foundation });
     //console.log('paid');
 
     //  - determine
     const reward_s2_wei = await _curator.determine(docId, { from: owner });
     const reward_s2_ether = web3.utils.fromWei(reward_s2_wei[0], "ether") * 1;
+    const refund_s2_ether = web3.utils.fromWei(reward_s2_wei[1], "ether") * 1;
     //console.log('reward_s2_ether : ' + reward_s2_ether.toString());
+    //console.log('refund_s2_ether : ' + refund_s2_ether.toString());
+    assert.equal(100, refund_s2_ether, "refund_s2_ether");
+
+    assert.isTrue(reward_s1_ether > 0);
+    assert.isTrue(rwdamount_s1_ether > 0);
+    assert.isTrue(reward_s2_ether > 0);
+    assert.equal(reward_s1_ether, rwdamount_s1_ether + reward_s2_ether, "rwdamount_s1_ether + reward_s2_ether");
 
     // -------------------------
     // Check result
@@ -965,8 +990,8 @@ contract("Asset - curator", accounts => {
       const refund_ether_SF = web3.utils.fromWei(reward_wei_SF[1], "ether") * 1;
       //console.log('reward_ether_SF : ' + reward_ether_SF.toString());
       //console.log('refund_ether_SF : ' + refund_ether_SF.toString());
-      assert.equal(0, reward_ether_SF, "determine claimed reward is not 0 : " + reward_ether);
-      assert.equal(0, refund_ether_SF, "determine claimed refund");
+      assert.equal(0, reward_ether_SF, "determine claimed reward SF is not 0 : " + reward_ether);
+      assert.equal(0, refund_ether_SF, "determine claimed refund SF");
     });
 
 });
