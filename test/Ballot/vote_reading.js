@@ -225,8 +225,8 @@ contract("Ballot - reading votes", accounts => {
   it("Get claimable user votes after claiming", async () => {
     const ADDR1 = accounts[1];
     const withdraw = '100000000000000000000';
-    await _ballot.updateWithdraw(ADDR1, DOC1, DAYS_4, withdraw);
     const vestingMillis = await _pool.getVestingMillis();
+    await _ballot.updateWithdraw(ADDR1, DOC1, DAYS_4, vestingMillis, withdraw);
     const claimable_day_9 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_9, DAYS_0, vestingMillis), "ether") * 1;
     assert.equal(0, claimable_day_9, "wrong claimable_day_9");
     const claimable_day_8 = web3.utils.fromWei(await _ballot.getUserClaimableVotes(ADDR1, DOC1, DAYS_8, DAYS_0, vestingMillis), "ether") * 1;

@@ -183,8 +183,8 @@ contract DocumentRegistry is Ownable {
         _tpvByDate[dateMillis] += pv;
         _tpvsByDate[dateMillis] += (pv ** 2);
 
-        if (_dateMillis < dateMillis) {
-            _dateMillis = dateMillis;
+        if (_dateMillis <= dateMillis) {
+            _dateMillis = (uint256(dateMillis/86400000) * 86400000) + 86400000;
         }
 
         emit PutPageView(docId, dateMillis, pv);

@@ -34,12 +34,12 @@ contract RewardPool is Ownable {
         require(address(source) == _creator || address(source) == _curator);
         (uint256 amount, uint256 refund) = source.determineAt(msg.sender, docId, getDateMillis());
         if ((amount + refund) > 0 && _token.balanceOf(address(this)) > (amount + refund)) {
-            _token.transfer(msg.sender, (amount + refund));
             if (refund == 0) {
                 _registry.updateWithdraw(docId, getDateMillis(), amount);
             } else {
-                _ballot.updateWithdraw(msg.sender, docId, getDateMillis(), amount);
+                _ballot.updateWithdraw(msg.sender, docId, getDateMillis(), getVestingMillis(), amount);
             }
+            _token.transfer(msg.sender, (amount + refund));
         }
     }
 
@@ -48,12 +48,12 @@ contract RewardPool is Ownable {
         require(address(_registry) != address(0));
         require(amount + refund > 0);
         require(_token.balanceOf(address(this)) > amount + refund);
-        _token.transfer(owner, amount + refund);
         if (refund == 0) {
             _registry.updateWithdraw(docId, dateMillis, amount);
         } else {
-            _ballot.updateWithdraw(owner, docId, dateMillis, amount);
+            _ballot.updateWithdraw(owner, docId, dateMillis, getVestingMillis(), amount);
         }
+        _token.transfer(owner, amount + refund);
     }
 
     function revoke() external onlyOwner() {
@@ -74,10 +74,10 @@ contract RewardPool is Ownable {
     }
 
     function getDailyRewardPool(uint256 percent, uint256 dt) external view returns (uint256) {
-        return uint256(((((_token.totalSupply() * 12 / 100) / 2) / (2 ** getOffsetYears(dt))) / 365) * percent / 100);
+        return uint256(((((_token.totalSupply() * 6 / 100)) / (2 ** getOffsetYears(dt))) / 365) * percent / 100);
     }
 
-    function getVestingMillis() external pure returns (uint256) {
+    function getVestingMillis() public pure returns (uint256) {
         return uint256(3 * getOneDayMillis());
     }
 
