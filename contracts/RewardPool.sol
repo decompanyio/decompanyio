@@ -78,7 +78,8 @@ contract RewardPool is Ownable {
     }
 
     function getVestingMillis() external pure returns (uint256) {
-        return uint256(3 * getOneDayMillis());
+        // vesting days for voting in milliseconds
+        return uint256(7 * getOneDayMillis());
     }
 
     function getDateMillis() public view returns (uint256) {

@@ -8,7 +8,6 @@ import "./DocumentRegistry.sol";
 contract Ballot is Ownable {
 
     event CreateVote(uint256 voteId, address addr, bytes32 docId, uint256 dateMillis, uint256 deposit);
-    event ClaimVote(uint256 voteId, uint256 amount);
     event Withdraw(address addr, bytes32 docId, uint256 claimedDate, uint256 amount);
 
     struct Vote {
