@@ -43,14 +43,14 @@
     "absolutePath": "/Users/centroine/Documents/iris/decompanyio/decompanyio/contracts/IAsset.sol",
     "exportedSymbols": {
       "IAsset": [
-        3620
+        3628
       ]
     },
-    "id": 3621,
+    "id": 3629,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3606,
+        "id": 3614,
         "literals": [
           "solidity",
           "0.5",
@@ -65,9 +65,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 3620,
+        "id": 3628,
         "linearizedBaseContracts": [
-          3620
+          3628
         ],
         "name": "IAsset",
         "nodeType": "ContractDefinition",
@@ -75,22 +75,22 @@
           {
             "body": null,
             "documentation": null,
-            "id": 3619,
+            "id": 3627,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "determineAt",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3613,
+              "id": 3621,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3608,
+                  "id": 3616,
                   "name": "addr",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "69:12:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -99,7 +99,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3607,
+                    "id": 3615,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "69:7:6",
@@ -114,10 +114,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 3610,
+                  "id": 3618,
                   "name": "docId",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "83:13:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -126,7 +126,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 3609,
+                    "id": 3617,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "83:7:6",
@@ -140,10 +140,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 3612,
+                  "id": 3620,
                   "name": "dateMillis",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "98:18:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -152,7 +152,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3611,
+                    "id": 3619,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "98:7:6",
@@ -168,15 +168,15 @@
               "src": "68:49:6"
             },
             "returnParameters": {
-              "id": 3618,
+              "id": 3626,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3615,
+                  "id": 3623,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "141:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -185,7 +185,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3614,
+                    "id": 3622,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "141:7:6",
@@ -199,10 +199,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 3617,
+                  "id": 3625,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "150:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -211,7 +211,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3616,
+                    "id": 3624,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "150:7:6",
@@ -226,14 +226,14 @@
               ],
               "src": "140:18:6"
             },
-            "scope": 3620,
+            "scope": 3628,
             "src": "48:111:6",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 3621,
+        "scope": 3629,
         "src": "25:136:6"
       }
     ],
@@ -243,14 +243,14 @@
     "absolutePath": "/Users/centroine/Documents/iris/decompanyio/decompanyio/contracts/IAsset.sol",
     "exportedSymbols": {
       "IAsset": [
-        3620
+        3628
       ]
     },
-    "id": 3621,
+    "id": 3629,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3606,
+        "id": 3614,
         "literals": [
           "solidity",
           "0.5",
@@ -265,9 +265,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 3620,
+        "id": 3628,
         "linearizedBaseContracts": [
-          3620
+          3628
         ],
         "name": "IAsset",
         "nodeType": "ContractDefinition",
@@ -275,22 +275,22 @@
           {
             "body": null,
             "documentation": null,
-            "id": 3619,
+            "id": 3627,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "determineAt",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3613,
+              "id": 3621,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3608,
+                  "id": 3616,
                   "name": "addr",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "69:12:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -299,7 +299,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3607,
+                    "id": 3615,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "69:7:6",
@@ -314,10 +314,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 3610,
+                  "id": 3618,
                   "name": "docId",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "83:13:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -326,7 +326,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 3609,
+                    "id": 3617,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "83:7:6",
@@ -340,10 +340,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 3612,
+                  "id": 3620,
                   "name": "dateMillis",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "98:18:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -352,7 +352,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3611,
+                    "id": 3619,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "98:7:6",
@@ -368,15 +368,15 @@
               "src": "68:49:6"
             },
             "returnParameters": {
-              "id": 3618,
+              "id": 3626,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3615,
+                  "id": 3623,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "141:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -385,7 +385,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3614,
+                    "id": 3622,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "141:7:6",
@@ -399,10 +399,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 3617,
+                  "id": 3625,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3619,
+                  "scope": 3627,
                   "src": "150:7:6",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -411,7 +411,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 3616,
+                    "id": 3624,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "150:7:6",
@@ -426,14 +426,14 @@
               ],
               "src": "140:18:6"
             },
-            "scope": 3620,
+            "scope": 3628,
             "src": "48:111:6",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 3621,
+        "scope": 3629,
         "src": "25:136:6"
       }
     ],
@@ -445,7 +445,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-05-27T06:19:01.243Z",
+  "updatedAt": "2019-06-18T04:40:18.663Z",
   "devdoc": {
     "methods": {}
   },

@@ -232,7 +232,7 @@
         "id": 870,
         "nodeType": "ImportDirective",
         "scope": 1062,
-        "sourceUnit": 2709,
+        "sourceUnit": 2711,
         "src": "24:20:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -243,7 +243,7 @@
         "id": 871,
         "nodeType": "ImportDirective",
         "scope": 1062,
-        "sourceUnit": 4595,
+        "sourceUnit": 4603,
         "src": "45:63:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -257,10 +257,10 @@
               "id": 872,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4594,
+              "referencedDeclaration": 4602,
               "src": "133:7:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$4594",
+                "typeIdentifier": "t_contract$_Ownable_$4602",
                 "typeString": "contract Ownable"
               }
             },
@@ -270,7 +270,7 @@
           }
         ],
         "contractDependencies": [
-          4594
+          4602
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -278,7 +278,7 @@
         "id": 1061,
         "linearizedBaseContracts": [
           1061,
-          4594
+          4602
         ],
         "name": "BountyOne",
         "nodeType": "ContractDefinition",
@@ -433,7 +433,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_Deck_$2708",
+              "typeIdentifier": "t_contract$_Deck_$2710",
               "typeString": "contract Deck"
             },
             "typeName": {
@@ -441,10 +441,10 @@
               "id": 886,
               "name": "Deck",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2708,
+              "referencedDeclaration": 2710,
               "src": "267:4:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Deck_$2708",
+                "typeIdentifier": "t_contract$_Deck_$2710",
                 "typeString": "contract Deck"
               }
             },
@@ -693,7 +693,7 @@
                                 "referencedDeclaration": 887,
                                 "src": "528:5:1",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_Deck_$2708",
+                                  "typeIdentifier": "t_contract$_Deck_$2710",
                                   "typeString": "contract Deck"
                                 }
                               }
@@ -701,7 +701,7 @@
                             "expression": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_contract$_Deck_$2708",
+                                  "typeIdentifier": "t_contract$_Deck_$2710",
                                   "typeString": "contract Deck"
                                 }
                               ],
@@ -814,10 +814,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        4681,
-                        4682
+                        4689,
+                        4690
                       ],
-                      "referencedDeclaration": 4681,
+                      "referencedDeclaration": 4689,
                       "src": "488:7:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -977,10 +977,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        4681,
-                        4682
+                        4689,
+                        4690
                       ],
-                      "referencedDeclaration": 4681,
+                      "referencedDeclaration": 4689,
                       "src": "559:7:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -1022,7 +1022,7 @@
                       "referencedDeclaration": 887,
                       "src": "612:5:1",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Deck_$2708",
+                        "typeIdentifier": "t_contract$_Deck_$2710",
                         "typeString": "contract Deck"
                       }
                     },
@@ -1056,10 +1056,10 @@
                         "name": "Deck",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2708,
+                        "referencedDeclaration": 2710,
                         "src": "620:4:1",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Deck_$2708_$",
+                          "typeIdentifier": "t_type$_t_contract$_Deck_$2710_$",
                           "typeString": "type(contract Deck)"
                         }
                       },
@@ -1073,13 +1073,13 @@
                       "nodeType": "FunctionCall",
                       "src": "620:12:1",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Deck_$2708",
+                        "typeIdentifier": "t_contract$_Deck_$2710",
                         "typeString": "contract Deck"
                       }
                     },
                     "src": "612:20:1",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_Deck_$2708",
+                      "typeIdentifier": "t_contract$_Deck_$2710",
                       "typeString": "contract Deck"
                     }
                   },
@@ -1220,7 +1220,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 4528,
+                  "referencedDeclaration": 4536,
                   "src": "462:9:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -1363,7 +1363,7 @@
                                   "name": "msg",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 4678,
+                                  "referencedDeclaration": 4686,
                                   "src": "802:3:1",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_message",
@@ -1446,7 +1446,7 @@
                                       "name": "this",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 4711,
+                                      "referencedDeclaration": 4719,
                                       "src": "846:4:1",
                                       "typeDescriptions": {
                                         "typeIdentifier": "t_contract$_BountyOne_$1061",
@@ -1505,7 +1505,7 @@
                                   "referencedDeclaration": 887,
                                   "src": "822:5:1",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_Deck_$2708",
+                                    "typeIdentifier": "t_contract$_Deck_$2710",
                                     "typeString": "contract Deck"
                                   }
                                 },
@@ -1516,7 +1516,7 @@
                                 "lValueRequested": false,
                                 "memberName": "balanceOf",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 2275,
+                                "referencedDeclaration": 2277,
                                 "src": "822:15:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
@@ -1936,7 +1936,7 @@
                               "referencedDeclaration": 887,
                               "src": "1141:5:1",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_Deck_$2708",
+                                "typeIdentifier": "t_contract$_Deck_$2710",
                                 "typeString": "contract Deck"
                               }
                             }
@@ -1944,7 +1944,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_Deck_$2708",
+                                "typeIdentifier": "t_contract$_Deck_$2710",
                                 "typeString": "contract Deck"
                               }
                             ],
@@ -2051,10 +2051,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        4681,
-                        4682
+                        4689,
+                        4690
                       ],
-                      "referencedDeclaration": 4681,
+                      "referencedDeclaration": 4689,
                       "src": "1125:7:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2105,7 +2105,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1188:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -2237,10 +2237,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        4681,
-                        4682
+                        4689,
+                        4690
                       ],
-                      "referencedDeclaration": 4681,
+                      "referencedDeclaration": 4689,
                       "src": "1172:7:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2301,7 +2301,7 @@
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 4678,
+                          "referencedDeclaration": 4686,
                           "src": "1233:3:1",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
@@ -2400,7 +2400,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1269:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -2469,7 +2469,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1319:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -2555,7 +2555,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1359:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -2600,7 +2600,7 @@
                                   "name": "msg",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 4678,
+                                  "referencedDeclaration": 4686,
                                   "src": "1375:3:1",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_message",
@@ -2653,7 +2653,7 @@
                               "referencedDeclaration": 887,
                               "src": "1344:5:1",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_Deck_$2708",
+                                "typeIdentifier": "t_contract$_Deck_$2710",
                                 "typeString": "contract Deck"
                               }
                             },
@@ -2664,7 +2664,7 @@
                             "lValueRequested": false,
                             "memberName": "transfer",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 2310,
+                            "referencedDeclaration": 2312,
                             "src": "1344:14:1",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -2701,7 +2701,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1421:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -2746,7 +2746,7 @@
                                   "name": "msg",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 4678,
+                                  "referencedDeclaration": 4686,
                                   "src": "1437:3:1",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_message",
@@ -2882,7 +2882,7 @@
         "id": 870,
         "nodeType": "ImportDirective",
         "scope": 1062,
-        "sourceUnit": 2709,
+        "sourceUnit": 2711,
         "src": "24:20:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2893,7 +2893,7 @@
         "id": 871,
         "nodeType": "ImportDirective",
         "scope": 1062,
-        "sourceUnit": 4595,
+        "sourceUnit": 4603,
         "src": "45:63:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2907,10 +2907,10 @@
               "id": 872,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4594,
+              "referencedDeclaration": 4602,
               "src": "133:7:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$4594",
+                "typeIdentifier": "t_contract$_Ownable_$4602",
                 "typeString": "contract Ownable"
               }
             },
@@ -2920,7 +2920,7 @@
           }
         ],
         "contractDependencies": [
-          4594
+          4602
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -2928,7 +2928,7 @@
         "id": 1061,
         "linearizedBaseContracts": [
           1061,
-          4594
+          4602
         ],
         "name": "BountyOne",
         "nodeType": "ContractDefinition",
@@ -3083,7 +3083,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_Deck_$2708",
+              "typeIdentifier": "t_contract$_Deck_$2710",
               "typeString": "contract Deck"
             },
             "typeName": {
@@ -3091,10 +3091,10 @@
               "id": 886,
               "name": "Deck",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2708,
+              "referencedDeclaration": 2710,
               "src": "267:4:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Deck_$2708",
+                "typeIdentifier": "t_contract$_Deck_$2710",
                 "typeString": "contract Deck"
               }
             },
@@ -3343,7 +3343,7 @@
                                 "referencedDeclaration": 887,
                                 "src": "528:5:1",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_Deck_$2708",
+                                  "typeIdentifier": "t_contract$_Deck_$2710",
                                   "typeString": "contract Deck"
                                 }
                               }
@@ -3351,7 +3351,7 @@
                             "expression": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_contract$_Deck_$2708",
+                                  "typeIdentifier": "t_contract$_Deck_$2710",
                                   "typeString": "contract Deck"
                                 }
                               ],
@@ -3464,10 +3464,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        4681,
-                        4682
+                        4689,
+                        4690
                       ],
-                      "referencedDeclaration": 4681,
+                      "referencedDeclaration": 4689,
                       "src": "488:7:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -3627,10 +3627,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        4681,
-                        4682
+                        4689,
+                        4690
                       ],
-                      "referencedDeclaration": 4681,
+                      "referencedDeclaration": 4689,
                       "src": "559:7:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -3672,7 +3672,7 @@
                       "referencedDeclaration": 887,
                       "src": "612:5:1",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Deck_$2708",
+                        "typeIdentifier": "t_contract$_Deck_$2710",
                         "typeString": "contract Deck"
                       }
                     },
@@ -3706,10 +3706,10 @@
                         "name": "Deck",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2708,
+                        "referencedDeclaration": 2710,
                         "src": "620:4:1",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_Deck_$2708_$",
+                          "typeIdentifier": "t_type$_t_contract$_Deck_$2710_$",
                           "typeString": "type(contract Deck)"
                         }
                       },
@@ -3723,13 +3723,13 @@
                       "nodeType": "FunctionCall",
                       "src": "620:12:1",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_Deck_$2708",
+                        "typeIdentifier": "t_contract$_Deck_$2710",
                         "typeString": "contract Deck"
                       }
                     },
                     "src": "612:20:1",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_Deck_$2708",
+                      "typeIdentifier": "t_contract$_Deck_$2710",
                       "typeString": "contract Deck"
                     }
                   },
@@ -3870,7 +3870,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 4528,
+                  "referencedDeclaration": 4536,
                   "src": "462:9:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -4013,7 +4013,7 @@
                                   "name": "msg",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 4678,
+                                  "referencedDeclaration": 4686,
                                   "src": "802:3:1",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_message",
@@ -4096,7 +4096,7 @@
                                       "name": "this",
                                       "nodeType": "Identifier",
                                       "overloadedDeclarations": [],
-                                      "referencedDeclaration": 4711,
+                                      "referencedDeclaration": 4719,
                                       "src": "846:4:1",
                                       "typeDescriptions": {
                                         "typeIdentifier": "t_contract$_BountyOne_$1061",
@@ -4155,7 +4155,7 @@
                                   "referencedDeclaration": 887,
                                   "src": "822:5:1",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_Deck_$2708",
+                                    "typeIdentifier": "t_contract$_Deck_$2710",
                                     "typeString": "contract Deck"
                                   }
                                 },
@@ -4166,7 +4166,7 @@
                                 "lValueRequested": false,
                                 "memberName": "balanceOf",
                                 "nodeType": "MemberAccess",
-                                "referencedDeclaration": 2275,
+                                "referencedDeclaration": 2277,
                                 "src": "822:15:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
@@ -4586,7 +4586,7 @@
                               "referencedDeclaration": 887,
                               "src": "1141:5:1",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_Deck_$2708",
+                                "typeIdentifier": "t_contract$_Deck_$2710",
                                 "typeString": "contract Deck"
                               }
                             }
@@ -4594,7 +4594,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_Deck_$2708",
+                                "typeIdentifier": "t_contract$_Deck_$2710",
                                 "typeString": "contract Deck"
                               }
                             ],
@@ -4701,10 +4701,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        4681,
-                        4682
+                        4689,
+                        4690
                       ],
-                      "referencedDeclaration": 4681,
+                      "referencedDeclaration": 4689,
                       "src": "1125:7:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -4755,7 +4755,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1188:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -4887,10 +4887,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        4681,
-                        4682
+                        4689,
+                        4690
                       ],
-                      "referencedDeclaration": 4681,
+                      "referencedDeclaration": 4689,
                       "src": "1172:7:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -4951,7 +4951,7 @@
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 4678,
+                          "referencedDeclaration": 4686,
                           "src": "1233:3:1",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
@@ -5050,7 +5050,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1269:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -5119,7 +5119,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1319:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -5205,7 +5205,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1359:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -5250,7 +5250,7 @@
                                   "name": "msg",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 4678,
+                                  "referencedDeclaration": 4686,
                                   "src": "1375:3:1",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_message",
@@ -5303,7 +5303,7 @@
                               "referencedDeclaration": 887,
                               "src": "1344:5:1",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_Deck_$2708",
+                                "typeIdentifier": "t_contract$_Deck_$2710",
                                 "typeString": "contract Deck"
                               }
                             },
@@ -5314,7 +5314,7 @@
                             "lValueRequested": false,
                             "memberName": "transfer",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 2310,
+                            "referencedDeclaration": 2312,
                             "src": "1344:14:1",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
@@ -5351,7 +5351,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 4678,
+                                "referencedDeclaration": 4686,
                                 "src": "1421:3:1",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -5396,7 +5396,7 @@
                                   "name": "msg",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 4678,
+                                  "referencedDeclaration": 4686,
                                   "src": "1437:3:1",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_message",
@@ -5514,12 +5514,12 @@
     "4": {
       "events": {},
       "links": {},
-      "address": "0xe34ab1C1DE267Be4C13c06915A3A2F0bF8673C83",
-      "transactionHash": "0x7d4d1d4c084229050fdf4f6c8636d8bb82a8dd03d7319dea3c69207da451bed0"
+      "address": "0x814D4c999CcDbB2139d9dF995eCe031C60b9b7e2",
+      "transactionHash": "0x8064f22ee02d2d253a8022f163e564b9edd5c995c0aeb43236bd29b23f09a2fc"
     }
   },
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-05-27T06:24:47.103Z",
+  "updatedAt": "2019-06-18T04:46:07.550Z",
   "devdoc": {
     "methods": {
       "isOwner()": {
