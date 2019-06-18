@@ -75,6 +75,7 @@ contract DocumentRegistry is Ownable {
 
     function register(address owner, bytes32 docId) external {
         require(msg.sender == _creator);
+        require(_dateMillis > 0);
         require(_docByDocId[docId].createTime == 0); // register once
 
         // adding to document registry

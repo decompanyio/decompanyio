@@ -56,7 +56,9 @@ contract Creator is IAsset, Ownable {
         _rewardPool._registry().register(msg.sender, docId);
     }
 
-    function update(address o, bytes32 d, uint256 ct, uint256 lt, uint256 withdraw) public {
+    function update(address o, bytes32 d, uint256 ct, uint256 lt, uint256 withdraw) public
+        onlyOwner()
+    {
         _rewardPool._registry().update(o, d, ct, lt, withdraw);
     }
 
