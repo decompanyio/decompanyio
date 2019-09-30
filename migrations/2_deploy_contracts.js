@@ -1,6 +1,7 @@
-const Deck = artifacts.require("Deck");
-//const Utility = artifacts.require("Utility");
-//const ether = (n) => new web3.BigNumber(web3.toWei(n, 'ether'));
+const Registry = artifacts.require("Registry");
+const Ballot = artifacts.require("Ballot");
+const RewardPool = artifacts.require("RewardPool");
+const ERC20 = artifacts.require("ERC20");
 
 const duration = {
   seconds: function (val) { return val; },
@@ -18,10 +19,9 @@ module.exports = function(deployer, network, accounts) {
     //const openingTime = latestTime;
     //const closingTime = openingTime + duration.weeks(1);
 
-    const name = "Decompany Alpha Deck";
-    const symbol = "DECK";
-    const decimals = 18;
-    await deployer.deploy(Deck , name, symbol, decimals, {gas: 4700000});
-    //await deployer.deploy(Utility);
+    await deployer.deploy(Registry);
+    await deployer.deploy(Ballot);
+    await deployer.deploy(RewardPool);
+    await deployer.deploy(ERC20);
   });
 };
