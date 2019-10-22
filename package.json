@@ -32,7 +32,7 @@
     "json-rpc-random-id": "^1.0.1",
     "keccak": "^1.4.0",
     "keccakjs": "^0.2.3",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "mime-types": "^2.1.22",
     "minimalistic-assert": "^1.0.1",
     "openzeppelin-solidity": "^2.1.2",
