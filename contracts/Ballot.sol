@@ -1,191 +1,191 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.0;
 
-import "./IERC20.sol";
-import "./Registry.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./RewardPool.sol";
+import "./DocumentRegistry.sol";
 
-contract Ballot {
 
-    event AddVote(bytes32 did, uint256 dateMillis, address owner, uint256 delta, uint256 deposit);
-    event Refund(uint256 dateMillis, address target, uint256 amount);
-    event OwnershipTransferred(address old, address to);
+contract Ballot is Ownable {
+
+    event CreateVote(uint256 voteId, address addr, bytes32 docId, uint256 dateMillis, uint256 deposit);
+    event Withdraw(address addr, bytes32 docId, uint256 claimedDate, uint256 amount);
 
     struct Vote {
+        address addr;
+        bytes32 docId;
+        uint256 startDate;
         uint256 deposit;
-        uint256 modified;
     }
 
-    IERC20 public _token;
+    struct Status {
+        uint lastClaimedDate;
+        uint withdraw;
+        bool added;
+    }
 
-    address private _owner;
+    // voteId to the vote data
+    mapping (uint256 => Vote) internal _mapById;
+
+    // address to the curator's vote data
+    mapping (address => uint256[]) internal _mapByAddr;
+
+    // docId to the curator's vote data
+    mapping (bytes32 => uint256[]) internal _mapByDoc;
+
+    // for user document list
+    mapping (address => mapping (bytes32 => Status)) internal _mapUserDocAdded;
+    mapping (address => bytes32[]) internal _mapUserDoc;
+
+    // number of total votes
+    uint256 private _length;
+
+    // accessibility
     address private _foundation;
     address private _rewardPool;
+    address private _curator;
 
-    mapping(address => uint256) _deposit;
-    mapping(uint256 => Vote) private _totalMap;
-    mapping(uint256 => mapping(bytes32 => Vote)) private _docMap;
-    mapping(uint256 => mapping(bytes32 => mapping(address => Vote))) private _userMap;
+    DocumentRegistry public _registry;
 
-    Registry private _registry;
-
-    constructor() public {
-        _owner = msg.sender;
+    function init(address addr) external onlyOwner() {
+        require(address(addr) != address(0));
+        require(address(_registry) == address(0));
+        _registry = DocumentRegistry(addr);
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == _owner, "only owner is allowed");
-        _;
+    // adding a new vote
+    function create(uint256 i, address addr, bytes32 docId, uint256 deposit) external {
+        require(address(_registry) != address(0));
+        require(msg.sender == _curator);
+        add(i, addr, docId, deposit, _registry.getDateMillis());
     }
 
-    function transferOwnership(address addr) external onlyOwner() {
-        require(addr != address(0), "invalid address");
-        emit OwnershipTransferred(_owner, addr);
-        _owner = addr;
+    function insert(uint256 i, address addr, bytes32 docId, uint256 deposit, uint256 dateMillis) external {
+        require(address(_registry) != address(0));
+        require(msg.sender == _foundation);
+        add(i, addr, docId, deposit, dateMillis);
     }
 
-    function setRegistry(address addr) external onlyOwner() {
-        require(addr != address(0), "invalid address");
-        _registry = Registry(addr);
+    function updateWithdraw(address a, bytes32 d, uint256 claimedDate, uint256 withdraw) external {
+        require(msg.sender == _rewardPool);
+        require(_mapUserDocAdded[a][d].added);
+        _mapUserDocAdded[a][d].lastClaimedDate = claimedDate;
+        _mapUserDocAdded[a][d].withdraw += withdraw;
+        emit Withdraw(a, d, claimedDate, withdraw);
     }
 
-    function setFoundation(address foundation) external onlyOwner() {
-        require(foundation != address(0), "invalid address");
-        _foundation = foundation;
-    }
-
-    function setRewardPool(address rewardPool) external onlyOwner() {
-        require(rewardPool != address(0), "invalid address");
-        _rewardPool = rewardPool;
-    }
-
-    function setToken(address addr) external onlyOwner() {
-        require(addr != address(0), "invalid address");
-        _token = IERC20(addr);
-    }
-
-    function addVote(bytes32 key, uint256 deposit) external {
-        _add(key, msg.sender, deposit, _registry.getBlockTimeMillis());
-    }
-
-    function upsertVote(uint256 dt, bytes32 key, address voter, uint256 deposit) external {
-        require(msg.sender == _foundation, "only foundation can update votes");
-        _upsert(dt, key, voter, deposit, _registry.getBlockTimeMillis());
-    }
-
-    function updateVote(uint256 dt, bytes32 key, address voter, uint256 deposit, uint256 tm) external {
-        require(msg.sender == _foundation, "only foundation can update votes with time");
-        require(_userMap[dt][key][voter].modified > 0, "can't find the vote");
-
-        uint256 offset = 0;
-
-        if (_userMap[dt][key][voter].deposit > deposit) {
-            // decrease
-            offset = _userMap[dt][key][voter].deposit - deposit;
-
-            _userMap[dt][key][voter].deposit = deposit;
-            _userMap[dt][key][voter].modified = tm;
-
-            _docMap[dt][key].deposit -= offset;
-            _docMap[dt][key].modified = tm;
-
-            _totalMap[dt].deposit -= offset;
-            _totalMap[dt].modified = tm;
-
-        } else {
-            // increase
-            offset = deposit - _userMap[dt][key][voter].deposit;
-
-            _userMap[dt][key][voter].deposit = deposit;
-            _userMap[dt][key][voter].modified = tm;
-
-            _docMap[dt][key].deposit += offset;
-            _docMap[dt][key].modified = tm;
-
-            _totalMap[dt].deposit += offset;
-            _totalMap[dt].modified = tm;
+    function setRewardPool(address addr) external onlyOwner() {
+        if (addr != _rewardPool) {
+            _rewardPool = addr;
         }
     }
 
-    function getVoteByUser(uint256 dateMillis, bytes32 key, address voter) external view returns (uint256, uint256) {
-        return (_userMap[dateMillis][key][voter].deposit, _userMap[dateMillis][key][voter].modified);
-    }
-
-    function getVoteByDocument(uint256 dateMillis, bytes32 key) external view returns (uint256, uint256) {
-        return (_docMap[dateMillis][key].deposit, _docMap[dateMillis][key].modified);
-    }
-
-    function getTotalVote(uint256 dateMillis) external view returns (uint256, uint256) {
-        return (_totalMap[dateMillis].deposit, _totalMap[dateMillis].modified);
-    }
-
-    function getDeposit() external view returns (uint256) {
-        return _getDeposit(msg.sender);
-    }
-
-    function getDepositOfUser(address target) external view returns (uint256) {
-        require(msg.sender == _foundation, "only foundation is allowed");
-        return _getDeposit(target);
-    }
-
-    function _add(bytes32 key, address voter, uint256 deposit, uint256 tm) private {
-        _upsert(_registry.getLastDateMillis(), key, voter, deposit, tm);
-        // transfer voter's token to this contract
-        _deposit[voter] += deposit;
-        _token.transferFrom(voter, address(this), deposit);
-    }
-
-    function _upsert(uint256 dt, bytes32 key, address voter, uint256 deposit, uint256 tm) private {
-        require(key != bytes32(0), "invalid document id");
-        require(deposit > 999999999999999999, "The deposit must be bigger than 0");
-        require(address(_registry) != address(0), "The registry is not set");
-        require(address(_token) != address(0), "The token is not set");
-
-        emit AddVote(key, dt, voter, deposit, _userMap[dt][key][voter].deposit + deposit);
-
-        // write on the map for users
-        if (_userMap[dt][key][voter].modified == 0) {
-            Vote memory vote = Vote(deposit, tm);
-            _userMap[dt][key][voter] = vote;
-        } else {
-            assert(_userMap[dt][key][voter].deposit + deposit > _userMap[dt][key][voter].deposit);
-            _userMap[dt][key][voter].deposit += deposit;
-            _userMap[dt][key][voter].modified = tm;
-        }
-        // write on the map for documents
-        if (_docMap[dt][key].modified == 0) {
-            Vote memory vote = Vote(deposit, tm);
-            _docMap[dt][key] = vote;
-        } else {
-            assert(_docMap[dt][key].deposit + deposit > _docMap[dt][key].deposit);
-            _docMap[dt][key].deposit += deposit;
-            _docMap[dt][key].modified = tm;
-        }
-        // write on the map for day
-        if (_totalMap[dt].modified == 0) {
-            Vote memory vote = Vote(deposit, tm);
-            _totalMap[dt] = vote;
-        } else {
-            assert(_totalMap[dt].deposit + deposit > _totalMap[dt].deposit);
-            _totalMap[dt].deposit += deposit;
-            _totalMap[dt].modified = tm;
+    function setCurator(address addr) external onlyOwner() {
+        if (addr != _curator) {
+            _curator = addr;
         }
     }
 
-    function refund(address target, uint256 amount) external {
-        require(target != address(0), "invalid address");
-        require(amount > 0, "amount must be bigger than 0");
-        require(msg.sender == _rewardPool, "only reward pool can call refund");
-        require(address(_registry) != address(0), "The registry is not set");
-        require(address(_token) != address(0), "The token is not set");
-        require(_token.balanceOf(address(this)) >= amount, "insufficient token");
-        require(_deposit[target] > 0, "nothing to refund");
-        require(_deposit[target] >= amount, "insufficient deposit to refund");
-
-        emit Refund(_registry.getBlockTimeMillis(), target, amount);
-        _deposit[target] -= amount;
-        _token.transfer(target, amount);
+    function setFoundation(address addr) external onlyOwner() {
+        if (addr != _foundation) {
+            _foundation = addr;
+        }
     }
 
-    function _getDeposit(address target) private view returns(uint256) {
-        return _deposit[target];
+    function getVote(uint256 i) external view returns (address, bytes32, uint256, uint256) {
+        return (_mapById[i].addr, _mapById[i].docId, _mapById[i].startDate, _mapById[i].deposit);
+    }
+
+    function getActiveVotes(bytes32 docId, uint dMillis, uint vMillis) external view returns (uint256) {
+        uint256 sum = 0;
+        for (uint i=0; i < _mapByDoc[docId].length; i++) {
+            if (isActive(_mapById[_mapByDoc[docId][i]], dMillis, vMillis)) {
+                sum += _mapById[_mapByDoc[docId][i]].deposit;
+            }
+        }
+        return sum;
+    }
+
+    function getUserActiveVotes(address a, bytes32 d, uint dMillis, uint vMillis) external view returns (uint256) {
+        uint256 sum = 0;
+        for (uint i=0; i < _mapByAddr[a].length; i++) {
+            if (sameDoc(_mapById[_mapByAddr[a][i]], d)
+            && isActive(_mapById[_mapByAddr[a][i]], dMillis, vMillis)) {
+                sum += _mapById[_mapByAddr[a][i]].deposit;
+            }
+        }
+        return sum;
+    }
+
+    function getUserClaimableVotes(address a, bytes32 d, uint dm, uint cm, uint vm) external view returns (uint256) {
+        uint256 sum = 0;
+        uint256 lm = _mapUserDocAdded[a][d].lastClaimedDate;
+        for (uint i=0; i < _mapByAddr[a].length; i++) {
+            if (sameDoc(_mapById[_mapByAddr[a][i]], d)
+            && isActive(_mapById[_mapByAddr[a][i]], dm, vm)
+            && isClaimable(_mapById[_mapByAddr[a][i]], lm, cm, vm)) {
+                sum += _mapById[_mapByAddr[a][i]].deposit;
+            }
+        }
+        return sum;
+    }
+
+    function getUserRefundableDeposit(address a, bytes32 d, uint dm, uint cm, uint vm) external view returns (uint256) {
+        uint256 sum = 0;
+        uint256 lm = _mapUserDocAdded[a][d].lastClaimedDate;
+        for (uint i=0; i < _mapByAddr[a].length; i++) {
+            if (sameDoc(_mapById[_mapByAddr[a][i]], d)
+            && isRefundable(_mapById[_mapByAddr[a][i]], dm, vm)
+            && isClaimable(_mapById[_mapByAddr[a][i]], lm, cm, vm)) {
+                sum += _mapById[_mapByAddr[a][i]].deposit;
+            }
+        }
+        return sum;
+    }
+
+    function getUserDocuments(address a) external view returns (bytes32[] memory) {
+        return _mapUserDoc[a];
+    }
+
+    function count() external view returns (uint256) {
+        return uint256(_length);
+    }
+
+    function next() external view returns (uint256) {
+        return uint256(_length + 1);
+    }
+
+    // adding a new vote
+    function add(uint256 i, address a, bytes32 d, uint256 deposit, uint256 dm) private {
+        require(i == _length + 1);
+
+        Vote memory vote = Vote(a, d, dm, deposit);
+        _mapById[i] = vote;
+        _mapByAddr[a].push(i);
+        _mapByDoc[d].push(i);
+        _length++;
+
+        if (_mapUserDocAdded[a][d].added == false) {
+            _mapUserDoc[a].push(d);
+            _mapUserDocAdded[a][d].added = true;
+        }
+
+        emit CreateVote(i, a, d, dm, deposit);
+    }
+
+    function sameDoc(Vote storage vote, bytes32 d) private view returns (bool) {
+        return (d == vote.docId);
+    }
+
+    function isActive(Vote storage vote, uint dm, uint vm) private view returns (bool) {
+        return (vote.startDate <= dm) && (dm < vote.startDate + vm);
+    }
+
+    function isClaimable(Vote storage vote, uint lm, uint cm, uint vm) private view returns (bool) {
+        lm = lm == 0 ? vm : lm;
+        return (lm <= vote.startDate + vm) && (vote.startDate + vm < cm);
+    }
+
+    function isRefundable(Vote storage vote, uint dm, uint vm) private view returns (bool) {
+        return (dm == vote.startDate + vm);
     }
 }

@@ -1,5 +1,7 @@
-const Migrations = artifacts.require("Migrations");
+var Migrations = artifacts.require("./Migrations.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(Migrations);
+  deployer.then(async() => {
+    await deployer.deploy(Migrations, {gas: 4700000});
+  });
 };
