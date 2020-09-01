@@ -7,14 +7,17 @@ contract("Registry", accounts => {
     const DOC3 = web3.utils.fromAscii("10000000000000000000000000000003");  // accounts[1]
     const DOC4 = web3.utils.fromAscii("10000000000000000000000000000004");  // accounts[2]
     const DOC5 = web3.utils.fromAscii("10000000000000000000000000000005");  // accounts[2]
+    const DOC6 = web3.utils.fromAscii("10000000000000000000000000000006");  // accounts[2]
 
     const HASH1 = web3.utils.fromAscii("20000000000000000000000000000001");  // accounts[1]
     const HASH2 = web3.utils.fromAscii("20000000000000000000000000000002");  // accounts[1]
     const HASH3 = web3.utils.fromAscii("20000000000000000000000000000003");  // accounts[1]
     const HASH4 = web3.utils.fromAscii("20000000000000000000000000000004");  // accounts[2]
     const HASH5 = web3.utils.fromAscii("20000000000000000000000000000005");  // accounts[2]
+    const HASH6 = web3.utils.fromAscii("20000000000000000000000000000006");  // accounts[2]
 
     const HASH31 = web3.utils.fromAscii("22000000000000000000000000000003");  // accounts[1]
+    const HASH32 = web3.utils.fromAscii("22000000000000000000000000000004");  // accounts[1]
 
     let _registry = undefined;
     let _dateMillis = undefined;
