@@ -7,7 +7,6 @@
 - Pre-sale support (with discount?)
 
 
-
 # Smart Contracts
 - Deck.sol: EIP20 Token. mintable
 - DocumentReg.sol: the document registry. reward pool. stores daily page view for each document
