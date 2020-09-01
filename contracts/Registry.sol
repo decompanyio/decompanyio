@@ -121,4 +121,3 @@ contract Registry {
         return uint(block.timestamp * 1000);
     }
 }
-
