@@ -45,7 +45,7 @@
     "solc": "^0.5.4",
     "strip-hex-prefix": "^1.0.0",
     "swarm-js": "^0.1.39",
-    "tar": "^4.4.8",
+    "tar": "^4.4.15",
     "truffle": "5.0.37",
     "truffle-flattener": "^1.4.2",
     "truffle-hdwallet-provider": "^1.0.17",
