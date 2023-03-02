@@ -46,7 +46,7 @@
     "strip-hex-prefix": "^1.0.0",
     "swarm-js": "^0.1.39",
     "tar": "^4.4.8",
-    "truffle": "5.0.37",
+    "truffle": "5.7.8",
     "truffle-flattener": "^1.4.2",
     "truffle-hdwallet-provider": "^1.0.17",
     "uuid": "^3.3.2",
